@@ -6,3 +6,6 @@ coverage/
 public/apos-frontend/
 data/
 .DS_Store
+apos-build/
+test-results/
+playwright-report/

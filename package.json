@@ -1,0 +1,32 @@
+{
+  "name": "church-system",
+  "version": "0.1.0",
+  "private": true,
+  "description": "An open-source church website and members area on ApostropheCMS 4.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "start": "node app.js",
+    "dev": "NODE_ENV=development node app.js",
+    "lint": "eslint .",
+    "test:unit": "node --test \"test/**/*.test.js\"",
+    "test:packages": "node scripts/test-packages.js",
+    "test:e2e": "playwright test",
+    "test": "npm run lint && npm run test:unit && npm run test:packages && npm run test:e2e"
+  },
+  "dependencies": {
+    "apostrophe": "~4.34.1"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.65.0",
+    "eslint": "^9.39.5",
+    "eslint-config-apostrophe": "^6.1.0",
+    "globals": "^17.14.0"
+  }
+}

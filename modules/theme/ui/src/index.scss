@@ -1,0 +1,60 @@
+// The one line that picks a church's look. Everything generic below uses only
+// the --church-* tokens the chosen theme defines.
+@use '../../../../sites/la-grange/theme/theme';
+
+body {
+  margin: 0;
+  color: var(--church-ink);
+  background: var(--church-paper);
+  font: var(--church-font-size) / 1.5 system-ui, sans-serif;
+}
+
+a { color: var(--church-accent); }
+
+.skip-link {
+  position: absolute;
+  left: -999px;
+}
+
+.skip-link:focus {
+  left: 0.5rem;
+  top: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--church-paper);
+}
+
+.demo-banner {
+  margin: 0;
+  padding: 0.5rem 1rem;
+  text-align: center;
+  font-weight: 600;
+  color: var(--church-banner-ink);
+  background: var(--church-banner-bg);
+}
+
+.church-header,
+.church-main,
+.church-footer {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.church-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.church-signin {
+  display: inline-block;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.5rem 1rem;
+  box-sizing: border-box;
+  color: var(--church-paper);
+  background: var(--church-accent);
+  text-decoration: none;
+}

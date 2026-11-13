@@ -1,0 +1,26 @@
+{% extends data.outerLayout %}
+
+{% block main %}
+  {% set site = apos.modules['church-site'].site() %}
+  <header class="church-header">
+    <p class="church-name"><strong>{{ site.name }}</strong></p>
+    <a class="church-signin" href="/login">{{ __t('church:memberSignIn') }}</a>
+  </header>
+  <main id="main" class="church-main">
+    <h1>{{ __t('church:welcome') }}</h1>
+    <p>{{ __t('church:homeIntro') }}</p>
+    <h2>{{ __t('church:serviceTimes') }}</h2>
+    <ul>
+      {% for item in site.serviceTimes %}
+        <li>{{ item.label }}: {{ item.time }}</li>
+      {% endfor %}
+    </ul>
+  </main>
+  <footer class="church-footer">
+    <h2>{{ __t('church:contact') }}</h2>
+    <p>{{ site.city }}</p>
+    <p>{{ __t('church:email') }}: <a href="mailto:{{ site.contact.email }}">{{ site.contact.email }}</a></p>
+    <p>{{ __t('church:phone') }}: <a href="tel:{{ site.contact.phone }}">{{ site.contact.phone }}</a></p>
+    <p><a href="{{ site.giveUrl }}">{{ __t('church:give') }}</a></p>
+  </footer>
+{% endblock %}

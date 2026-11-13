@@ -1,0 +1,12 @@
+{% extends "outerLayoutBase.html" %}
+
+{% block title %}{% set site = apos.modules['church-site'].site() %}{{ data.piece.title or data.page.title or site.name }}{% endblock %}
+
+{% block extraHead %}
+  <meta name="robots" content="noindex, nofollow">
+{% endblock %}
+
+{% block beforeMain %}
+  <a class="skip-link" href="#main">{{ __t('church:skipToContent') }}</a>
+  <p class="demo-banner" data-demo-banner>{{ __t('church:demoBanner') }}</p>
+{% endblock %}
