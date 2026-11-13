@@ -19,9 +19,20 @@ jobs:
           node-version: 22
       - name: Install and test
         run: |
+          # The root package (once it exists) runs everything, workspaces included.
+          # Until then, each package under packages/ is installed and tested on its own.
           if [ -f package.json ]; then
             npm ci
             npm test
           else
-            echo "No package.json yet; nothing to test."
+            found=0
+            for d in packages/*/; do
+              if [ -f "$d/package.json" ]; then
+                found=1
+                echo "::group::$d"
+                (cd "$d" && npm ci && npm test)
+                echo "::endgroup::"
+              fi
+            done
+            [ "$found" = 1 ] || echo "No package.json yet; nothing to test."
           fi
