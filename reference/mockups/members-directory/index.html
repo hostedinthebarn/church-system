@@ -184,6 +184,8 @@
 (function () {
   const TODAY = new Date('2026-11-11T12:00:00');
   const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  // All markup goes in through setHtml: every dynamic value is esc()'d first, and the parsed nodes are swapped in.
+  const setHtml = (el, html) => el.replaceChildren(...new DOMParser().parseFromString(html, 'text/html').body.childNodes);
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
   // ---------- made-up data (the edge cases from LGC-12 are deliberate) ----------
@@ -377,7 +379,7 @@
   }
   function who() {
     const m = ME();
-    document.getElementById('who').innerHTML = `<span class="name">Signed in as <b>${esc(m.name)}</b>${isOffice() ? ' <span class="tag office">Office admin</span>' : ''}</span><span class="avatar" aria-hidden="true">${m.initials}</span>`;
+    setHtml(document.getElementById('who'), `<span class="name">Signed in as <b>${esc(m.name)}</b>${isOffice() ? ' <span class="tag office">Office admin</span>' : ''}</span><span class="avatar" aria-hidden="true">${esc(m.initials)}</span>`);
   }
   function band(title, sub, crumb) {
     return `<div class="band"><div class="wrap">${crumb ? `<p class="crumb">${crumb}</p>` : ''}<h1 id="page-h" tabindex="-1">${title}</h1>${sub ? `<p>${sub}</p>` : ''}</div></div>`;
@@ -441,7 +443,7 @@
         <div class="two"><section class="card"><h2>Birthdays in ${MONTHS[month - 1]}</h2><ul class="plain">${bdays.map((p) => `<li style="display:flex;justify-content:space-between;gap:8px"><a href="#/h/${p.hh}">${esc(fullName(p))}</a><span>${md(p.dob)}</span></li>`).join('')}</ul></section>
         <section class="card"><h2>Recently updated</h2><ul class="plain">${recent.map((h) => `<li><a href="#/h/${h.id}">${esc(hhName(h))}</a><br><span class="small muted">${full(h.updated.at)}</span></li>`).join('')}</ul></section></div></div>`;
     }
-    app.innerHTML = band('Church directory', `${isOffice() ? 'Office view: you see everyone, including hidden details.' : 'Our church family. Only signed-in members see this page.'} <span class="tag">Made-up data</span>`, '<a href="/3/">Home</a> › Directory') + `<main id="main">${body}</main>`;
+    setHtml(app, band('Church directory', `${isOffice() ? 'Office view: you see everyone, including hidden details.' : 'Our church family. Only signed-in members see this page.'} <span class="tag">Made-up data</span>`, '<a href="/3/">Home</a> › Directory') + `<main id="main">${body}</main>`);
     const q = document.getElementById('q');
     if (q) q.addEventListener('input', (e) => { query = e.target.value; const pos = e.target.selectionStart; render(); const n = document.getElementById('q'); n.focus(); n.setSelectionRange(pos, pos); });
     app.querySelectorAll('[data-show]').forEach((c) => c.addEventListener('change', () => { officeShow[c.dataset.show] = c.checked; render(); }));
@@ -473,18 +475,18 @@
 
   function viewHousehold(id) {
     const h = H(id);
-    if (!h || !(isOffice() || listedForMembers(h) || (P(ME().person) || {}).hh === id)) { app.innerHTML = band('Not found', '', '<a href="#/">Directory</a>') + '<main id="main" class="wrap"><p>That household isn\'t in the directory.</p></main>'; return; }
+    if (!h || !(isOffice() || listedForMembers(h) || (P(ME().person) || {}).hh === id)) { setHtml(app, band('Not found', '', '<a href="#/">Directory</a>') + '<main id="main" class="wrap"><p>That household isn\'t in the directory.</p></main>'); return; }
     const ps = visibleMembers(id).sort((a, b) => isMinor(a) - isMinor(b) || a.dob.localeCompare(b.dob));
     const mine = (P(ME().person) || {}).hh === id;
     const addr = addrFor(h);
     const hidden = h.hideAddress;
-    const edit = canEdit(h) ? `<a class="btn" href="#/edit/${id}">${mine ? 'Edit my household' : 'Edit this household'}</a>` : (!adults(id).length && isOffice() === false ? '' : '');
+    const edit = canEdit(h) ? `<a class="btn" href="#/edit/${esc(id)}">${mine ? 'Edit my household' : 'Edit this household'}</a>` : (!adults(id).length && isOffice() === false ? '' : '');
     let html = band(esc(hhName(h)) + badges(h), mine ? 'Your household. This is what other members see, apart from the notes in orange.' : '', `<a href="#/">Directory</a> › Household`) +
-      `<main id="main"><div class="wrap">${flash ? `<div class="flash" role="status">${flash}</div>` : ''}<div class="grid"><div>
+      `<main id="main"><div class="wrap">${flash ? `<div class="flash" role="status">${esc(flash)}</div>` : ''}<div class="grid"><div>
       <section class="card" aria-labelledby="ppl-h"><h2 id="ppl-h">People</h2><ul class="plain">${ps.map((p) => personRow(p)).join('')}</ul></section></div><div>
       <section class="card" aria-labelledby="home-h"><h2 id="home-h">Home</h2><dl class="facts">
         <dt>Address</dt><dd>${addr ? `<a href="https://maps.google.com/?q=${encodeURIComponent(addr)}">${esc(addr)}</a>` : 'Not shared'}${hidden && isOffice() ? ' <span class="hidden-note">(hidden from members)</span>' : ''}${hidden && mine && !isOffice() ? ' <span class="hidden-note">(you\'ve hidden this from members)</span>' : ''}</dd>
-        ${h.home ? `<dt>Home phone</dt><dd><a href="tel:${h.home.replace(/\D/g, '')}">${esc(h.home)}</a></dd>` : ''}</dl>
+        ${h.home ? `<dt>Home phone</dt><dd><a href="tel:${esc(h.home.replace(/\D/g, ''))}">${esc(h.home)}</a></dd>` : ''}</dl>
         ${h.optOut ? `<p class="hidden-note">This household has opted out of the directory and the PDF.</p>` : ''}
         <div class="row" style="margin-top:14px">${edit}</div>
         ${mine || isOffice() ? `<p class="stamp">Last updated by ${esc(h.updated.by)} on ${full(h.updated.at)}</p>` : ''}
@@ -494,7 +496,7 @@
       </div></div>
       <details class="proto no-print"><summary>Prototype: the raw records behind this page</summary><pre>${esc(JSON.stringify({ household: h, people: members(id), relationships: rels.filter((r) => members(id).some((p) => p.id === r.a || p.id === r.b)) }, null, 2))}</pre></details>
       </div></main>`;
-    app.innerHTML = html;
+    setHtml(app, html);
     flash = '';
     const f = document.getElementById('note-form');
     if (f) f.addEventListener('submit', (e) => {
@@ -530,11 +532,11 @@
 
   function viewEdit(id) {
     const h = H(id);
-    if (!h || !canEdit(h)) { app.innerHTML = band('Can\'t edit this household', '', '<a href="#/">Directory</a>') + `<main id="main" class="wrap"><p>${h && !adults(id).length ? 'A household with no adults is edited by the office only.' : 'You can edit your own household. Ask the office to change anyone else\'s.'}</p><p><a href="#/h/${id}">Back</a></p></main>`; return; }
+    if (!h || !canEdit(h)) { setHtml(app, band('Can\'t edit this household', '', '<a href="#/">Directory</a>') + `<main id="main" class="wrap"><p>${h && !adults(id).length ? 'A household with no adults is edited by the office only.' : 'You can edit your own household. Ask the office to change anyone else\'s.'}</p><p><a href="#/h/${esc(id)}">Back</a></p></main>`); return; }
     const ps = (isOffice() ? members(id) : members(id).filter(active)).sort((a, b) => isMinor(a) - isMinor(b) || a.dob.localeCompare(b.dob));
     const inp = (pid, f, label, type, val, hint) => `<div class="field"><label for="${pid}-${f}">${label}</label>${hint ? `<div class="hint" id="${pid}-${f}-h">${hint}</div>` : ''}<input type="${type}" id="${pid}-${f}" name="${pid}.${f}" value="${esc(val)}" ${hint ? `aria-describedby="${pid}-${f}-h"` : ''}></div>`;
     const hideBox = (p, f, label) => `<label class="check"><input type="checkbox" name="${p.id}.hide.${f}" ${p.hide[f] ? 'checked' : ''}> Hide my ${label} from other members</label>`;
-    app.innerHTML = band(`Edit ${esc(hhName(h))}`, isOffice() ? 'Office: you can change anything. Every change goes into the change history.' : 'Changes show in the directory straight away. The office can see what changed.', `<a href="#/">Directory</a> › <a href="#/h/${id}">Household</a> › Edit`) +
+    setHtml(app, band(`Edit ${esc(hhName(h))}`, isOffice() ? 'Office: you can change anything. Every change goes into the change history.' : 'Changes show in the directory straight away. The office can see what changed.', `<a href="#/">Directory</a> › <a href="#/h/${id}">Household</a> › Edit`) +
       `<main id="main"><form class="wrap" id="edit" style="max-width:820px">
       <fieldset><legend>Home</legend>
         ${inp('hh', 'address', 'Address', 'text', h.address)}
@@ -556,7 +558,7 @@
         </fieldset>`;
       }).join('')}
       <p class="small muted">${isOffice() ? '' : 'To add or remove someone, or move them to another household, ask the office.'}</p>
-      <div class="row"><button class="btn" type="submit">Save changes</button><a class="btn ghost" href="#/h/${id}">Cancel</a></div></form></main>`;
+      <div class="row"><button class="btn" type="submit">Save changes</button><a class="btn ghost" href="#/h/${esc(id)}">Cancel</a></div></form></main>`);
     document.getElementById('edit').addEventListener('submit', (e) => {
       e.preventDefault();
       const fd = new FormData(e.target);
@@ -594,12 +596,12 @@
         ${sp ? `<div>Married ${md(sp.anniversary)}</div>` : ''}
         ${kids.length ? `<div class="kid">Children: ${kids.map((k) => `${esc(display(k))} (${md(k.dob)})`).join(', ')}</div>` : ''}</div>`;
     };
-    app.innerHTML = band('Directory PDF', 'What the Download PDF button produces: letter size, two columns, households A–Z. Use Print below, or your browser\'s Save as PDF.', '<a href="#/">Directory</a> › PDF') +
+    setHtml(app, band('Directory PDF', 'What the Download PDF button produces: letter size, two columns, households A–Z. Use Print below, or your browser\'s Save as PDF.', '<a href="#/">Directory</a> › PDF') +
       `<main id="main"><div class="wrap"><div class="row no-print" style="margin-bottom:16px"><button class="btn" type="button" id="print">Print / save as PDF</button><a class="btn ghost" href="#/">Back to the directory</a></div>
       <p class="small muted no-print">Left out on purpose: households that opted out, hidden fields, visitors, inactive people, and every child's phone and email. ${isOffice() ? 'The office gets the same PDF as members.' : ''}</p>
       <article class="sheet" aria-label="Directory PDF preview"><header><b>La Grange Church of Christ: Member directory</b><span>November 2026</span></header>
       <div class="cols">${hs.map(entry).join('')}</div>
-      <div class="foot"><span>For members of La Grange Church of Christ only. Please don't share it or post it online.</span><span>Changes? Update your household in the members area, or call the office.</span></div></article></div></main>`;
+      <div class="foot"><span>For members of La Grange Church of Christ only. Please don't share it or post it online.</span><span>Changes? Update your household in the members area, or call the office.</span></div></article></div></main>`);
     document.getElementById('print').addEventListener('click', () => window.print());
   }
 
@@ -621,8 +623,8 @@
     let b = document.querySelector('.demo-bar');
     if (!b) { b = document.createElement('nav'); b.className = 'demo-bar'; b.setAttribute('aria-label', 'Prototype controls'); document.body.appendChild(b); }
     const keys = Object.keys(VARIANTS);
-    b.innerHTML = `<button type="button" data-v="-1" aria-label="Previous layout">‹</button><span style="padding:0 6px;color:#fff;white-space:nowrap">${variant}<span class="label">&nbsp;(${VARIANTS[variant]})</span></span><button type="button" data-v="1" aria-label="Next layout">›</button>
-      <span class="sep" aria-hidden="true"></span><button type="button" id="role" aria-pressed="${isOffice()}">${isOffice() ? 'Office' : 'Member'}<span class="label">&nbsp;view</span></button>`;
+    setHtml(b, `<button type="button" data-v="-1" aria-label="Previous layout">‹</button><span style="padding:0 6px;color:#fff;white-space:nowrap">${esc(variant)}<span class="label">&nbsp;(${esc(VARIANTS[variant])})</span></span><button type="button" data-v="1" aria-label="Next layout">›</button>
+      <span class="sep" aria-hidden="true"></span><button type="button" id="role" aria-pressed="${isOffice()}">${isOffice() ? 'Office' : 'Member'}<span class="label">&nbsp;view</span></button>`);
     b.querySelectorAll('[data-v]').forEach((x) => x.addEventListener('click', () => cycle(Number(x.dataset.v))));
     b.querySelector('#role').addEventListener('click', () => { role = isOffice() ? 'member' : 'office'; setURL(); render(); });
     function cycle(d) { const i = (keys.indexOf(variant) + d + keys.length) % keys.length; variant = keys[i]; setURL(); if (location.hash && location.hash !== '#/') location.hash = '#/'; else render(); }
