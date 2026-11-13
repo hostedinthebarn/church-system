@@ -39,6 +39,7 @@ require('apostrophe')({
     },
     'church-site': { options: { site } },
     theme: {},
+    'church-signin': {},
     'church-audit': {},
     person: {},
     household: {},
