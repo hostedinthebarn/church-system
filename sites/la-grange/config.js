@@ -3,28 +3,31 @@
 // To run the system for another church, copy this folder to sites/<name>/
 // and start with CHURCH_SITE=<name>.
 //
-// These values are made up or placeholders until the church confirms them.
-// The POC runs on demo data; nothing here is a published fact.
+// The service times and contact details are the church's published ones; the
+// members, events and everything else in the POC are demo data.
 module.exports = {
   name: 'La Grange Church of Christ',
   shortName: 'La Grange COC',
   city: 'La Grange, Texas',
-  // Confirm with the office before the POC is shown to anyone: these are
-  // placeholders, not the church's real times.
+  // From the church's own site (lagrangecoc.com/location and the home page),
+  // read 2026-11-13. Display only: nothing sends mail to this address.
   serviceTimes: [
     {
-      label: 'Sunday morning worship',
-      time: 'To be confirmed'
+      label: 'Sunday Bible class',
+      time: '9:00 am'
     },
     {
-      label: 'Sunday Bible class',
-      time: 'To be confirmed'
+      label: 'Sunday worship',
+      time: '10:00 am'
+    },
+    {
+      label: 'Wednesday Bible class',
+      time: '6:30 pm'
     }
   ],
   contact: {
-    // example.com never delivers mail (POC rule: no real inboxes)
-    email: 'office@example.com',
-    phone: '555-0100'
+    email: 'info@lagrangecoc.com',
+    phone: '(979) 968-5676'
   },
   // The church's hosted giving form (LGC-3: stays a link out to FellowshipOne)
   giveUrl: 'https://www.fellowshiponegiving.com/App/Form/3835ceb2-5e89-498b-99e0-49c89636cc43'

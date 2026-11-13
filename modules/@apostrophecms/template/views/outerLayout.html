@@ -8,5 +8,11 @@
 
 {% block beforeMain %}
   <a class="skip-link" href="#main">{{ __t('church:skipToContent') }}</a>
+{% endblock %}
+
+{# The banner sits here, not in beforeMain, because Apostrophe's login page
+   replaces beforeMain and the banner must show on every page. #}
+{% block mainAnchor %}
   <p class="demo-banner" data-demo-banner>{{ __t('church:demoBanner') }}</p>
+  {{ super() }}
 {% endblock %}

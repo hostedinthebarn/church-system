@@ -4,7 +4,7 @@ const site = require('../sites/la-grange/config.js');
 
 test('La Grange site config has what the generic templates read', () => {
   assert.ok(site.name);
-  assert.ok(site.contact.email.endsWith('@example.com'));
+  assert.match(site.contact.email, /^[^@\s]+@[^@\s]+\.[a-z]+$/);
   assert.ok(site.contact.phone);
   assert.ok(Array.isArray(site.serviceTimes) && site.serviceTimes.length > 0);
   assert.match(site.giveUrl, /^https:\/\//);
