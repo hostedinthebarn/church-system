@@ -1,0 +1,26 @@
+{% extends data.outerLayout %}
+
+{% block title %}{{ __t('church:outboxTitle') }}{% endblock %}
+
+{% block main %}
+  <main id="main" class="church-main">
+    <h1>{{ __t('church:outboxTitle') }}</h1>
+    <p>{{ __t('church:outboxIntro') }}</p>
+    <p>{{ __t('church:outboxAllowlist') }}: {{ data.allowlist | join(', ') }}</p>
+    {% if data.messages | length %}
+      <ol>
+        {% for message in data.messages %}
+          <li>
+            <p>{{ __t('church:outboxTo') }}: {{ message.to }}<br>
+            {{ __t('church:outboxSubject') }}: {{ message.subject }}<br>
+            <time datetime="{{ message.at }}">{{ message.at }}</time></p>
+            {% if message.link %}<p><a href="{{ message.link }}">{{ __t('church:outboxOpenLink') }}</a></p>{% endif %}
+            <pre>{{ message.text }}</pre>
+          </li>
+        {% endfor %}
+      </ol>
+    {% else %}
+      <p>{{ __t('church:outboxEmpty') }}</p>
+    {% endif %}
+  </main>
+{% endblock %}

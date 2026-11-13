@@ -1,0 +1,28 @@
+{% extends data.outerLayout %}
+
+{% block title %}{{ __t('church:signinTitle') }}{% endblock %}
+
+{% block main %}
+  <main id="main" class="church-main">
+    <h1>{{ __t('church:signinTitle') }}</h1>
+    {% if data.state == 'sent' %}
+      <p role="status">{{ __t('church:signinSent') }}</p>
+    {% else %}
+      {% if data.state == 'limited' %}
+        <p role="alert">{{ __t('church:signinLimited') }}</p>
+      {% elif data.state == 'invalid' %}
+        <p role="alert">{{ __t('church:signinInvalid') }}</p>
+      {% else %}
+        <p>{{ __t('church:signinIntro') }}</p>
+      {% endif %}
+      <form method="post" action="/sign-in">
+        <p>
+          <label for="signin-email">{{ __t('church:signinEmailLabel') }}</label><br>
+          <input id="signin-email" name="email" type="email" autocomplete="email" required>
+        </p>
+        <button type="submit">{{ __t('church:signinSubmit') }}</button>
+      </form>
+    {% endif %}
+    <p><a href="/">{{ __t('church:signinBackHome') }}</a></p>
+  </main>
+{% endblock %}

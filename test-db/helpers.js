@@ -3,7 +3,7 @@
 const path = require('node:path');
 const t = require('apostrophe/test-lib/util.js');
 
-async function start() {
+async function start(extra = {}) {
   return t.create({
     // Makes Apostrophe look for our modules/ folder at the repo root.
     root: {
@@ -17,7 +17,8 @@ async function start() {
       'person-relationship': {},
       group: {},
       'office-note': {},
-      'away-date': {}
+      'away-date': {},
+      ...extra
     }
   });
 }
