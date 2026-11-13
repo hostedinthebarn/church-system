@@ -38,6 +38,13 @@ require('apostrophe')({
       }
     },
     'church-site': { options: { site } },
-    theme: {}
+    theme: {},
+    'church-audit': {},
+    person: {},
+    household: {},
+    'person-relationship': {},
+    group: {},
+    'office-note': {},
+    'away-date': {}
   }
 });

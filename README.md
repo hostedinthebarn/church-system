@@ -26,6 +26,7 @@ Checks:
 ```sh
 npm test           # lint, unit tests, workspace packages, then the browser tests
 npm run test:unit  # fast: no database or browser needed
+npm run test:db    # record types and the audit trail, needs MongoDB at APOS_MONGODB_URI
 ```
 
 The browser tests (`npm run test:e2e`) start the app on port 3100 and need MongoDB plus Google Chrome. Without Chrome, run `npx playwright install chromium` and set `PW_CHANNEL=chromium`.
@@ -34,6 +35,7 @@ The browser tests (`npm run test:e2e`) start the app on port 3100 and need Mongo
 
 - `sites/la-grange/`: this church's details (`config.js`: name, service times, contact, Give link) and its theme tokens. Nothing in `modules/` names the church. To run another church, copy the folder to `sites/<name>/`, start with `CHURCH_SITE=<name>`, and point `modules/theme/ui/src/index.scss` at its theme.
 - `modules/church-site/`: generic behaviour and our interface text (`i18n/church/en.json`, `es.json`).
+- `modules/person`, `household`, `person-relationship`, `group`, `office-note`, `away-date`: the members-area record types (LGC-39). All are office-admin only for now. `modules/church-audit` writes every create, change and delete to its own `churchAudit` collection (office admins read it at `/api/v1/church-audit/entries`); `lib/rules.js` holds the data rules as plain functions.
 - `packages/*`: npm workspaces for the logic packages; `npm test` runs theirs too.
 - Spanish (`/es`) is configured but hidden: visitors get a 404, signed-in editors can reach it. All interface text goes through `__t('church:...')`, and `test/i18n.test.js` fails on any literal text in our templates.
 - The POC is noindexed everywhere (`X-Robots-Tag` and a meta tag) and every page carries a "Demo data" banner.
