@@ -1,0 +1,14 @@
+{
+  "name": "@church-system/roster-logic",
+  "version": "0.1.0",
+  "description": "Pure, database-free suggested rotation for a church servers roster.",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": "./src/index.js",
+  "license": "MIT",
+  "private": true,
+  "engines": { "node": ">=22.8" },
+  "scripts": {
+    "test": "node --test --experimental-test-coverage --test-coverage-include=src/**/*.js --test-coverage-lines=100 --test-coverage-branches=100 --test-coverage-functions=100 test/*.test.js"
+  }
+}
