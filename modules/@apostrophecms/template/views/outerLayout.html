@@ -1,0 +1,18 @@
+{% extends "outerLayoutBase.html" %}
+
+{% block title %}{% set site = apos.modules['church-site'].site() %}{{ data.piece.title or data.page.title or site.name }}{% endblock %}
+
+{% block extraHead %}
+  <meta name="robots" content="noindex, nofollow">
+{% endblock %}
+
+{% block beforeMain %}
+  <a class="skip-link" href="#main">{{ __t('church:skipToContent') }}</a>
+{% endblock %}
+
+{# The banner sits here, not in beforeMain, because Apostrophe's login page
+   replaces beforeMain and the banner must show on every page. #}
+{% block mainAnchor %}
+  <p class="demo-banner" data-demo-banner>{{ __t('church:demoBanner') }}</p>
+  {{ super() }}
+{% endblock %}
