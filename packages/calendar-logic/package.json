@@ -1,0 +1,13 @@
+{
+  "name": "@church-system/calendar-logic",
+  "version": "0.1.0",
+  "description": "Pure, database-free calendar rules for the church system: repeats, series edits, top-up, announce-from, bulletin window, Facebook action.",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "main": "src/index.js",
+  "engines": { "node": ">=22.8" },
+  "scripts": {
+    "test": "node --test --experimental-test-coverage --test-coverage-include='src/**' --test-coverage-lines=100 --test-coverage-branches=100 --test-coverage-functions=100 'test/*.test.js'"
+  }
+}
