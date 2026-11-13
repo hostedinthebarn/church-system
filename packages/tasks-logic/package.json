@@ -1,0 +1,15 @@
+{
+  "name": "@church-system/tasks-logic",
+  "version": "0.1.0",
+  "description": "Pure, database-free logic for the weekly tasks list: week, template, carry-over, due days, reminders, system items.",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": "./src/index.js",
+  "license": "MIT",
+  "private": true,
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "test": "c8 --check-coverage --lines=100 --branches=100 --functions=100 --statements=100 --include=src --reporter=text node --test \"test/*.test.js\""
+  },
+  "devDependencies": { "c8": "^10.1.3" }
+}
