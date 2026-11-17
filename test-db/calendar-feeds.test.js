@@ -170,7 +170,7 @@ test('event pages: Add to Google Calendar, cancelled and members-only handled', 
   assert.match(cancelledHtml, /Cancelled/);
   const linkHosts = [ ...cancelledHtml.matchAll(/href="([^"]+)"/g) ]
     .map(m => new URL(m[1].replace(/&amp;/g, '&'), 'http://local.test').hostname);
-  assert.ok(!linkHosts.includes('calendar.google.com'), 'no Google link on a cancelled event');
+  assert.ok(!linkHosts.some(host => host === 'calendar.google.com'), 'no Google link on a cancelled event');
 
   // The feed now links each event to its page.
   const feed = await apos.http.get('/calendar/public.ics');
