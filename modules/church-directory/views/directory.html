@@ -1,0 +1,107 @@
+{% extends data.outerLayout %}
+
+{% block title %}{{ __t('church:directoryTitle') }}{% endblock %}
+
+{% block main %}
+  {% include "_nav.html" %}
+  <main id="main" class="church-main directory directory-{{ data.layout }}">
+    <h1>{{ __t('church:directoryTitle') }}</h1>
+
+    <p class="actions">
+      <a class="btn" href="/members/directory.pdf" download>{{ __t('church:downloadPdf') }}</a>
+      {% if data.nav.householdId %}
+        <a class="btn ghost" href="/members/household/{{ data.nav.householdId }}">{{ __t('church:myHousehold') }}</a>
+      {% endif %}
+    </p>
+
+    <form class="search" role="search" method="get" action="/members/directory">
+      <label for="q">{{ __t('church:searchLabel') }}</label>
+      <div class="search-row">
+        <input id="q" type="search" name="q" value="{{ data.query }}" autocomplete="off" aria-describedby="q-help">
+        <button type="submit" class="btn">{{ __t('church:search') }}</button>
+      </div>
+      <p id="q-help" class="muted">{{ __t('church:searchHelp') }}</p>
+      <input type="hidden" name="layout" value="{{ data.layout }}">
+      {% if data.office %}
+        <fieldset class="filters">
+          <legend>{{ __t('church:officeAlsoShow') }}</legend>
+          <label class="check"><input type="checkbox" name="inactive" value="{{ '1' }}"{% if data.include.inactive %} checked{% endif %}> {{ __t('church:filterInactive') }}</label>
+          <label class="check"><input type="checkbox" name="visitors" value="{{ '1' }}"{% if data.include.visitors %} checked{% endif %}> {{ __t('church:filterVisitors') }}</label>
+          <label class="check"><input type="checkbox" name="optedOut" value="{{ '1' }}"{% if data.include.optedOut %} checked{% endif %}> {{ __t('church:filterOptedOut') }}</label>
+        </fieldset>
+      {% endif %}
+    </form>
+
+    <p class="layout-switch">
+      <a href="/members/directory?layout={{ data.otherLayout }}{% if data.query %}&amp;q={{ data.query | urlencode }}{% endif %}{% if data.include.inactive %}&amp;inactive=1{% endif %}{% if data.include.visitors %}&amp;visitors=1{% endif %}{% if data.include.optedOut %}&amp;optedOut=1{% endif %}" class="btn ghost">
+        {% if data.layout == 'a' %}{{ __t('church:layoutSwitchToList') }}{% else %}{{ __t('church:layoutSwitchToCards') }}{% endif %}
+      </a>
+    </p>
+
+    <p class="count" id="count" role="status">{{ __t('church:householdsFound', { n: data.rows.length }) }}</p>
+
+    {% if not data.rows.length %}
+      <p>{{ __t('church:noMatches') }}</p>
+    {% elif data.layout == 'a' %}
+      <ul class="cards plain">
+        {% for row in data.rows %}
+          <li>
+            <a class="hh-card" href="/members/household/{{ row.id }}">
+              {% if row.photoUrl %}
+                <img class="photo" src="{{ row.photoUrl }}" alt="" width="56" height="56">
+              {% else %}
+                <span class="ini" aria-hidden="true">{{ row.initials }}</span>
+              {% endif %}
+              <span class="hh-text">
+                <b>{{ row.name }}</b>
+                {% for flag in row.flags %}
+                  <span class="tag grey">{% if flag == 'optedOut' %}{{ __t('church:flagOptedOut') }}{% elif flag == 'visitor' %}{{ __t('church:flagVisitor') }}{% else %}{{ __t('church:flagInactive') }}{% endif %}</span>
+                {% endfor %}
+                <span class="people">{% for person in row.people %}{{ person.name }}{% if not loop.last %} · {% endif %}{% endfor %}</span>
+                <span class="small muted">{% if row.city %}{{ row.city }}{% else %}{{ __t('church:addressNotShared') }}{% endif %}</span>
+              </span>
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="book">
+        <div class="book-list">
+          {% for group in data.letters %}
+            <h2 class="letter" id="L-{{ group.letter }}">{{ group.letter }}</h2>
+            {% for row in group.rows %}
+              <details>
+                <summary>
+                  <span class="nm">{{ row.name }}
+                    {% for flag in row.flags %}
+                      <span class="tag grey">{% if flag == 'optedOut' %}{{ __t('church:flagOptedOut') }}{% elif flag == 'visitor' %}{{ __t('church:flagVisitor') }}{% else %}{{ __t('church:flagInactive') }}{% endif %}</span>
+                    {% endfor %}
+                  </span>
+                  <span class="ph">{{ row.phone }}</span>
+                  <span class="ad">{% if row.address %}{{ row.address }}{% else %}{{ __t('church:addressNotShared') }}{% endif %}</span>
+                  <span class="more">{{ __t('church:showFamily') }}</span>
+                </summary>
+                <div class="inner">
+                  <ul class="plain">
+                    {% for person in row.people %}<li>{{ person.name }}</li>{% endfor %}
+                  </ul>
+                  {% if row.phone %}
+                    <p><a href="tel:{{ row.phone | replace(r/[^0-9+]/g, '') }}">{{ __t('church:callPhone', { phone: row.phone }) }}</a></p>
+                  {% endif %}
+                  <p><a class="btn small" href="/members/household/{{ row.id }}">{{ __t('church:openHousehold') }}</a></p>
+                </div>
+              </details>
+            {% endfor %}
+          {% endfor %}
+        </div>
+        {% if not data.searching %}
+          <nav class="rail" aria-label="{{ __t('church:jumpToLetter') }}">
+            {% for item in data.rail %}
+              {% if item.present %}<a href="#L-{{ item.letter }}">{{ item.letter }}</a>{% endif %}
+            {% endfor %}
+          </nav>
+        {% endif %}
+      </div>
+    {% endif %}
+  </main>
+{% endblock %}

@@ -9,6 +9,10 @@ module.exports = {
   name: 'La Grange Church of Christ',
   shortName: 'La Grange COC',
   city: 'La Grange, Texas',
+  timeZone: 'America/Chicago',
+  // The PDF's adults' birthdays: Brynna has not said yet (2026-11-12). Set
+  // adultBirthdaysInPdf to false to leave them out.
+  directory: { adultBirthdaysInPdf: true },
   // From the church's own site (lagrangecoc.com/location and the home page),
   // read 2026-11-13. Display only: nothing sends mail to this address.
   serviceTimes: [
