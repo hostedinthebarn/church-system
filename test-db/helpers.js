@@ -21,6 +21,9 @@ async function start(extra = {}) {
       group: {},
       'office-note': {},
       'away-date': {},
+      '@apostrophecms/event': {},
+      '@apostrophecms/event-page': {},
+      'church-calendar': {},
       ...extra
     }
   });

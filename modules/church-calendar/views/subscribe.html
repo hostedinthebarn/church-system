@@ -1,0 +1,41 @@
+{% extends data.outerLayout %}
+
+{% block title %}{{ __t('church:calSubscribeTitle') }}{% endblock %}
+
+{% block main %}
+  <main id="main" class="church-main">
+    <h1>{{ __t('church:calSubscribeTitle') }}</h1>
+    <p>{{ __t('church:calSubscribeIntro') }}</p>
+
+    <h2>{{ __t('church:calPublicHeading') }}</h2>
+    <p>{{ __t('church:calPublicHelp') }}</p>
+    {% if data.publicUrl %}
+      <p><a href="{{ data.publicWebcal }}">{{ __t('church:calOpenInCalendar') }}</a></p>
+      <p><input type="text" readonly value="{{ data.publicUrl }}" size="60" aria-label="{{ __t('church:calPublicHeading') }}"></p>
+    {% endif %}
+
+    {% if data.signedInPerson %}
+      <h2>{{ __t('church:calMemberHeading') }}</h2>
+      <p>{{ __t('church:calMemberHelp') }}</p>
+      {% if data.link %}
+        <p role="status"><strong>{{ __t('church:calMemberLinkOnce') }}</strong></p>
+        <p><a href="{{ data.memberWebcal }}">{{ __t('church:calOpenInCalendar') }}</a></p>
+        <p><input type="text" readonly value="{{ data.link }}" size="60" aria-label="{{ __t('church:calMemberHeading') }}"></p>
+      {% elif data.turnedOff %}
+        <p role="status">{{ __t('church:calMemberOff') }}</p>
+      {% elif data.hasLink %}
+        <p>{{ __t('church:calMemberOn') }}</p>
+      {% else %}
+        <p>{{ __t('church:calMemberNone') }}</p>
+      {% endif %}
+      <form method="post" action="/calendar/subscribe/new">
+        <button type="submit">{{ __t('church:calMemberMake') if not data.hasLink and not data.link else __t('church:calMemberReplace') }}</button>
+      </form>
+      {% if data.hasLink or data.link %}
+        <form method="post" action="/calendar/subscribe/off">
+          <button type="submit">{{ __t('church:calMemberTurnOff') }}</button>
+        </form>
+      {% endif %}
+    {% endif %}
+  </main>
+{% endblock %}

@@ -42,3 +42,13 @@ The browser tests (`npm run test:e2e`) start the app on port 3100 and need Mongo
 - The POC is noindexed everywhere (`X-Robots-Tag` and a meta tag) and every page carries a "Demo data" banner.
 - In production, set `CHURCH_SESSION_SECRET`; the app refuses to start without it.
 - Mail settings (environment, no secrets in the repo): `CHURCH_MAIL` (`fake`, the default, or `resend`), `CHURCH_MAIL_ALLOWLIST` (exact addresses and `@domain` entries, separated by commas or spaces; defaults to `@example.com` for the fake sender and to nothing, so everything refused, for Resend), `RESEND_API_KEY` and `CHURCH_MAIL_FROM` (Resend only). Links are built from `APOS_BASE_URL`; in production no link is sent without it. Behind a proxy, set the `trustProxy` option on `@apostrophecms/express` so the rate limit sees real client IPs.
+
+### Events and calendar feeds (LGC-41)
+
+Events are `@apostrophecms/event` 1.0.2, extended in `modules/@apostrophecms/event` with `improve`.
+
+- Repeats: weekly, or monthly on the nth weekday, ending after a count, on a date, or never. Each occurrence is its own record, linked by `eventGroupId`.
+- Edits to a series go through `apos.event.editSeries(req, id, 'this' | 'following', changes)`, or `POST /api/v1/@apostrophecms/event/:id/edit-series`. The admin has no prompt for it yet.
+- Open-ended series are kept filled 12 months ahead by a nightly task: `node app.js @apostrophecms/event:top-up`. Run it from cron or a systemd timer. It is safe to run twice.
+- Feeds: `/calendar/public.ics` (public events) and `/calendar/member/<token>.ics` (a private link per member, made, replaced and turned off at `/calendar/subscribe`).
+- Every event page has an "Add to Google Calendar" link.

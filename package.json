@@ -21,6 +21,8 @@
     "test:db": "node --test --test-concurrency=1 \"test-db/**/*.test.js\""
   },
   "dependencies": {
+    "@apostrophecms/event": "1.0.2",
+    "@church-system/calendar-logic": "*",
     "apostrophe": "~4.34.1"
   },
   "devDependencies": {

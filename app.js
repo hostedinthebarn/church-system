@@ -34,6 +34,9 @@ require('apostrophe')({
         types: [ {
           name: '@apostrophecms/home-page',
           label: 'Home'
+        }, {
+          name: '@apostrophecms/event-page',
+          label: 'Events'
         } ]
       }
     },
@@ -46,6 +49,9 @@ require('apostrophe')({
     'person-relationship': {},
     group: {},
     'office-note': {},
-    'away-date': {}
+    'away-date': {},
+    '@apostrophecms/event': {},
+    '@apostrophecms/event-page': {},
+    'church-calendar': {}
   }
 });
