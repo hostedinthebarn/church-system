@@ -46,6 +46,8 @@ require('apostrophe')({
     'person-relationship': {},
     group: {},
     'office-note': {},
-    'away-date': {}
+    'away-date': {},
+    'bulletin-standing': {},
+    bulletin: {}
   }
 });

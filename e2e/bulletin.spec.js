@@ -1,0 +1,172 @@
+const { test, expect } = require('@playwright/test');
+const AxeBuilder = require('@axe-core/playwright').default;
+const { spawnSync } = require('node:child_process');
+const path = require('node:path');
+
+const AXE_TAGS = [ 'wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa' ];
+const DATE = '2026-11-15';
+const OTHER = '2026-11-22';
+const PASSWORD = process.env.E2E_ADMIN_PASSWORD || 'e2e-only-password';
+
+test.describe.configure({ mode: 'serial' });
+
+test.beforeAll(() => {
+  // A repeat run finds the user already there and exits with an error: fine.
+  spawnSync('node', [ path.join(__dirname, 'seed-admin.js') ], {
+    env: process.env,
+    timeout: 120_000
+  });
+});
+
+async function signIn(page) {
+  await page.goto('/login');
+  await page.locator('input[type="text"], input[name="username"]').first().fill('e2e-admin');
+  await page.locator('input[type="password"]').fill(PASSWORD);
+  await page.locator('input[type="password"]').press('Enter');
+  await page.waitForURL(url => !url.pathname.startsWith('/login'));
+}
+
+async function save(page, date, text) {
+  if (!page.url().endsWith(`/bulletin/${date}/edit`)) {
+    await page.goto(`/bulletin/${date}/edit`);
+  }
+  await page.locator('#hand-announcements').fill(text);
+  await page.getByRole('button', { name: 'Save' }).click();
+  await expect(page.locator('#hand-announcements')).toHaveValue(text);
+}
+
+test('the screens are for the office; the public sees only a signed-off week', async ({ request }) => {
+  for (const suffix of [ '/edit', '/print', '/pdf' ]) {
+    const response = await request.get(`/bulletin/${DATE}${suffix}`);
+    expect(response.status(), suffix).toBe(404);
+  }
+  const post = await request.post(`/bulletin/${DATE}/save`, { data: {} });
+  expect(post.status()).toBeGreaterThanOrEqual(400);
+  expect((await request.get('/bulletin/not-a-date')).status()).toBe(404);
+  // A week nobody has saved is not found.
+  expect((await request.get('/bulletin/2026-12-06')).status()).toBe(404);
+});
+
+test('edit screen: fill, save, overflow signal, sign-off rule', async ({ page }) => {
+  await signIn(page);
+  await page.goto(`/bulletin/${DATE}/edit`);
+  // Start from the defaults whatever an earlier run left behind.
+  await page.getByLabel('Members-only: put it in the bulletin').uncheck();
+  await save(page, DATE, 'Collection today.\n- Thank you for VBS');
+  await expect(page.locator('[data-bulletin-status]')).toHaveText('Draft');
+
+  // Roster and calendar are filled in; the members-only event is not there.
+  const preview = page.locator('.preview');
+  await expect(preview.locator('[data-section="serving"]')).toContainText('Pat Example');
+  await expect(preview.locator('[data-section="serving"]')).toContainText('unfilled');
+  await expect(preview.locator('[data-section="calendar"]')).toContainText('Fellowship meal');
+  await expect(preview.locator('[data-section="calendar"]')).toContainText('CANCELLED');
+  await expect(preview.locator('[data-section="calendar"]')).not.toContainText('Elders and deacons');
+  await expect(preview.locator('[data-section="birthdays"]')).toHaveCount(0);
+
+  // Panels fit.
+  await expect(page.locator('[data-overflow-status] li').first()).toBeVisible();
+  const fits = await page.evaluate(() => window.__bulletinOverflow);
+  expect(fits.every(item => item.lines === 0)).toBe(true);
+
+  // Tick the members-only event: it appears after saving.
+  await page.getByLabel('Members-only: put it in the bulletin').check();
+  await page.getByRole('button', { name: 'Save' }).click();
+  await expect(preview.locator('[data-section="calendar"]')).toContainText('Elders and deacons');
+
+  // Too much text: the panel is flagged and sign-off is refused.
+  const long = Array.from({ length: 80 }, (_, i) => `Announcement line number ${i} with some words`).join('\n\n');
+  await page.locator('#hand-announcements').fill(long);
+  await page.getByRole('button', { name: 'Save' }).click();
+  await expect(page.locator('#hand-announcements')).toHaveValue(long);
+  await expect(page.locator('[data-panel="left"]')).toHaveAttribute('data-overflow', 'true');
+  await expect(page.locator('[data-overflow-status]')).toContainText(/left: full by \d+ lines?/);
+  await page.getByRole('button', { name: 'Sign off', exact: true }).click();
+  await expect(page.locator('[data-message]')).toContainText('Full: left');
+  await expect(page.locator('[data-bulletin-status]')).toHaveText('Draft');
+
+  // Back to a text that fits: sign-off works, then printed.
+  await page.locator('#hand-announcements').fill('Collection today.');
+  await page.getByRole('button', { name: 'Save' }).click();
+  await expect(page.locator('#hand-announcements')).toHaveValue('Collection today.');
+  await page.getByRole('button', { name: 'Sign off', exact: true }).click();
+  await expect(page.locator('[data-bulletin-status]')).toHaveText('Signed off');
+  await page.getByRole('button', { name: 'Mark as printed' }).click();
+  await expect(page.locator('[data-bulletin-status]')).toHaveText('Printed');
+});
+
+test('edit screen has no axe violations', async ({ page }) => {
+  await signIn(page);
+  await page.goto(`/bulletin/${DATE}/edit`);
+  await expect(page.locator('[data-overflow-status] li').first()).toBeVisible();
+  const results = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze();
+  expect(results.violations).toEqual([]);
+});
+
+test('website page: a signed-off week is public, without the prayer list or members-only events', async ({ page, request, browser }) => {
+  await signIn(page);
+  await page.goto(`/bulletin/${DATE}/edit`);
+  await page.locator('#hand-prayerRequests').fill('Zed Prayer in hospital');
+  await page.getByRole('button', { name: 'Save' }).click();
+  await expect(page.locator('#hand-prayerRequests')).toHaveValue('Zed Prayer in hospital');
+  await page.getByLabel('Members-only: put it in the bulletin').check();
+  await page.getByRole('button', { name: 'Save' }).click();
+  await expect(page.locator('.preview [data-section="prayer"]')).toContainText('Zed Prayer');
+  await expect(page.locator('.preview [data-section="calendar"]')).toContainText('Elders and deacons');
+  await page.getByRole('button', { name: 'Sign off', exact: true }).click();
+  await expect(page.locator('[data-bulletin-status]')).toHaveText('Signed off');
+
+  const response = await request.get(`/bulletin/${DATE}`);
+  expect(response.status()).toBe(200);
+  expect(response.headers()['x-robots-tag']).toContain('noindex');
+  const html = await response.text();
+  expect(html).not.toContain('Prayer List');
+  expect(html).not.toContain('Zed Prayer');
+  expect(html).not.toContain('Elders and deacons');
+  expect(html).toContain('Fellowship meal');
+  expect(html).toContain('data-demo-banner');
+
+  const anon = await (await browser.newContext({ baseURL: test.info().project.use.baseURL })).newPage();
+  await anon.goto(`/bulletin/${DATE}`);
+  await expect(anon.getByRole('heading', { level: 1 })).toContainText('Sunday, November 15, 2026');
+  const results = await new AxeBuilder({ page: anon }).withTags(AXE_TAGS).analyze();
+  expect(results.violations).toEqual([]);
+  await anon.context().close();
+});
+
+test('a draft week is not public', async ({ page, request }) => {
+  await signIn(page);
+  await save(page, OTHER, 'Next week');
+  expect((await request.get(`/bulletin/${OTHER}`)).status()).toBe(404);
+});
+
+test('print page and PDF are two 14 x 8.5 in pages', async ({ page }) => {
+  await signIn(page);
+  await page.goto(`/bulletin/${DATE}/print`);
+  await expect(page.locator('[data-page]')).toHaveCount(2);
+  await expect(page.locator('[data-panel]')).toHaveCount(6);
+  const size = await page.evaluate(() => {
+    const el = document.querySelector('[data-page="outside"]');
+    return [ el.offsetWidth, el.offsetHeight ];
+  });
+  expect(size).toEqual([ 1344, 816 ]);
+  // The reading order in the markup differs from the visual order.
+  const order = await page.locator('[data-page="outside"] [data-panel]').evaluateAll(
+    els => els.map(el => el.getAttribute('data-panel')));
+  expect(order).toEqual([ 'cover', 'flap', 'back' ]);
+  const x = await page.locator('[data-panel="flap"]').evaluate(el => el.getBoundingClientRect().x);
+  const cover = await page.locator('[data-panel="cover"]').evaluate(el => el.getBoundingClientRect().x);
+  expect(x).toBeLessThan(cover);
+
+  const response = await page.request.get(`/bulletin/${DATE}/pdf`);
+  expect(response.status()).toBe(200);
+  expect(response.headers()['content-type']).toContain('application/pdf');
+  const body = await response.body();
+  expect(body.subarray(0, 5).toString()).toBe('%PDF-');
+  const text = body.toString('latin1');
+  expect((text.match(/\/Type\s*\/Page[^s]/g) || []).length).toBe(2);
+  expect((text.match(/\/MediaBox\s*\[\s*0\s+0\s+1008\s+612\s*\]/g) || []).length).toBe(2);
+  if (process.env.E2E_SAVE_PDF) {
+    require('node:fs').writeFileSync(process.env.E2E_SAVE_PDF, body);
+  }
+});

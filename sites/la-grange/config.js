@@ -30,5 +30,14 @@ module.exports = {
     phone: '(979) 968-5676'
   },
   // The church's hosted giving form (LGC-3: stays a link out to FellowshipOne)
+  // The bulletin (LGC-61). `switches` overrides a section's print and website
+  // defaults, for example { prayer: { website: true } }; the defaults are in
+  // packages/bulletin-logic/src/sections.js. `sources` supplies events and the
+  // servers roster until those pieces exist (made-up demo data for now).
+  bulletin: {
+    tagline: 'Loving God. Loving Others',
+    switches: {},
+    sources: require('./bulletin-demo.js')
+  },
   giveUrl: 'https://www.fellowshiponegiving.com/App/Form/3835ceb2-5e89-498b-99e0-49c89636cc43'
 };

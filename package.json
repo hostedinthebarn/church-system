@@ -21,7 +21,9 @@
     "test:db": "node --test --test-concurrency=1 \"test-db/**/*.test.js\""
   },
   "dependencies": {
-    "apostrophe": "~4.34.1"
+    "@church-system/bulletin-logic": "*",
+    "apostrophe": "~4.34.1",
+    "playwright-core": "^1.65.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",

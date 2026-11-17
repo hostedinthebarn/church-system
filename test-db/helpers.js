@@ -21,6 +21,8 @@ async function start(extra = {}) {
       group: {},
       'office-note': {},
       'away-date': {},
+      'bulletin-standing': {},
+      bulletin: {},
       ...extra
     }
   });
