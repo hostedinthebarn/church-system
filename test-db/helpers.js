@@ -11,6 +11,9 @@ async function start(extra = {}) {
       require
     },
     modules: {
+      // Holds the interface strings (the church: namespace), so messages built
+      // from them, such as the sign-in email, read as they do in the real app.
+      'church-site': { options: { site: require('../sites/la-grange/config.js') } },
       'church-audit': {},
       person: {},
       household: {},
