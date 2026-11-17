@@ -3,7 +3,7 @@
 const path = require('node:path');
 const t = require('apostrophe/test-lib/util.js');
 
-async function start() {
+async function start(extra = {}) {
   return t.create({
     // Makes Apostrophe look for our modules/ folder at the repo root.
     root: {
@@ -11,13 +11,17 @@ async function start() {
       require
     },
     modules: {
+      // Holds the interface strings (the church: namespace), so messages built
+      // from them, such as the sign-in email, read as they do in the real app.
+      'church-site': { options: { site: require('../sites/la-grange/config.js') } },
       'church-audit': {},
       person: {},
       household: {},
       'person-relationship': {},
       group: {},
       'office-note': {},
-      'away-date': {}
+      'away-date': {},
+      ...extra
     }
   });
 }

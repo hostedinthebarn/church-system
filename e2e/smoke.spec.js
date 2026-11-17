@@ -43,3 +43,33 @@ test.describe('admin login', () => {
     expect(results.violations).toEqual([]);
   });
 });
+
+test.describe('emailed-link sign-in', () => {
+  test('the sign-in page loads, is noindexed and has no axe violations', async ({ page }) => {
+    const response = await page.goto('/sign-in');
+    expect(response.status()).toBe(200);
+    expect(response.headers()['x-robots-tag']).toContain('noindex');
+    await expect(page.getByLabel('Email address')).toBeVisible();
+    const results = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze();
+    expect(results.violations).toEqual([]);
+  });
+
+  test('a request gets the same answer whoever the address belongs to', async ({ page }) => {
+    await page.goto('/sign-in');
+    await page.getByLabel('Email address').fill('nobody-here@example.com');
+    await page.getByRole('button', { name: 'Send me a link' }).click();
+    await expect(page.getByRole('status')).toContainText('If that address belongs to a member');
+  });
+
+  test('a link that was never issued does not sign anyone in', async ({ page }) => {
+    await page.goto('/sign-in/verify?token=not-a-real-token');
+    await page.getByRole('button', { name: 'Sign in' }).click();
+    await expect(page.getByRole('alert')).toContainText('expired');
+  });
+
+  test('the dev outbox is viewable with the fake sender', async ({ page }) => {
+    const response = await page.goto('/dev/outbox');
+    expect(response.status()).toBe(200);
+    await expect(page.getByRole('heading', { name: 'Dev outbox' })).toBeVisible();
+  });
+});

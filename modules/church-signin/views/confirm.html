@@ -1,0 +1,19 @@
+{% extends data.outerLayout %}
+
+{% block title %}{{ __t('church:signinConfirmTitle') }}{% endblock %}
+
+{% block main %}
+  <main id="main" class="church-main">
+    <h1>{{ __t('church:signinConfirmTitle') }}</h1>
+    {% if data.token %}
+      <p>{{ __t('church:signinConfirmBody') }}</p>
+      <form method="post" action="/sign-in/verify">
+        <input type="hidden" name="token" value="{{ data.token }}">
+        <button type="submit">{{ __t('church:signinConfirmButton') }}</button>
+      </form>
+    {% else %}
+      <p role="alert">{{ __t('church:signinBadLinkBody') }}</p>
+      <p><a href="/sign-in">{{ __t('church:signinTryAgain') }}</a></p>
+    {% endif %}
+  </main>
+{% endblock %}

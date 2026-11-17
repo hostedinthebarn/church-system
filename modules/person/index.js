@@ -118,6 +118,12 @@ module.exports = {
         type: 'date',
         label: 'Baptism date'
       },
+      officeAdmin: {
+        type: 'boolean',
+        label: 'Office admin',
+        help: 'Signs in as an office admin, not a member. Needs an email and an adult.',
+        def: false
+      },
       showBaptism: {
         type: 'boolean',
         label: 'Show the baptism date to members',
@@ -141,7 +147,7 @@ module.exports = {
       },
       office: {
         label: 'Office',
-        fields: [ 'status', 'inactiveReason', 'baptismDate', 'showBaptism' ]
+        fields: [ 'status', 'inactiveReason', 'officeAdmin', 'baptismDate', 'showBaptism' ]
       }
     }
   },
