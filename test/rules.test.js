@@ -369,3 +369,13 @@ test('storedFields drops temporary relationship copies and relationship extras',
   );
   assert.equal(rules.storedFields(null), null);
 });
+
+test('a hidden birthday is not shown to another household', () => {
+  const view = rules.viewPerson({
+    viewer: other,
+    person: { ...person, hiddenFields: [ 'birthday' ] },
+    household,
+    today: TODAY
+  });
+  assert.equal(view.birthday, null);
+});

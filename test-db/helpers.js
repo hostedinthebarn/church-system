@@ -11,13 +11,16 @@ async function start() {
       require
     },
     modules: {
+      'church-site': { options: { site: require('../sites/la-grange/config.js') } },
       'church-audit': {},
       person: {},
       household: {},
       'person-relationship': {},
       group: {},
       'office-note': {},
-      'away-date': {}
+      'away-date': {},
+      'bulletin-standing': {},
+      bulletin: {}
     }
   });
 }
