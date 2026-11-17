@@ -1,0 +1,47 @@
+{% extends data.outerLayout %}
+
+{% block title %}{{ __t('church:awayTitle') }}{% endblock %}
+
+{% block main %}
+  <main id="main" class="church-main">
+    <h1>{{ __t('church:awayTitle') }}</h1>
+    {% if data.household %}
+      <h2>{{ data.household.title }}</h2>
+      <p>{{ __t('church:awayIntro') }}</p>
+      {% if data.spans | length %}
+        <ul data-away-list>
+          {% for span in data.spans %}
+            <li>
+              {{ span.name }}: {{ span.from }}{% if span.to != span.from %} – {{ span.to }}{% endif %}
+              <form method="post" action="/away/remove" class="away-remove">
+                <input type="hidden" name="household" value="{{ data.household.id }}">
+                <input type="hidden" name="id" value="{{ span.id }}">
+                <button type="submit">{{ __t('church:awayRemove') }}<span class="visually-hidden"> {{ span.name }} {{ span.from }}</span></button>
+              </form>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>{{ __t('church:awayNone') }}</p>
+      {% endif %}
+      <h2>{{ __t('church:awayAddHeading') }}</h2>
+      <form method="post" action="/away/add" data-away-add>
+        <input type="hidden" name="household" value="{{ data.household.id }}">
+        <p><label>{{ __t('church:awayWho') }}
+          <select name="person" required>
+            {% for person in data.people %}<option value="{{ person.id }}">{{ person.name }}</option>{% endfor %}
+          </select></label></p>
+        <p><label>{{ __t('church:awayFrom') }} <input type="date" name="startDate" min="{{ data.today }}" required></label></p>
+        <p><label>{{ __t('church:awayTo') }} <input type="date" name="endDate" min="{{ data.today }}"></label></p>
+        <p>{{ __t('church:awayToHelp') }}</p>
+        <button type="submit">{{ __t('church:awayAdd') }}</button>
+      </form>
+      {% if data.office %}<p><a href="/away">{{ __t('church:awayOtherHousehold') }}</a></p>{% endif %}
+    {% else %}
+      <p>{{ __t('church:awayPickHousehold') }}</p>
+      <ul>
+        {% for household in data.households %}<li><a href="/away?household={{ household.id }}">{{ household.title }}</a></li>{% endfor %}
+      </ul>
+    {% endif %}
+  </main>
+{% endblock %}

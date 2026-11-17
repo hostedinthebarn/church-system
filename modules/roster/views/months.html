@@ -1,0 +1,22 @@
+{% extends data.outerLayout %}
+
+{% block title %}{{ __t('church:rosterTitle') }}{% endblock %}
+
+{% block main %}
+  <main id="main" class="church-main">
+    <h1>{{ __t('church:rosterTitle') }}</h1>
+    <p>{{ __t('church:rosterIndexIntro') }}</p>
+    <ul>
+      {% for item in data.months %}
+        <li>
+          <a href="/roster/{{ item.month }}">{{ item.month }}</a>:
+          {% if item.status == 'published' %}{{ __t('church:rosterStatusPublished') }}
+          {% elif item.status == 'draft' %}{{ __t('church:rosterStatusDraft') }}
+          {% else %}{{ __t('church:rosterStatusNone') }}{% endif %}
+          {% if item.status != 'published' and item.month in data.due %} ({{ __t('church:rosterDue') }}){% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+    <p><a href="/away">{{ __t('church:awayTitle') }}</a></p>
+  </main>
+{% endblock %}

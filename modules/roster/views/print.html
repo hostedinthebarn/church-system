@@ -1,0 +1,35 @@
+{% extends data.outerLayout %}
+
+{% block title %}{{ __t('church:rosterPrintTitle') }} {{ data.layout.month }}{% endblock %}
+
+{% block main %}
+  <main id="main" class="church-main roster-print">
+    <h1>{{ __t('church:rosterPrintTitle') }} {{ data.layout.month }}</h1>
+    {% if not data.published %}<p class="roster-noprint">{{ __t('church:rosterNotPublished') }}</p>{% endif %}
+    <p class="roster-noprint"><a href="/roster/{{ data.layout.month }}">{{ __t('church:rosterBack') }}</a></p>
+
+    {% if data.layout.monthly | length %}
+      <table>
+        <caption>{{ __t('church:rosterAllMonth') }}</caption>
+        <thead><tr><th scope="col">{{ __t('church:rosterRole') }}</th><th scope="col">{{ __t('church:rosterWho') }}</th></tr></thead>
+        <tbody>
+          {% for row in data.layout.monthly %}
+            <tr><th scope="row">{{ row.name }}</th><td>{% for person in row.people %}{{ person or __t('church:rosterUnfilled') }}{% if not loop.last %}, {% endif %}{% endfor %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+
+    {% for week in data.layout.weekly %}
+      <table>
+        <caption>{{ week.date }}</caption>
+        <thead><tr><th scope="col">{{ __t('church:rosterRole') }}</th><th scope="col">{{ __t('church:rosterWho') }}</th></tr></thead>
+        <tbody>
+          {% for row in week.rows %}
+            <tr><th scope="row">{{ row.name }}</th><td>{% for person in row.people %}{{ person or __t('church:rosterUnfilled') }}{% if not loop.last %}, {% endif %}{% endfor %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endfor %}
+  </main>
+{% endblock %}

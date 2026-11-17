@@ -194,12 +194,15 @@ module.exports = {
         const wantDirectory = birthdays.print || birthdays.website;
         const standing = await self.apos.bulletinStanding.current(req);
         const sources = config().sources || {};
-        const rosterData = sources.roster
-          ? sources.roster(date)
-          : {
-            assignments: [],
-            names: {}
-          };
+        // The published roster when there is one for these Sundays; until
+        // then the church's demo source, or nothing.
+        const rosterData = (self.apos.roster && await self.apos.roster.bulletinData(req, date)) ||
+          (sources.roster
+            ? sources.roster(date)
+            : {
+              assignments: [],
+              names: {}
+            });
         const directory = wantDirectory
           ? await self.directory(req)
           : {

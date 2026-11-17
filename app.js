@@ -47,6 +47,8 @@ require('apostrophe')({
     group: {},
     'office-note': {},
     'away-date': {},
+    'serving-role': {},
+    roster: {},
     'bulletin-standing': {},
     bulletin: {}
   }
