@@ -168,7 +168,7 @@ test('event pages: Add to Google Calendar, cancelled and members-only handled', 
   const cancelled = await apos.event.find(apos.task.getAnonReq({ mode: 'published' }), { title: 'Cancelled sing' }).toObject();
   const cancelledHtml = await apos.http.get(cancelled._url);
   assert.match(cancelledHtml, /Cancelled/);
-  assert.doesNotMatch(cancelledHtml, /calendar\.google\.com/);
+  assert.ok(!cancelledHtml.includes('https://calendar.google.com/'), 'no Google link on a cancelled event');
 
   // The feed now links each event to its page.
   const feed = await apos.http.get('/calendar/public.ics');
