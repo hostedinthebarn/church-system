@@ -22,8 +22,10 @@
   },
   "dependencies": {
     "@apostrophecms/event": "1.0.2",
+    "@church-system/bulletin-logic": "*",
     "@church-system/calendar-logic": "*",
-    "apostrophe": "~4.34.1"
+    "apostrophe": "~4.34.1",
+    "playwright-core": "^1.65.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",

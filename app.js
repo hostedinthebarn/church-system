@@ -52,6 +52,8 @@ require('apostrophe')({
     'away-date': {},
     '@apostrophecms/event': {},
     '@apostrophecms/event-page': {},
-    'church-calendar': {}
+    'church-calendar': {},
+    'bulletin-standing': {},
+    bulletin: {}
   }
 });

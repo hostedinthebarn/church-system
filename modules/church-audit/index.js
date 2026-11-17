@@ -28,7 +28,8 @@ module.exports = {
     alias: 'churchAudit',
     // The record types that are audited.
     types: [
-      'person', 'household', 'person-relationship', 'group', 'office-note', 'away-date'
+      'person', 'household', 'person-relationship', 'group', 'office-note', 'away-date',
+      'bulletin', 'bulletin-standing'
     ]
   },
   init(self) {

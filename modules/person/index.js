@@ -68,6 +68,14 @@ module.exports = {
           {
             label: 'Address',
             value: 'address'
+          },
+          {
+            label: 'Birthday',
+            value: 'birthday'
+          },
+          {
+            label: 'Anniversary',
+            value: 'anniversary'
           }
         ]
       },

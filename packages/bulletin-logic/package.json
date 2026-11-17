@@ -1,0 +1,16 @@
+{
+  "name": "@church-system/bulletin-logic",
+  "version": "0.1.0",
+  "description": "Pure, database-free bulletin rules for the church system: sections and their print and website switches, the six-panel layout, filling from the roster, events and directory, and the HTML for the screen, the website and the 14 x 8.5 in print sheet.",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "main": "src/index.js",
+  "dependencies": {
+    "@church-system/calendar-logic": "*"
+  },
+  "engines": { "node": ">=22.8" },
+  "scripts": {
+    "test": "node --test --experimental-test-coverage --test-coverage-include='src/**' --test-coverage-lines=100 --test-coverage-branches=100 --test-coverage-functions=100 'test/*.test.js'"
+  }
+}
