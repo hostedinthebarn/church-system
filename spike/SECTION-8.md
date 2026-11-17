@@ -53,3 +53,8 @@ From the MCP authorization spec, 2025-11-25 ([spec](https://modelcontextprotocol
 - **Version records are not written per draft save.** After inserting and updating draft events as the capped user there were **no** records. They appeared when the admin published: one `draft` record (`author` Real Admin, `ai: true`, carried from the draft) and one `published` record (`ai: false`, because that admin's publish req had no AI flag). So the AI flag follows each write, and the published version's `ai` shows how the **publish** was done, not how the content was drafted. The editor-facing trail for "Claude helped" is the draft version plus our own audit log.
 - `updatedBy` on the document is the real person, with or without `_ai`.
 - ⚠️ Not observed: `_ai` through the REST body (only the in-process flag); two people editing one draft in a day.
+
+### Decided (Gary, 2026-11-17)
+
+- Bulletin under the cap: lower the bulletin's `editRole` to contributor; sign-off stays admin-only in our own route. (This keeps Apostrophe refusing publish on the events and pages, while the bulletin's own sign-off is our code.)
+- The two web allowlist entries (`support.claude.com`, `platform.claude.com`) are approved, to finish the Claude-specific OAuth items. They were not yet live when this was written, so those items stay unverified here.
