@@ -310,3 +310,36 @@ test('the contact person\'s name is kept on the event for members to see', async
   });
   assert.equal(cleared.contactName, '');
 });
+
+test('a "this one only" edit of the newest occurrence is not copied by the top-up', async () => {
+  const parent = await event.insert(req, {
+    ...event.newInstance(),
+    ...base,
+    title: 'Wednesday class',
+    place: 'Auditorium',
+    startDate: '2027-01-06',
+    dateType: 'repeat',
+    repeatPattern: 'weekly',
+    repeatEnds: 'never'
+  });
+  const before = await all(parent.eventGroupId);
+  const newest = before.sort((a, b) => (a.ruleDate < b.ruleDate ? 1 : -1))[0];
+  await event.editSeries(req, newest._id, 'this', {
+    place: 'Fellowship hall',
+    title: 'Wednesday class: guest teacher'
+  });
+  // The count covers every series in the database, so count this one's own.
+  await event.topUpSeries(req, { today: addDaysIso(rulesToday(), 35) });
+  const after = await all(parent.eventGroupId);
+  const fresh = after.filter(o => o.ruleDate > newest.ruleDate);
+  assert.ok(fresh.length >= 4, `created ${fresh.length}`);
+  assert.equal(after.length, before.length + fresh.length);
+  for (const o of fresh) {
+    assert.equal(o.place, 'Auditorium', `${o.ruleDate} keeps the series' place`);
+    assert.equal(o.title, 'Wednesday class', `${o.ruleDate} keeps the series' title`);
+    assert.notEqual(o.seriesException, true);
+  }
+  const edited = after.find(o => o._id === newest._id);
+  assert.equal(edited.seriesException, true);
+  assert.equal(edited.place, 'Fellowship hall');
+});

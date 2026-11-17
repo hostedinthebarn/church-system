@@ -167,6 +167,14 @@ module.exports = {
           label: 'Repeat copy',
           hidden: true
         },
+        // Set by a "this one only" edit. The nightly top-up never copies an
+        // exception, so a one-off change (a guest speaker, a cancellation)
+        // can't spread to the dates it creates.
+        seriesException: {
+          type: 'boolean',
+          label: 'Edited on its own',
+          hidden: true
+        },
         ruleDate: {
           type: 'string',
           label: 'Rule date',
@@ -312,6 +320,7 @@ module.exports = {
           endDate: date,
           ruleDate: date,
           status: 'scheduled',
+          seriesException: false,
           announceFrom: null,
           slug: `${String(template.slug).replace(/-\d{4}-\d{2}-\d{2}$/, '')}-${date}`
         }, overrides);
@@ -376,6 +385,9 @@ module.exports = {
           set.status = 'changed';
         }
         Object.assign(piece, set);
+        if (scope === 'this' && piece.eventGroupId) {
+          piece.seriesException = true;
+        }
         // A time change for this and all after is the series' new time.
         if (scope === 'following' && piece.seriesRule && ('startTime' in set || 'endTime' in set)) {
           const rule = JSON.parse(piece.seriesRule);
@@ -435,8 +447,11 @@ module.exports = {
         }).toArray();
         // Archived occurrences still count as existing: the top-up must not
         // bring back one the office removed.
+        // The template is the newest occurrence that still follows the series:
+        // not archived, not edited on its own. "This and all after" edits reach
+        // it, so it carries the series' current details.
         const template = all
-          .filter(o => !o.archived)
+          .filter(o => !o.archived && !o.seriesException)
           .sort((a, b) => (a.ruleDate < b.ruleDate ? 1 : -1))[0];
         if (!template || !template.seriesRule) {
           return 0;
