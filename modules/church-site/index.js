@@ -1,6 +1,8 @@
 // Generic church-system behaviour for the POC. Nothing here names a church:
 // the site's details arrive as the `site` option from sites/<name>/config.js.
 module.exports = {
+  // Interface strings are also needed in the admin (field labels).
+  i18n: { church: { browser: true } },
   options: {
     // Spanish is configured but hidden until the church decides to use it.
     hiddenLocales: [ 'es' ]

@@ -1,0 +1,31 @@
+{% extends data.outerLayout %}
+{% block title %}{{ data.piece.title }}{% endblock %}
+
+{# Replaces the stock page of @apostrophecms/event-page (LGC-41). #}
+{% block main %}
+  <main id="main" class="church-main">
+    {% set status = data.piece.status %}
+    <h1{% if status == 'cancelled' %} style="text-decoration: line-through"{% endif %}>{{ data.piece.title }}</h1>
+    {% if status == 'cancelled' %}
+      <p role="status"><strong>{{ __t('church:eventStatusCancelled') }}</strong></p>
+    {% elif status == 'changed' %}
+      <p role="status"><strong>{{ __t('church:eventStatusChanged') }}</strong></p>
+    {% endif %}
+    {% if data.piece.publicEvent == false %}
+      <p>{{ __t('church:eventMembersOnly') }}</p>
+    {% endif %}
+    <p>{{ apos.event.whenText(data.piece, data.locale) }}</p>
+    {% if data.piece.place %}
+      <p>{{ __t('church:eventPlace') }}: {{ data.piece.place }}</p>
+    {% endif %}
+    {% if data.piece.contactName %}
+      <p>{{ __t('church:eventContact') }}: {{ data.piece.contactName }}</p>
+    {% endif %}
+    {% if data.piece.description %}
+      <p>{{ data.piece.description }}</p>
+    {% endif %}
+    {% if status != 'cancelled' %}
+      <p><a class="church-button" href="{{ apos.event.googleCalendarUrl(data.piece) }}" rel="noopener" target="_blank">{{ __t('church:eventAddToGoogle') }}</a></p>
+    {% endif %}
+  </main>
+{% endblock %}
