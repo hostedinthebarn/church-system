@@ -14,6 +14,30 @@ test.describe('home page', () => {
     await expect(page.getByRole('link', { name: 'Give' })).toBeVisible();
   });
 
+  test('uses the self-hosted fonts, and shows the name as text until a logo is uploaded', async ({ page }) => {
+    const external = [];
+    page.on('request', request => {
+      const url = new URL(request.url());
+      if (url.hostname !== 'localhost') {
+        external.push(request.url());
+      }
+    });
+    await page.goto('/');
+    await page.evaluate(() => document.fonts.ready);
+    const fonts = await page.evaluate(() => ({
+      h1: window.getComputedStyle(document.querySelector('h1')).fontFamily,
+      body: window.getComputedStyle(document.body).fontFamily,
+      loaded: [ ...document.fonts ].filter(face => face.status === 'loaded').map(face => face.family)
+    }));
+    expect(fonts.h1).toMatch(/^Jost/);
+    expect(fonts.body).toMatch(/^Inter/);
+    expect(fonts.loaded.join(' ')).toMatch(/Jost/);
+    expect(fonts.loaded.join(' ')).toMatch(/Inter/);
+    expect(external).toEqual([]);
+    await expect(page.locator('.church-name')).toContainText('La Grange Church of Christ');
+    await expect(page.locator('.church-logo')).toHaveCount(0);
+  });
+
   test('has no axe violations', async ({ page }) => {
     await page.goto('/');
     const results = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze();

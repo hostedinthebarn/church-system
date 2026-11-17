@@ -6,7 +6,7 @@ An open-source church website and members area, built on [ApostropheCMS 4](https
 
 It covers a public home page and calendar, a members directory with households, groups and a servers roster, events with calendar feeds, a weekly bulletin, and a weekly task list for the church office. Volunteers can also update it by asking Claude, through the companion [apostrophe-mcp](https://github.com/hostedinthebarn/apostrophe-mcp) server.
 
-MIT licensed. Changes reach `main` through pull requests only.
+MIT licensed; the fonts (Jost, Inter) are OFL, see THIRD-PARTY-NOTICES.md. The church's logo is never in this repo: the office uploads it in the site settings. Changes reach `main` through pull requests only.
 
 ## Run it locally
 
