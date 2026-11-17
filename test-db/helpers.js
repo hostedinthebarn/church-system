@@ -23,6 +23,7 @@ async function start(extra = {}) {
       'away-date': {},
       'bulletin-standing': {},
       bulletin: {},
+      tasks: {},
       ...extra
     }
   });

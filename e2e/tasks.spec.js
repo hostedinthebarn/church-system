@@ -1,0 +1,63 @@
+const { test, expect } = require('@playwright/test');
+const AxeBuilder = require('@axe-core/playwright').default;
+const { spawnSync } = require('node:child_process');
+const path = require('node:path');
+
+const AXE_TAGS = [ 'wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa' ];
+const PASSWORD = process.env.E2E_ADMIN_PASSWORD || 'e2e-only-password';
+
+test.describe.configure({ mode: 'serial' });
+
+test.beforeAll(() => {
+  // A repeat run finds the user already there and exits with an error: fine.
+  spawnSync('node', [ path.join(__dirname, 'seed-admin.js') ], {
+    env: process.env,
+    timeout: 120_000
+  });
+});
+
+async function signIn(page) {
+  await page.goto('/login');
+  await page.locator('input[type="text"], input[name="username"]').first().fill('e2e-admin');
+  await page.locator('input[type="password"]').fill(PASSWORD);
+  await page.locator('input[type="password"]').press('Enter');
+  await page.waitForURL(url => !url.pathname.startsWith('/login'));
+}
+
+test('the tasks screens are for the office only', async ({ request }) => {
+  for (const url of [ '/tasks', '/tasks/template', '/tasks/week/2026-11-16' ]) {
+    expect((await request.get(url)).status(), url).toBe(404);
+  }
+  const post = await request.post('/tasks/tick', { data: {} });
+  expect(post.status()).toBeGreaterThanOrEqual(400);
+});
+
+test('this week: the template is there, add a one-off, tick it', async ({ page }) => {
+  await signIn(page);
+  await page.goto('/tasks');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Weekly tasks');
+  await expect(page.locator('[data-tasks]')).toContainText('Build the bulletin');
+  const title = `Order tags ${Date.now()}`;
+  await page.getByLabel('Task', { exact: true }).fill(title);
+  await page.getByLabel('Day').selectOption('friday');
+  await page.getByRole('button', { name: 'Add task' }).click();
+  const row = page.locator('li', { hasText: title });
+  await expect(row).toBeVisible();
+  await row.getByRole('button', { name: 'Tick' }).click();
+  await expect(page.locator('li', { hasText: title })).toContainText('Done by');
+});
+
+test('the tasks screens have no axe violations', async ({ page }) => {
+  await signIn(page);
+  for (const url of [ '/tasks', '/tasks/template' ]) {
+    await page.goto(url);
+    await expect(page.locator('[data-tasks]')).toBeVisible();
+    const results = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze();
+    expect(results.violations, url).toEqual([]);
+  }
+});
+
+test('a future week is not found', async ({ page }) => {
+  await signIn(page);
+  expect((await page.goto('/tasks/week/2099-01-04')).status()).toBe(404);
+});

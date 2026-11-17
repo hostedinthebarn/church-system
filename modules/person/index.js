@@ -132,6 +132,12 @@ module.exports = {
         help: 'Signs in as an office admin, not a member. Needs an email and an adult.',
         def: false
       },
+      remindersOff: {
+        type: 'boolean',
+        label: 'Stop the weekly-task reminder emails',
+        help: 'Only matters for office admins, who can own tasks on the weekly list.',
+        def: false
+      },
       showBaptism: {
         type: 'boolean',
         label: 'Show the baptism date to members',
@@ -155,7 +161,7 @@ module.exports = {
       },
       office: {
         label: 'Office',
-        fields: [ 'status', 'inactiveReason', 'officeAdmin', 'baptismDate', 'showBaptism' ]
+        fields: [ 'status', 'inactiveReason', 'officeAdmin', 'remindersOff', 'baptismDate', 'showBaptism' ]
       }
     }
   },
