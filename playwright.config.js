@@ -1,15 +1,7 @@
 const { defineConfig } = require('@playwright/test');
+const { e2eMongoUri } = require('./e2e/mongo-uri');
 
 const port = process.env.E2E_PORT || '3100';
-
-// The browser tests reset and fill their own database (church-system-e2e), on
-// the same server as APOS_MONGODB_URI, never the database that variable names.
-function e2eMongoUri() {
-  const base = process.env.APOS_MONGODB_URI || 'mongodb://localhost:27017/x';
-  const url = new URL(base);
-  url.pathname = '/church-system-e2e';
-  return url.toString();
-}
 
 module.exports = defineConfig({
   testDir: 'e2e',

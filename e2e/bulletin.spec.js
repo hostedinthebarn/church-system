@@ -1,7 +1,5 @@
 const { test, expect } = require('@playwright/test');
 const AxeBuilder = require('@axe-core/playwright').default;
-const { spawnSync } = require('node:child_process');
-const path = require('node:path');
 
 const AXE_TAGS = [ 'wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa' ];
 const DATE = '2026-11-15';
@@ -9,14 +7,6 @@ const OTHER = '2026-11-22';
 const PASSWORD = process.env.E2E_ADMIN_PASSWORD || 'e2e-only-password';
 
 test.describe.configure({ mode: 'serial' });
-
-test.beforeAll(() => {
-  // A repeat run finds the user already there and exits with an error: fine.
-  spawnSync('node', [ path.join(__dirname, 'seed-admin.js') ], {
-    env: process.env,
-    timeout: 120_000
-  });
-});
 
 async function signIn(page) {
   await page.goto('/login');

@@ -1,7 +1,5 @@
 const { test, expect } = require('@playwright/test');
 const AxeBuilder = require('@axe-core/playwright').default;
-const { spawnSync } = require('node:child_process');
-const path = require('node:path');
 
 const AXE_TAGS = [ 'wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa' ];
 const PASSWORD = process.env.E2E_ADMIN_PASSWORD || 'e2e-only-password';
@@ -9,19 +7,6 @@ const PASSWORD = process.env.E2E_ADMIN_PASSWORD || 'e2e-only-password';
 const MONTH = `${3000 + Math.floor(Math.random() * 6000)}-0${1 + Math.floor(Math.random() * 9)}`;
 
 test.describe.configure({ mode: 'serial' });
-
-test.beforeAll(() => {
-  // The admin may exist already (an error we ignore); the roles are made once.
-  spawnSync('node', [ path.join(__dirname, 'seed-admin.js') ], {
-    env: process.env,
-    timeout: 120_000
-  });
-  const seeded = spawnSync('node', [ path.join(__dirname, '..', 'app.js'), 'serving-role:seed' ], {
-    env: process.env,
-    timeout: 120_000
-  });
-  expect(seeded.status).toBe(0);
-});
 
 async function signIn(page) {
   await page.goto('/login');
