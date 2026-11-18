@@ -6,8 +6,16 @@
     <p class="church-name"><strong>{{ site.name }}</strong></p>
     <p class="home-links">
       <a class="church-signin" href="/members/directory">{{ __t('church:directoryTitle') }}</a>
-      <a class="church-signin" href="/sign-in">{{ __t('church:memberSignIn') }}</a>
+      {% if not data.user %}
+        <a class="church-signin" href="/sign-in">{{ __t('church:memberSignIn') }}</a>
+      {% endif %}
     </p>
+    {% if data.user %}
+      <nav aria-label="{{ __t('church:memberLinks') }}">
+        <a href="/away">{{ __t('church:awayTitle') }}</a>
+        {% if data.user.role == 'admin' %} · <a href="/roster">{{ __t('church:rosterTitle') }}</a>{% endif %}
+      </nav>
+    {% endif %}
   </header>
   <main id="main" class="church-main">
     <h1>{{ __t('church:welcome') }}</h1>

@@ -54,6 +54,8 @@ require('apostrophe')({
     '@apostrophecms/event': {},
     '@apostrophecms/event-page': {},
     'church-calendar': {},
+    'serving-role': {},
+    roster: {},
     'bulletin-standing': {},
     bulletin: {},
     // The timer that builds the week and sends the morning reminders.

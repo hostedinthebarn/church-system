@@ -29,7 +29,7 @@ module.exports = {
     // The record types that are audited.
     types: [
       'person', 'household', 'person-relationship', 'group', 'office-note', 'away-date',
-      'bulletin', 'bulletin-standing'
+      'bulletin', 'bulletin-standing', 'serving-role', 'roster'
     ]
   },
   init(self) {

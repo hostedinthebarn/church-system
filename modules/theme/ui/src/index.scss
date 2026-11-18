@@ -299,4 +299,41 @@ legend { padding: 0 0.4rem; font-weight: 700; }
   align-items: center;
   min-height: 44px;
   min-width: 44px;
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+// The roster screens (LGC-44)
+.church-main fieldset {
+  margin: 0 0 1rem;
+}
+
+.church-main fieldset label {
+  display: inline-block;
+  margin-right: 1rem;
+}
+
+.roster-print table {
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+}
+
+.roster-print th,
+.roster-print td {
+  border: 1px solid currentcolor;
+  padding: 0.25rem 0.5rem;
+  text-align: left;
+}
+
+@media print {
+  .demo-banner,
+  .skip-link,
+  .roster-noprint {
+    display: none;
+  }
 }

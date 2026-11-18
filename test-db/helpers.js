@@ -24,6 +24,8 @@ async function start(extra = {}) {
       '@apostrophecms/event': {},
       '@apostrophecms/event-page': {},
       'church-calendar': {},
+      'serving-role': {},
+      roster: {},
       'bulletin-standing': {},
       bulletin: {},
       'church-directory': {},
