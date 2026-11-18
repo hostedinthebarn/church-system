@@ -1,0 +1,132 @@
+{% extends data.outerLayout %}
+
+{% block title %}{{ __t('church:editTitle', { name: data.householdName }) }}{% endblock %}
+
+{% block main %}
+  {% set f = data.form %}
+  {% include "_nav.html" %}
+  <main id="main" class="church-main edit">
+    <p class="crumb">
+      <a href="/members/directory">{{ __t('church:directoryTitle') }}</a> {{ '›' }}
+      <a href="/members/household/{{ data.householdId }}">{{ data.householdName }}</a>
+    </p>
+    <h1>{{ __t('church:editTitle', { name: data.householdName }) }}</h1>
+    <p class="muted">{% if f.office %}{{ __t('church:editIntroOffice') }}{% else %}{{ __t('church:editIntroMember') }}{% endif %}</p>
+    {% if data.hasErrors %}<p class="error-summary" role="alert">{{ __t('church:editErrors') }}</p>{% endif %}
+
+    <form method="post" action="/members/household/{{ data.householdId }}/edit" novalidate>
+      <input type="hidden" name="token" value="{{ data.nav.token }}">
+
+      <fieldset>
+        <legend>{{ __t('church:home') }}</legend>
+        {% if f.office %}
+          <div class="field">
+            <label for="f-title">{{ __t('church:householdName') }}</label>
+            <input type="text" id="f-title" name="title" value="{{ f.title.value }}" autocomplete="off"{% if f.title.error %} aria-invalid="true" aria-describedby="f-title-err"{% endif %}>
+            {% if f.title.error %}<p class="error" id="f-title-err">{{ f.title.error }}</p>{% endif %}
+          </div>
+          <label class="check"><input type="checkbox" name="autoName"{% if f.autoName %} checked{% endif %}> {{ __t('church:autoName') }}</label>
+        {% endif %}
+        <div class="field">
+          <label for="f-street">{{ __t('church:street') }}</label>
+          <input type="text" id="f-street" name="street" value="{{ f.street }}" autocomplete="street-address">
+        </div>
+        <div class="fgrid">
+          <div class="field">
+            <label for="f-city">{{ __t('church:city') }}</label>
+            <input type="text" id="f-city" name="city" value="{{ f.city }}" autocomplete="address-level2">
+          </div>
+          <div class="field">
+            <label for="f-state">{{ __t('church:state') }}</label>
+            <input type="text" id="f-state" name="state" value="{{ f.state }}" autocomplete="address-level1">
+          </div>
+          <div class="field">
+            <label for="f-zip">{{ __t('church:zip') }}</label>
+            <input type="text" id="f-zip" name="zip" value="{{ f.zip }}" autocomplete="postal-code" inputmode="numeric">
+          </div>
+        </div>
+        <div class="field">
+          <label for="f-homePhone">{{ __t('church:homePhoneLandline') }}</label>
+          <input type="tel" id="f-homePhone" name="homePhone" value="{{ f.homePhone }}" aria-describedby="f-homePhone-h" autocomplete="tel">
+          <p class="hint" id="f-homePhone-h">{{ __t('church:homePhoneHint') }}</p>
+        </div>
+        <label class="check"><input type="checkbox" name="directoryOptOut"{% if f.directoryOptOut %} checked{% endif %}> {{ __t('church:optOutLabel') }}</label>
+      </fieldset>
+
+      {% for person in f.people %}
+        <fieldset>
+          <legend>{{ person.name }}{% if person.minor %} ({{ __t('church:childLower') }}){% endif %}</legend>
+          <div class="fgrid">
+            <div class="field">
+              <label for="{{ person.fields.firstName.id }}">{{ __t('church:firstName') }}</label>
+              <input type="text" id="{{ person.fields.firstName.id }}" name="{{ person.fields.firstName.name }}" value="{{ person.fields.firstName.value }}"{% if person.fields.firstName.error %} aria-invalid="true" aria-describedby="{{ person.fields.firstName.id }}-err"{% endif %}>
+              {% if person.fields.firstName.error %}<p class="error" id="{{ person.fields.firstName.id }}-err">{{ person.fields.firstName.error }}</p>{% endif %}
+            </div>
+            <div class="field">
+              <label for="{{ person.fields.lastName.id }}">{{ __t('church:lastName') }}</label>
+              <input type="text" id="{{ person.fields.lastName.id }}" name="{{ person.fields.lastName.name }}" value="{{ person.fields.lastName.value }}"{% if person.fields.lastName.error %} aria-invalid="true" aria-describedby="{{ person.fields.lastName.id }}-err"{% endif %}>
+              {% if person.fields.lastName.error %}<p class="error" id="{{ person.fields.lastName.id }}-err">{{ person.fields.lastName.error }}</p>{% endif %}
+            </div>
+          </div>
+          <div class="fgrid">
+            <div class="field">
+              <label for="{{ person.fields.preferredName.id }}">{{ __t('church:goesBy') }}</label>
+              <input type="text" id="{{ person.fields.preferredName.id }}" name="{{ person.fields.preferredName.name }}" value="{{ person.fields.preferredName.value }}">
+            </div>
+            <div class="field">
+              <label for="{{ person.fields.dateOfBirth.id }}">{{ __t('church:dateOfBirth') }}</label>
+              <input type="date" id="{{ person.fields.dateOfBirth.id }}" name="{{ person.fields.dateOfBirth.name }}" value="{{ person.fields.dateOfBirth.value }}"{% if person.fields.dateOfBirth.error %} aria-invalid="true" aria-describedby="{{ person.fields.dateOfBirth.id }}-err"{% else %} aria-describedby="{{ person.fields.dateOfBirth.id }}-h"{% endif %}>
+              <p class="hint" id="{{ person.fields.dateOfBirth.id }}-h">{% if f.office %}{{ __t('church:dobHintOffice') }}{% else %}{{ __t('church:dobHint') }}{% endif %}</p>
+              {% if person.fields.dateOfBirth.error %}<p class="error" id="{{ person.fields.dateOfBirth.id }}-err">{{ person.fields.dateOfBirth.error }}</p>{% endif %}
+            </div>
+          </div>
+          <div class="field">
+            <label for="{{ person.fields.cellphone.id }}">{{ __t('church:cellphoneOptional') }}</label>
+            <input type="tel" id="{{ person.fields.cellphone.id }}" name="{{ person.fields.cellphone.name }}" value="{{ person.fields.cellphone.value }}"{% if person.minor %} aria-describedby="{{ person.fields.cellphone.id }}-h"{% endif %}>
+            {% if person.minor %}<p class="hint" id="{{ person.fields.cellphone.id }}-h">{{ __t('church:minorContactHint') }}</p>{% endif %}
+          </div>
+          {% if not person.minor %}
+            <label class="check"><input type="checkbox" id="{{ person.hide.cellphone.id }}" name="{{ person.hide.cellphone.name }}"{% if person.hide.cellphone.checked %} checked{% endif %}> {{ __t('church:hideCellphone') }}</label>
+          {% endif %}
+          <div class="field">
+            <label for="{{ person.fields.email.id }}">{{ __t('church:emailOptional') }}</label>
+            <input type="email" id="{{ person.fields.email.id }}" name="{{ person.fields.email.name }}" value="{{ person.fields.email.value }}" autocomplete="off" aria-describedby="{{ person.fields.email.id }}-h{% if person.fields.email.error %} {{ person.fields.email.id }}-err{% endif %}"{% if person.fields.email.error %} aria-invalid="true"{% endif %}>
+            <p class="hint" id="{{ person.fields.email.id }}-h">{% if person.minor %}{{ __t('church:minorEmailHint') }}{% elif person.self %}{{ __t('church:ownEmailHint') }}{% else %}{{ __t('church:emailHint') }}{% endif %}</p>
+            {% if person.fields.email.error %}<p class="error" id="{{ person.fields.email.id }}-err">{{ person.fields.email.error }}</p>{% endif %}
+          </div>
+          {% if not person.minor %}
+            <label class="check"><input type="checkbox" id="{{ person.hide.email.id }}" name="{{ person.hide.email.name }}"{% if person.hide.email.checked %} checked{% endif %}> {{ __t('church:hideEmail') }}</label>
+            <label class="check"><input type="checkbox" id="{{ person.hide.address.id }}" name="{{ person.hide.address.name }}"{% if person.hide.address.checked %} checked{% endif %}> {{ __t('church:hideAddress') }}</label>
+          {% endif %}
+          {% if f.office %}
+            <div class="fgrid">
+              <div class="field">
+                <label for="{{ person.status.id }}">{{ __t('church:statusOfficeOnly') }}</label>
+                <select id="{{ person.status.id }}" name="{{ person.status.name }}">
+                  <option value="{{ 'member' }}"{% if person.status.value == 'member' %} selected{% endif %}>{{ __t('church:statusMember') }}</option>
+                  <option value="{{ 'regular' }}"{% if person.status.value == 'regular' %} selected{% endif %}>{{ __t('church:statusRegular') }}</option>
+                  <option value="{{ 'visitor' }}"{% if person.status.value == 'visitor' %} selected{% endif %}>{{ __t('church:statusVisitor') }}</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="{{ person.inactiveReason.id }}">{{ __t('church:inactiveOfficeOnly') }}</label>
+                <select id="{{ person.inactiveReason.id }}" name="{{ person.inactiveReason.name }}">
+                  <option value="{{ '' }}"{% if not person.inactiveReason.value %} selected{% endif %}>{{ __t('church:active') }}</option>
+                  <option value="{{ 'deceased' }}"{% if person.inactiveReason.value == 'deceased' %} selected{% endif %}>{{ __t('church:inactiveDeceased') }}</option>
+                  <option value="{{ 'moved' }}"{% if person.inactiveReason.value == 'moved' %} selected{% endif %}>{{ __t('church:inactiveMoved') }}</option>
+                  <option value="{{ 'left' }}"{% if person.inactiveReason.value == 'left' %} selected{% endif %}>{{ __t('church:inactiveLeft') }}</option>
+                </select>
+              </div>
+            </div>
+          {% endif %}
+        </fieldset>
+      {% endfor %}
+
+      {% if not f.office %}<p class="muted">{{ __t('church:askOfficeToAdd') }}</p>{% endif %}
+      <p class="actions">
+        <button type="submit" class="btn">{{ __t('church:saveChanges') }}</button>
+        <a class="btn ghost" href="/members/household/{{ data.householdId }}">{{ __t('church:cancel') }}</a>
+      </p>
+    </form>
+  </main>
+{% endblock %}

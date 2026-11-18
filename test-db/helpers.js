@@ -26,6 +26,7 @@ async function start(extra = {}) {
       'church-calendar': {},
       'bulletin-standing': {},
       bulletin: {},
+      'church-directory': {},
       ...extra
     }
   });

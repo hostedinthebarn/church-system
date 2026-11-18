@@ -1,0 +1,12 @@
+{% extends data.outerLayout %}
+
+{% block title %}{{ __t('church:notFoundTitle') }}{% endblock %}
+
+{% block main %}
+  {% include "_nav.html" %}
+  <main id="main" class="church-main">
+    <h1>{{ __t('church:notFoundTitle') }}</h1>
+    <p>{{ __t('church:notFoundBody') }}</p>
+    <p><a class="btn" href="/members/directory">{{ __t('church:backToDirectory') }}</a></p>
+  </main>
+{% endblock %}

@@ -379,3 +379,23 @@ test('a hidden birthday is not shown to another household', () => {
   });
   assert.equal(view.birthday, null);
 });
+
+test('storedFields ignores the bookkeeping Apostrophe adds inside object fields', () => {
+  const seeded = {
+    _id: 'h',
+    address: {
+      street: '1 A St',
+      metaType: 'object'
+    }
+  };
+  const saved = {
+    _id: 'h',
+    address: {
+      street: '1 A St',
+      metaType: 'object',
+      _objectFieldId: 'doc.household.address'
+    }
+  };
+  assert.deepEqual(rules.storedFields(saved), rules.storedFields(seeded));
+  assert.deepEqual(rules.storedFields(saved).address, { street: '1 A St' });
+});

@@ -9,3 +9,4 @@ data/
 apos-build/
 test-results/
 playwright-report/
+e2e/.auth/
