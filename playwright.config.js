@@ -6,6 +6,9 @@ module.exports = defineConfig({
   testDir: 'e2e',
   // The first start builds Apostrophe's assets, which is slow.
   timeout: 60_000,
+  // Each browser brings many threads. Four at once go past the 512-process limit
+  // of the container our agents test in, so outside CI they run one at a time.
+  workers: process.env.CI ? undefined : 1,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? 'list' : 'line',
   use: {
