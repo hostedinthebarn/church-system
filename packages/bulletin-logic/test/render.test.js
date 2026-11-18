@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   esc, blockHtml, buildBulletin, viewFor, renderSheet, sheetCss, renderDocument, renderWebsite,
-  OVERFLOW_SCRIPT, READING_ORDER
+  OVERFLOW_SCRIPT, READING_ORDER, logoHtml, FONT_HEADING, FONT_BODY
 } from '../src/index.js';
 
 const site = { name: 'Test <Church>', tagline: 'Loving God' };
@@ -65,7 +65,32 @@ test('the preview says what is empty; the print does not', () => {
   assert.match(renderSheet(view, { site, mode: 'preview' }), /Nothing here yet/);
   assert.ok(!renderSheet(view, { site, mode: 'print' }).includes('Nothing here yet'));
   const noName = renderSheet(view);
-  assert.match(noName, /class="church"><\/p>/);
+  assert.match(noName, /class="church logo-text"><\/p>/);
+});
+
+test('the cover shows the uploaded logo, or the church name as text when there is none', () => {
+  const view = viewFor(model, 'print');
+  const none = renderSheet(view, { site });
+  assert.match(none, /<p class="church logo-text">Test &lt;Church&gt;<\/p>/);
+  assert.ok(!none.includes('<img'));
+  const logo = { src: 'data:image/png;base64,AAAA', alt: 'Test logo "x"' };
+  const set = renderSheet(view, { site, logo });
+  assert.match(set, /<img class="logo" src="data:image\/png;base64,AAAA" alt="Test logo &quot;x&quot;">/);
+  assert.ok(!set.includes('logo-text'));
+  // No alt text given: the church's name.
+  assert.match(logoHtml({ src: '/x.png' }, 'Name'), /alt="Name"/);
+  assert.match(logoHtml({ src: '/x.png' }), /alt=""/);
+  assert.match(logoHtml({ src: '' }, 'Name'), /logo-text/);
+});
+
+test('the fonts are Jost for headings and Inter for body, with no CDN', () => {
+  const css = sheetCss();
+  assert.ok(css.includes(FONT_HEADING));
+  assert.ok(css.includes(FONT_BODY));
+  assert.match(FONT_HEADING, /^'Jost'/);
+  assert.match(FONT_BODY, /^'Inter'/);
+  assert.ok(!/Georgia|Helvetica, Arial/.test(css));
+  assert.ok(!/googleapis|gstatic|typekit/.test(css));
 });
 
 test('the css sets legal landscape and keeps colour', () => {
@@ -97,5 +122,13 @@ test('website: only sections switched on, reading order, no prayer list, banner 
   assert.ok(html.indexOf('data-section="announcements"') < html.indexOf('data-section="leadership"'));
   const bare = renderWebsite(viewFor(model, 'website'));
   assert.ok(!bare.includes('data-demo-banner'));
+  assert.ok(!bare.includes('<img'));
+  const withLogo = renderWebsite(viewFor(model, 'website'), {
+    site,
+    logo: { src: '/uploads/l.png', alt: 'Logo' },
+    head: '<style>/* fonts */</style>'
+  });
+  assert.match(withLogo, /<img class="logo" src="\/uploads\/l.png" alt="Logo">\s*<\/p>\s*<h1>/);
+  assert.match(withLogo, /\/\* fonts \*\//);
   assert.match(bare, /<title>Church bulletin/);
 });

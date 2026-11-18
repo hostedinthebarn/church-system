@@ -299,6 +299,15 @@ module.exports = {
         }
         return date;
       },
+      // `fonts` and `logo` for a page. Screen pages link the fonts and the
+      // logo; the PDF embeds both (`embed`), so it needs nothing from the site.
+      async assets(req, { embed = false } = {}) {
+        const church = self.apos.modules['church-site'];
+        return {
+          logo: await church.logo(req, { embed }),
+          fontCss: church.fontFaceCss({ embed })
+        };
+      },
       async pdf(html) {
         // Same engine as the preview. playwright-core drives an installed
         // Google Chrome; BULLETIN_PDF_CHANNEL can name another channel.
@@ -307,6 +316,7 @@ module.exports = {
         try {
           const page = await browser.newPage();
           await page.setContent(html, { waitUntil: 'load' });
+          await page.evaluate(() => document.fonts.ready);
           return await page.pdf({
             width: `${logic.SHEET.widthIn}in`,
             height: `${logic.SHEET.heightIn}in`,
@@ -318,13 +328,14 @@ module.exports = {
           await browser.close();
         }
       },
-      printHtml(view) {
+      printHtml(view, { logo = null, fontCss = '' } = {}) {
         return logic.renderDocument({
           title: `Bulletin ${view.weekOf}`,
-          head: `<style>${logic.sheetCss()}</style>`,
+          head: `<style>${fontCss}\n${logic.sheetCss()}</style>`,
           body: logic.renderSheet(view, {
             site: self.sheetSite(),
-            mode: 'print'
+            mode: 'print',
+            logo
           }),
           script: logic.OVERFLOW_SCRIPT
         });
@@ -365,10 +376,13 @@ module.exports = {
             return res.status(404).send('Not found');
           }
           const view = logic.viewFor(await self.model(reader, date, doc), 'website');
+          const { logo, fontCss } = await self.assets(reader);
           res.set('Cache-Control', 'no-store');
           return res.send(logic.renderWebsite(view, {
             site: self.siteConfig(),
-            demoBanner: req.t('church:demoBanner')
+            demoBanner: req.t('church:demoBanner'),
+            logo,
+            head: `<style>${fontCss}</style>`
           }));
         }),
         '/bulletin/:date/edit': safe(async (req, res) => {
@@ -378,8 +392,11 @@ module.exports = {
           }
           const doc = await self.findWeek(req, date);
           const model = await self.model(req, date, doc);
+          const { logo, fontCss } = await self.assets(req);
           res.set('Cache-Control', 'no-store');
           return res.send(renderEditor({
+            logo,
+            fontCss,
             model,
             doc,
             site: self.sheetSite(),
@@ -396,7 +413,7 @@ module.exports = {
           }
           const model = await self.model(req, date, await self.findWeek(req, date));
           res.set('Cache-Control', 'no-store');
-          return res.send(self.printHtml(logic.viewFor(model, 'print')));
+          return res.send(self.printHtml(logic.viewFor(model, 'print'), await self.assets(req)));
         }),
         '/bulletin/:date/pdf': safe(async (req, res) => {
           const date = self.validDate(req, res);
@@ -404,7 +421,7 @@ module.exports = {
             return;
           }
           const model = await self.model(req, date, await self.findWeek(req, date));
-          const pdf = await self.pdf(self.printHtml(logic.viewFor(model, 'print')));
+          const pdf = await self.pdf(self.printHtml(logic.viewFor(model, 'print'), await self.assets(req, { embed: true })));
           res.set({
             'Content-Type': 'application/pdf',
             'Content-Disposition': `attachment; filename="bulletin-${date}.pdf"`,

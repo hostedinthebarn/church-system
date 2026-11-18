@@ -6,10 +6,23 @@ body {
   margin: 0;
   color: var(--church-ink);
   background: var(--church-paper);
-  font: var(--church-font-size) / 1.5 system-ui, sans-serif;
+  font: var(--church-font-size) / 1.5 var(--church-font-body);
+}
+
+h1, h2, h3, .church-name {
+  font-family: var(--church-font-heading);
+  font-weight: 700;
 }
 
 a { color: var(--church-accent); }
+
+.church-logo {
+  display: block;
+  max-width: min(100%, 24rem);
+  max-height: 6rem;
+  width: auto;
+  height: auto;
+}
 
 .skip-link {
   position: absolute;

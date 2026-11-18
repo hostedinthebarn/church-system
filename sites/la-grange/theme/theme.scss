@@ -7,4 +7,8 @@
   --church-banner-bg: #fff3bf;
   --church-banner-ink: #1b1b1b;
   --church-font-size: 1.125rem;
+  // Self-hosted, open-licensed near matches for the church's Adobe Fonts
+  // (Futura PT headings, Aktiv Grotesk body), which we cannot reuse.
+  --church-font-heading: 'Jost', 'Futura', 'Century Gothic', sans-serif;
+  --church-font-body: 'Inter', system-ui, 'Helvetica Neue', Arial, sans-serif;
 }

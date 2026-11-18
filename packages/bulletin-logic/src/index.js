@@ -5,5 +5,5 @@ export {
 } from './fill.js';
 export { buildBulletin, viewFor, previousSunday } from './model.js';
 export {
-  esc, READING_ORDER, blockHtml, renderSheet, sheetCss, OVERFLOW_SCRIPT, renderDocument, renderWebsite
+  esc, READING_ORDER, blockHtml, renderSheet, sheetCss, OVERFLOW_SCRIPT, renderDocument, renderWebsite, logoHtml, FONT_HEADING, FONT_BODY
 } from './render.js';

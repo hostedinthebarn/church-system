@@ -3,7 +3,12 @@
 {% block main %}
   {% set site = apos.modules['church-site'].site() %}
   <header class="church-header">
-    <p class="church-name"><strong>{{ site.name }}</strong></p>
+    {# The logo is uploaded in the site settings; until then the name shows. #}
+    {% if data.global.logo %}
+      <img class="church-logo" src="{{ apos.attachment.url(data.global.logo, { size: 'full' }) }}" alt="{{ data.global.logoAlt or site.name }}">
+    {% else %}
+      <p class="church-name"><strong>{{ site.name }}</strong></p>
+    {% endif %}
     <p class="home-links">
       <a class="church-signin" href="/members/directory">{{ __t('church:directoryTitle') }}</a>
       {% if not data.user %}
