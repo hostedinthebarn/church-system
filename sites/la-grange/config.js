@@ -43,5 +43,14 @@ module.exports = {
     switches: {},
     sources: require('./bulletin-demo.js')
   },
+  // The weekly tasks list (LGC-43). Reminders for tasks with no owner go to
+  // `officeAddress`: a made-up address here, which the fake sender's outbox
+  // takes. The real office address is set at deploy time. `sources` supplies
+  // the live problems for system items until the events and Facebook work
+  // exists (made-up demo data for now).
+  tasks: {
+    officeAddress: 'office@example.com',
+    sources: require('./tasks-demo.js')
+  },
   giveUrl: 'https://www.fellowshiponegiving.com/App/Form/3835ceb2-5e89-498b-99e0-49c89636cc43'
 };

@@ -27,6 +27,7 @@ async function start(extra = {}) {
       'bulletin-standing': {},
       bulletin: {},
       'church-directory': {},
+      tasks: {},
       ...extra
     }
   });

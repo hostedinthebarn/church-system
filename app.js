@@ -55,6 +55,8 @@ require('apostrophe')({
     '@apostrophecms/event-page': {},
     'church-calendar': {},
     'bulletin-standing': {},
-    bulletin: {}
+    bulletin: {},
+    // The timer that builds the week and sends the morning reminders.
+    tasks: { options: { schedule: process.env.NODE_ENV !== 'test' && process.env.CHURCH_TASKS_TIMER !== 'off' } }
   }
 });
