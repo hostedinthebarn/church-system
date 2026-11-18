@@ -173,9 +173,6 @@ test('the PDF embeds the uploaded logo and both fonts, and links nothing', async
   assert.equal(without.subarray(0, 5).toString(), '%PDF-');
   assert.ok(!/\/Subtype\s*\/Image/.test(without.toString('latin1')));
   assert.ok(without.length < withLogo.length);
-  if (process.env.LOGO_TEST_SAVE_PDF) {
-    fs.writeFileSync(process.env.LOGO_TEST_SAVE_PDF, withLogo);
-  }
 });
 
 test('the fonts are served from the site, only the listed files', async () => {
