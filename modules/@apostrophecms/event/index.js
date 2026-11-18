@@ -11,7 +11,7 @@
 // - Times. The stock module builds start and end in the server's time zone.
 //   Ours are America/Chicago wall-clock times turned into UTC instants.
 // - The series link. `eventGroupId` and `isClone` weren't schema fields, so
-//   publishing lost them (SW-127). They are now, hidden.
+//   publishing lost them (SW-127). They are now, hidden and read-only.
 //
 // Each occurrence is its own record, grouped by eventGroupId. `ruleDate` is the
 // date the repeat rule gave an occurrence, kept when one is moved so the
@@ -155,17 +155,20 @@ module.exports = {
             repeatEnds: 'until'
           }
         },
-        // The series link, and the rule, as plain stored fields so they survive
-        // publishing (Apostrophe copies only schema fields).
+        // The series link, and the rule, as stored fields so they survive
+        // publishing (Apostrophe copies only schema fields). Only this module
+        // sets them: readOnly keeps a save from clearing or changing them.
         eventGroupId: {
           type: 'string',
           label: 'Series',
-          hidden: true
+          hidden: true,
+          readOnly: true
         },
         isClone: {
           type: 'boolean',
           label: 'Repeat copy',
-          hidden: true
+          hidden: true,
+          readOnly: true
         },
         // Set by a "this one only" edit. The nightly top-up never copies an
         // exception, so a one-off change (a guest speaker, a cancellation)
@@ -173,17 +176,20 @@ module.exports = {
         seriesException: {
           type: 'boolean',
           label: 'Edited on its own',
-          hidden: true
+          hidden: true,
+          readOnly: true
         },
         ruleDate: {
           type: 'string',
           label: 'Rule date',
-          hidden: true
+          hidden: true,
+          readOnly: true
         },
         seriesRule: {
           type: 'string',
           label: 'Series rule',
-          hidden: true
+          hidden: true,
+          readOnly: true
         }
       },
       remove: [ 'repeatInterval' ],
