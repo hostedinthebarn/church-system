@@ -343,3 +343,70 @@ test('a "this one only" edit of the newest occurrence is not copied by the top-u
   assert.equal(edited.seriesException, true);
   assert.equal(edited.place, 'Fellowship hall');
 });
+
+const SERIES_LINK = [ 'eventGroupId', 'isClone', 'seriesException', 'ruleDate', 'seriesRule' ];
+
+function pick(doc, names) {
+  return Object.fromEntries(names.map(name => [ name, doc[name] ]));
+}
+
+// A weekly series whose second occurrence has been edited on its own, so every
+// series field on it holds a value worth losing.
+async function editedOccurrence() {
+  const parent = await event.insert(req, {
+    ...event.newInstance(),
+    ...base,
+    title: 'Series link',
+    slug: `series-link-${apos.util.generateId()}`,
+    dateType: 'repeat',
+    repeatPattern: 'weekly',
+    repeatEnds: 'never'
+  });
+  const [ , second ] = await all(parent.eventGroupId);
+  await event.editSeries(req, second._id, 'this', { place: 'Fellowship hall' });
+  return apos.doc.db.findOne({ _id: second._id });
+}
+
+// What an API client or script sends: the event's fields without the series link.
+function clientFields(draft) {
+  const input = {};
+  for (const field of event.schema) {
+    if (!SERIES_LINK.includes(field.name) && !field.name.startsWith('_') && draft[field.name] !== undefined) {
+      input[field.name] = draft[field.name];
+    }
+  }
+  return input;
+}
+
+async function saveThroughConvert(draft, input) {
+  const piece = await event.findOneForEditing(req, { _id: draft._id });
+  await event.convert(req, input, piece);
+  await event.update(req, piece);
+  return apos.doc.db.findOne({ _id: draft._id });
+}
+
+test('a save that leaves out the series fields keeps them', async () => {
+  const draft = await editedOccurrence();
+  assert.equal(draft.isClone, true);
+  assert.equal(draft.seriesException, true);
+  const input = {
+    ...clientFields(draft),
+    place: 'Sanctuary'
+  };
+  const saved = await saveThroughConvert(draft, input);
+  assert.equal(saved.place, 'Sanctuary');
+  assert.deepEqual(pick(saved, SERIES_LINK), pick(draft, SERIES_LINK));
+});
+
+test('series fields sent by a client are ignored', async () => {
+  const draft = await editedOccurrence();
+  const saved = await saveThroughConvert(draft, {
+    ...clientFields(draft),
+    eventGroupId: 'another-series',
+    isClone: false,
+    seriesException: false,
+    ruleDate: '2030-01-01',
+    seriesRule: '{}'
+  });
+  assert.deepEqual(pick(saved, SERIES_LINK), pick(draft, SERIES_LINK));
+});
