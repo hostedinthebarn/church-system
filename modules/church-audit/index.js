@@ -29,7 +29,7 @@ module.exports = {
     // The record types that are audited.
     types: [
       'person', 'household', 'person-relationship', 'group', 'office-note', 'away-date',
-      'bulletin', 'bulletin-standing'
+      'bulletin', 'bulletin-standing', 'serving-role', 'roster'
     ]
   },
   init(self) {
@@ -97,7 +97,9 @@ module.exports = {
       // Writes one entry. Also used by code that changes a record directly,
       // such as the household's generated name.
       async record(req, action, doc, changes) {
-        const user = req && req.user;
+        // `actingUser` is set when a record is saved on someone's behalf, as
+        // when a member edits their household through the directory.
+        const user = req && (req.actingUser || req.user);
         await self.collection.insertOne({
           at: new Date(),
           action,

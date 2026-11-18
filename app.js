@@ -44,6 +44,7 @@ require('apostrophe')({
     theme: {},
     'church-signin': {},
     'church-audit': {},
+    'church-directory': {},
     person: {},
     household: {},
     'person-relationship': {},
@@ -53,7 +54,11 @@ require('apostrophe')({
     '@apostrophecms/event': {},
     '@apostrophecms/event-page': {},
     'church-calendar': {},
+    'serving-role': {},
+    roster: {},
     'bulletin-standing': {},
-    bulletin: {}
+    bulletin: {},
+    // The timer that builds the week and sends the morning reminders.
+    tasks: { options: { schedule: process.env.NODE_ENV !== 'test' && process.env.CHURCH_TASKS_TIMER !== 'off' } }
   }
 });

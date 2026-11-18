@@ -4,7 +4,7 @@
 // strings are gathered in S so they can move to the i18n files together.
 const {
   esc, handFields, SECTIONS, renderSheet, sheetCss, OVERFLOW_SCRIPT,
-  renderDocument, viewFor
+  renderDocument, viewFor, FONT_BODY, FONT_HEADING
 } = require('@church-system/bulletin-logic');
 
 const S = {
@@ -129,7 +129,7 @@ const CLIENT = csrfName => `
 
 // model: buildBulletin(...) result; doc: the saved bulletin or null.
 function renderEditor({
-  model, doc, site, date, csrfName, demoBanner, figuresDefault
+  model, doc, site, date, csrfName, demoBanner, figuresDefault, logo = null, fontCss = ''
 }) {
   const status = (doc && doc.status) || 'draft';
   const view = viewFor(model, 'print');
@@ -163,13 +163,16 @@ function renderEditor({
 <section aria-labelledby="fit"><h2 id="fit">${esc(S.panels)}</h2><ul data-overflow-status aria-live="polite"></ul></section>
 <section aria-labelledby="pv"><h2 id="pv">${esc(S.preview)}</h2><div class="preview" tabindex="0" role="region" aria-labelledby="pv" style="overflow:auto">${renderSheet(view, {
  site,
-mode: 'preview'
+mode: 'preview',
+logo
 })}</div></section>
 </main>`;
-  const css = `${sheetCss()}
-.editor { max-width: 60rem; margin: 0 auto; padding: 1rem; font: 1rem/1.5 Helvetica, Arial, sans-serif; }
+  const css = `${fontCss}
+${sheetCss()}
+.editor { max-width: 60rem; margin: 0 auto; padding: 1rem; font: 1rem/1.5 ${FONT_BODY}; }
+.editor h1, .editor h2 { font-family: ${FONT_HEADING}; }
 .editor .preview { max-width: 100%; }
-.demo-banner { background: #fde68a; padding: .5rem 1rem; margin: 0; font-family: Helvetica, Arial, sans-serif; }
+.demo-banner { background: #fde68a; padding: .5rem 1rem; margin: 0; }
 fieldset { margin: 0 0 1rem; } textarea { max-width: 100%; }
 `;
   return renderDocument({

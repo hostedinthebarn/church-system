@@ -1,0 +1,20 @@
+{% set site = apos.modules['church-site'].site() %}
+<header class="church-header church-nav">
+  <p class="church-name"><a href="/"><strong>{{ site.name }}</strong></a></p>
+  {% if data.nav %}
+    <nav class="member-nav" aria-label="{{ __t('church:memberNavLabel') }}">
+      <a href="/members/directory">{{ __t('church:directoryTitle') }}</a>
+      {% if data.nav.householdId %}
+        <a href="/members/household/{{ data.nav.householdId }}">{{ __t('church:myHousehold') }}</a>
+      {% endif %}
+      <form method="post" action="/members/sign-out" class="inline-form">
+        <input type="hidden" name="token" value="{{ data.nav.token }}">
+        <button type="submit" class="btn ghost">{{ __t('church:signOut') }}</button>
+      </form>
+    </nav>
+    <p class="who">
+      {{ __t('church:signedInAs', { name: data.nav.name }) }}
+      {% if data.nav.office %}<span class="tag office">{{ __t('church:officeAdmin') }}</span>{% endif %}
+    </p>
+  {% endif %}
+</header>

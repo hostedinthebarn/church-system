@@ -64,23 +64,32 @@ function sectionHtml(section, mode) {
   return `<section class="sec sec--${esc(section.id)}" data-section="${esc(section.id)}">${heading}${body}${empty}</section>`;
 }
 
-const LOGO = `<svg class="logo" viewBox="0 0 64 64" role="img" aria-label="Church logo (placeholder)">
-<circle cx="32" cy="40" r="14" fill="#c9a227"/><rect x="29" y="6" width="6" height="40" fill="#1a1a1a"/>
-<rect x="20" y="16" width="24" height="6" fill="#1a1a1a"/><rect x="4" y="48" width="56" height="4" fill="#1a1a1a"/></svg>`;
+// The church's logo is uploaded to the site (a setting), never kept in the
+// repo. `logo` is { src, alt } or empty; with none, the church's name stands
+// in as plain text, which is also what dev, tests and CI show.
+export const FONT_HEADING = "'Jost', 'Futura', 'Century Gothic', sans-serif";
+export const FONT_BODY = "'Inter', system-ui, 'Helvetica Neue', Arial, sans-serif";
 
-function coverHeader(view, site) {
-  return `<header class="cover-head">${LOGO}
-<p class="church">${esc(site.name || '')}</p>
+export function logoHtml(logo, name) {
+  return logo && logo.src
+    ? `<img class="logo" src="${esc(logo.src)}" alt="${esc(logo.alt || name || '')}">`
+    : `<p class="church logo-text">${esc(name || '')}</p>`;
+}
+
+function coverHeader(view, site, logo) {
+  return `<header class="cover-head">${logoHtml(logo, site.name)}
 <p class="tagline">${esc(site.tagline || '')}</p>
 <p class="date">${esc(view.heading)}</p></header>`;
 }
 
 // mode: 'print' | 'preview'. `view` comes from viewFor(model, 'print').
-export function renderSheet(view, { site = {}, mode = 'print', pages = PAGES } = {}) {
+export function renderSheet(view, {
+  site = {}, mode = 'print', pages = PAGES, logo = null
+} = {}) {
   const bySection = panel => view.sections.filter(section => section.panel === panel);
   const panelHtml = (page, panel, column) => {
     const inner = bySection(panel.id).map(section => sectionHtml(section, mode)).join('\n');
-    const head = panel.id === 'cover' ? coverHeader(view, site) : '';
+    const head = panel.id === 'cover' ? coverHeader(view, site, logo) : '';
     return `<section class="panel panel--${panel.id}" data-panel="${panel.id}" aria-label="${esc(panel.label)} panel" style="grid-column:${column};grid-row:1">
 <div class="panel__body" data-body>${head}${inner}</div></section>`;
   };
@@ -102,24 +111,24 @@ export function sheetCss({ sheet = SHEET } = {}) {
 @page inside { size: ${sheet.widthIn}in ${sheet.heightIn}in; margin: 0; }
 :root { --gold: #c9a227; --ink: #1a1a1a; --paper: #fff; }
 * { box-sizing: border-box; }
-body { margin: 0; font: 10pt/1.3 Georgia, 'Times New Roman', serif; color: var(--ink); background: var(--paper); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { margin: 0; font: 10pt/1.3 ${FONT_BODY}; color: var(--ink); background: var(--paper); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 .sheet-page { display: grid; width: ${sheet.widthIn}in; height: ${sheet.heightIn}in; overflow: hidden; break-after: page; }
 .sheet-page--outside { page: outside; }
 .sheet-page--inside { page: inside; break-after: auto; }
 .panel { position: relative; padding: ${pad}in; height: ${sheet.heightIn}in; border-right: 1px dashed transparent; }
 .panel__body { height: calc(${sheet.heightIn}in - ${pad * 2}in); overflow: hidden; }
-.band { margin: 0.12in 0 0.05in; padding: 2px 6px; background: var(--gold); color: var(--ink); font: bold 10.5pt/1.3 Helvetica, Arial, sans-serif; text-transform: uppercase; letter-spacing: 0.04em; }
+.band { margin: 0.12in 0 0.05in; padding: 2px 6px; background: var(--gold); color: var(--ink); font: 700 10.5pt/1.3 ${FONT_HEADING}; text-transform: uppercase; letter-spacing: 0.04em; }
 .sec:first-child .band { margin-top: 0; }
-h3 { margin: 0.08in 0 0.02in; font: bold 10pt/1.3 Helvetica, Arial, sans-serif; }
+h3 { margin: 0.08in 0 0.02in; font: 700 10pt/1.3 ${FONT_HEADING}; }
 p { margin: 0 0 0.06in; }
 ul, dl { margin: 0 0 0.06in; padding-left: 0.18in; }
 dl.serving { padding: 0; display: grid; grid-template-columns: max-content 1fr; gap: 0 0.1in; }
 dl.serving dt { font-weight: bold; }
 dl.serving dd { margin: 0; }
 .cover-head { text-align: center; margin-bottom: 0.1in; }
-.cover-head .logo { width: 0.9in; height: 0.9in; }
-.cover-head .church { font: bold 14pt/1.2 Helvetica, Arial, sans-serif; margin: 0; }
-.cover-head .tagline { font-style: italic; margin: 0; }
+.cover-head .logo { display: block; max-width: 100%; max-height: 1.6in; width: auto; height: auto; margin: 0 auto 0.05in; }
+.cover-head .church { font: 700 14pt/1.2 ${FONT_HEADING}; margin: 0; }
+.cover-head .tagline { margin: 0; }
 .cover-head .date { font-weight: bold; margin-top: 0.05in; }
 .figures-date { font-size: 12pt; font-weight: bold; }
 .status { color: #8a1c1c; }
@@ -183,10 +192,12 @@ ${script ? `<script>${script}</script>` : ''}
 }
 
 const WEBSITE_CSS = `
-body { max-width: 42rem; margin: 0 auto; padding: 1rem; font: 1.05rem/1.5 Georgia, serif; color: #1a1a1a; }
-.demo-banner { background: #fde68a; padding: .5rem 1rem; margin: -1rem -1rem 1rem; font-family: Helvetica, Arial, sans-serif; }
+body { max-width: 42rem; margin: 0 auto; padding: 1rem; font: 1.05rem/1.5 ${FONT_BODY}; color: #1a1a1a; }
+.demo-banner { background: #fde68a; padding: .5rem 1rem; margin: -1rem -1rem 1rem; }
+h1, h2, h3 { font-family: ${FONT_HEADING}; }
 h1 { font-size: 1.6rem; }
-.band { background: #c9a227; color: #1a1a1a; padding: .2rem .5rem; font: bold 1.05rem Helvetica, Arial, sans-serif; text-transform: uppercase; }
+.logo { display: block; max-width: 100%; max-height: 6rem; width: auto; height: auto; }
+.band { background: #c9a227; color: #1a1a1a; padding: .2rem .5rem; font: 700 1.05rem ${FONT_HEADING}; text-transform: uppercase; }
 dl.serving { display: grid; grid-template-columns: max-content 1fr; gap: 0 1rem; }
 dl.serving dd { margin: 0; } dl.serving dt { font-weight: bold; }
 .status { color: #8a1c1c; }
@@ -194,17 +205,19 @@ dl.serving dd { margin: 0; } dl.serving dt { font-weight: bold; }
 `;
 
 // The public page: only sections with website on, in reading order.
-export function renderWebsite(view, { site = {}, demoBanner = '' } = {}) {
+export function renderWebsite(view, {
+  site = {}, demoBanner = '', logo = null, head = ''
+} = {}) {
   const rank = id => READING_ORDER.indexOf(id);
   const sections = [ ...view.sections ].sort((a, b) => rank(a.panel) - rank(b.panel) || a.order - b.order);
   const body = `${demoBanner ? `<p class="demo-banner" data-demo-banner>${esc(demoBanner)}</p>` : ''}
 <main id="main">
-<h1>${esc(site.name || '')} bulletin, ${esc(view.heading)}</h1>
+${logo && logo.src ? `<p>${logoHtml(logo, site.name)}</p>\n` : ''}<h1>${esc(site.name || '')} bulletin, ${esc(view.heading)}</h1>
 ${sections.map(section => sectionHtml(section, 'website')).join('\n')}
 </main>`;
   return renderDocument({
     title: `${site.name || 'Church'} bulletin, ${view.heading}`,
-    head: `<style>${WEBSITE_CSS}</style>`,
+    head: `${head}<style>${WEBSITE_CSS}</style>`,
     body
   });
 }

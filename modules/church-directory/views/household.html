@@ -1,0 +1,161 @@
+{% extends data.outerLayout %}
+
+{% block title %}{{ data.household.name }}{% endblock %}
+
+{% block main %}
+  {% set hh = data.household %}
+  {% include "_nav.html" %}
+  <main id="main" class="church-main household">
+    <p class="crumb"><a href="/members/directory">{{ __t('church:directoryTitle') }}</a></p>
+    <h1>{{ hh.name }}</h1>
+    {% if hh.own %}<p class="muted">{{ __t('church:yourHousehold') }}</p>{% endif %}
+    {% if hh.optOut %}<p class="hidden-note">{{ __t('church:householdOptedOut') }}</p>{% endif %}
+    {% if hh.noAdults %}<p class="hidden-note">{{ __t('church:householdNoAdults') }}</p>{% endif %}
+    {% if data.saved !== null %}
+      <p class="flash" role="status">
+        {% if data.saved > 0 %}{{ __t('church:savedChanges', { n: data.saved }) }}{% else %}{{ __t('church:savedNothing') }}{% endif %}
+      </p>
+    {% endif %}
+
+    {% if hh.canEdit %}
+      <p class="actions">
+        <a class="btn" href="/members/household/{{ hh.id }}/edit">{% if hh.own %}{{ __t('church:editMyHousehold') }}{% else %}{{ __t('church:editThisHousehold') }}{% endif %}</a>
+      </p>
+    {% endif %}
+
+    <div class="grid">
+      <section class="card" aria-labelledby="people-h">
+        <h2 id="people-h">{{ __t('church:people') }}</h2>
+        <ul class="plain">
+          {% for person in hh.people %}
+            <li class="person">
+              <span class="person-name">{{ person.name }}{% if person.deceased %} †{% endif %}</span>
+              {% if person.firstName %}<span class="muted small">({{ person.firstName }})</span>{% endif %}
+              {% if person.minor %}<span class="tag grey">{{ __t('church:child') }}</span>{% endif %}
+              {% if data.nav.office %}
+                <span class="tag office">{% if person.status == 'regular' %}{{ __t('church:statusRegular') }}{% elif person.status == 'visitor' %}{{ __t('church:statusVisitor') }}{% else %}{{ __t('church:statusMember') }}{% endif %}</span>
+                {% if person.inactiveReason %}<span class="tag grey">{{ __t('church:inactiveWithReason', { reason: person.inactiveReason }) }}</span>{% endif %}
+                {% if person.turnsEighteen %}<span class="tag">{{ __t('church:turnsEighteen') }}</span>{% endif %}
+              {% endif %}
+              {% if person.minor and not data.nav.office and not hh.own %}
+                <div class="rel">{{ __t('church:childrenNameBirthdayOnly') }}</div>
+              {% endif %}
+              <dl class="facts">
+                {% if data.nav.office and person.dateOfBirthText %}
+                  <dt>{{ __t('church:birthday') }}</dt><dd>{{ person.dateOfBirthText }} {{ __t('church:ageYears', { age: person.age }) }}</dd>
+                {% elif person.birthdayText %}
+                  <dt>{{ __t('church:birthday') }}</dt><dd>{{ person.birthdayText }}</dd>
+                {% endif %}
+                {% if person.cellphone %}
+                  <dt>{{ __t('church:cellphone') }}</dt>
+                  <dd><a href="tel:{{ person.cellphone | replace(r/[^0-9+]/g, '') }}">{{ person.cellphone }}</a>
+                    {% if person.hiddenFromMembers.includes('cellphone') %}<span class="hidden-note">({{ __t('church:hiddenFromMembers') }})</span>{% endif %}
+                    {% if person.onlyYourHousehold %}<span class="hidden-note">({{ __t('church:onlyYourHousehold') }})</span>{% endif %}
+                  </dd>
+                {% endif %}
+                {% if person.email %}
+                  <dt>{{ __t('church:email') }}</dt>
+                  <dd><a href="mailto:{{ person.email }}">{{ person.email }}</a>
+                    {% if person.hiddenFromMembers.includes('email') %}<span class="hidden-note">({{ __t('church:hiddenFromMembers') }})</span>{% endif %}
+                  </dd>
+                {% endif %}
+                {% if person.baptismText %}
+                  <dt>{{ __t('church:baptized') }}</dt>
+                  <dd>{{ person.baptismText }}{% if person.baptismHidden %} <span class="hidden-note">({{ __t('church:notShownToMembers') }})</span>{% endif %}</dd>
+                {% endif %}
+                {% if person.groups.length %}
+                  <dt>{{ __t('church:groups') }}</dt><dd>{{ person.groups | join(', ') }}</dd>
+                {% endif %}
+              </dl>
+              {% if person.relations.length %}
+                <ul class="plain relations">
+                  {% for r in person.relations %}
+                    <li class="rel">
+                      {% if r.kind == 'spouse' %}{{ __t('church:relSpouse') }}
+                      {% elif r.kind == 'parentOf' %}{{ __t('church:relParentOf') }}
+                      {% elif r.kind == 'childOf' %}{{ __t('church:relChildOf') }}
+                      {% elif r.kind == 'guardianOf' %}{{ __t('church:relGuardianOf') }}
+                      {% elif r.kind == 'wardOf' %}{{ __t('church:relWardOf') }}
+                      {% elif r.kind == 'siblingOf' %}{{ __t('church:relSiblingOf') }}
+                      {% elif r.kind == 'grandparentOf' %}{{ __t('church:relGrandparentOf') }}
+                      {% else %}{{ __t('church:relGrandchildOf') }}{% endif %}
+                      {% if r.householdId %}<a href="/members/household/{{ r.householdId }}">{{ r.name }}</a>{% else %}{{ r.name }}{% endif %}
+                      {% if r.otherHousehold %}<span class="small">({{ __t('church:otherHousehold', { name: r.otherHousehold }) }})</span>{% endif %}
+                      {% if r.anniversaryText %}· {{ __t('church:marriedOn', { date: r.anniversaryText }) }}{% endif %}
+                      {% if r.deceased %}<span class="small">({{ __t('church:deceased') }})</span>{% endif %}
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </section>
+
+      <div>
+        <section class="card" aria-labelledby="home-h">
+          <h2 id="home-h">{{ __t('church:home') }}</h2>
+          {% if data.photoUrl %}<img class="household-photo" src="{{ data.photoUrl }}" alt="{{ hh.name }}">{% endif %}
+          <dl class="facts">
+            <dt>{{ __t('church:address') }}</dt>
+            <dd>{% if hh.address %}{{ hh.address }}{% else %}{{ __t('church:addressNotShared') }}{% endif %}
+              {% if hh.addressHidden %}<span class="hidden-note">({{ __t('church:hiddenFromMembers') }})</span>{% endif %}
+            </dd>
+            {% if hh.homePhone %}
+              <dt>{{ __t('church:homePhone') }}</dt>
+              <dd><a href="tel:{{ hh.homePhone | replace(r/[^0-9+]/g, '') }}">{{ hh.homePhone }}</a></dd>
+            {% endif %}
+          </dl>
+          {% if data.updated %}
+            <p class="stamp">{{ __t('church:lastUpdated', { by: data.updated.by, date: data.updated.date }) }}</p>
+          {% endif %}
+        </section>
+
+        {% if data.nav.office %}
+          <section class="card office-panel" aria-labelledby="history-h">
+            <h2 id="history-h">{{ __t('church:changeHistory') }}</h2>
+            <p class="small muted">{{ __t('church:changeHistoryIntro') }}</p>
+            {% if data.history.length %}
+              <div class="tablewrap">
+                <table class="audit">
+                  <thead>
+                    <tr>
+                      <th scope="col">{{ __t('church:historyWhen') }}</th>
+                      <th scope="col">{{ __t('church:historyBy') }}</th>
+                      <th scope="col">{{ __t('church:historyWhat') }}</th>
+                      <th scope="col">{{ __t('church:historyWas') }}</th>
+                      <th scope="col">{{ __t('church:historyNow') }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for entry in data.history %}
+                      {% if entry.changes.length %}
+                        {% for change in entry.changes %}
+                          <tr>
+                            <td>{{ entry.when }}</td>
+                            <td>{{ entry.by }}</td>
+                            <td>{{ entry.record }}: {{ change.field }}</td>
+                            <td class="old">{% if change.old %}{{ change.old }}{% else %}—{% endif %}</td>
+                            <td class="new">{% if change.new %}{{ change.new }}{% else %}—{% endif %}</td>
+                          </tr>
+                        {% endfor %}
+                      {% else %}
+                        <tr>
+                          <td>{{ entry.when }}</td>
+                          <td>{{ entry.by }}</td>
+                          <td colspan="3">{{ entry.record }}: {% if entry.action == 'create' %}{{ __t('church:historyCreated') }}{% elif entry.action == 'delete' %}{{ __t('church:historyDeleted') }}{% else %}{{ __t('church:historyUpdated') }}{% endif %}</td>
+                        </tr>
+                      {% endif %}
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% else %}
+              <p class="muted">{{ __t('church:noChanges') }}</p>
+            {% endif %}
+          </section>
+        {% endif %}
+      </div>
+    </div>
+  </main>
+{% endblock %}

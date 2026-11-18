@@ -3,8 +3,24 @@
 {% block main %}
   {% set site = apos.modules['church-site'].site() %}
   <header class="church-header">
-    <p class="church-name"><strong>{{ site.name }}</strong></p>
-    <a class="church-signin" href="/sign-in">{{ __t('church:memberSignIn') }}</a>
+    {# The logo is uploaded in the site settings; until then the name shows. #}
+    {% if data.global.logo %}
+      <img class="church-logo" src="{{ apos.attachment.url(data.global.logo, { size: 'full' }) }}" alt="{{ data.global.logoAlt or site.name }}">
+    {% else %}
+      <p class="church-name"><strong>{{ site.name }}</strong></p>
+    {% endif %}
+    <p class="home-links">
+      <a class="church-signin" href="/members/directory">{{ __t('church:directoryTitle') }}</a>
+      {% if not data.user %}
+        <a class="church-signin" href="/sign-in">{{ __t('church:memberSignIn') }}</a>
+      {% endif %}
+    </p>
+    {% if data.user %}
+      <nav aria-label="{{ __t('church:memberLinks') }}">
+        <a href="/away">{{ __t('church:awayTitle') }}</a>
+        {% if data.user.role == 'admin' %} · <a href="/roster">{{ __t('church:rosterTitle') }}</a>{% endif %}
+      </nav>
+    {% endif %}
   </header>
   <main id="main" class="church-main">
     <h1>{{ __t('church:welcome') }}</h1>

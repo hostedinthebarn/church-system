@@ -1,0 +1,38 @@
+{% extends data.outerLayout %}
+
+{% block title %}{{ __t('church:tasksTemplateTitle') }}{% endblock %}
+
+{% block main %}
+  <main id="main" class="church-main" data-tasks data-csrf="{{ data.csrfName }}" data-failed="{{ __t('church:tasksFailed') }}">
+    <h1>{{ __t('church:tasksTemplateTitle') }}</h1>
+    <p>{{ __t('church:tasksTemplateIntro') }} <time datetime="{{ data.nextWeekStart }}">{{ data.nextWeekStart }}</time>.</p>
+    {% if data.startsNextWeek %}<p>{{ __t('church:tasksTemplatePending') }}</p>{% endif %}
+    <p><a href="/tasks">{{ __t('church:tasksBackToThisWeek') }}</a></p>
+    <p data-message role="status"></p>
+    <form data-template-form>
+      <ol>
+        {% for row in data.rows %}
+          <li data-row data-key="{{ row.key }}">
+            <label>{{ __t('church:tasksFieldTitle') }} <input data-title type="text" maxlength="200" value="{{ row.title }}"></label>
+            <label>{{ __t('church:tasksFieldDay') }}
+              <select data-day>
+                <option value="">{{ __t('church:tasksNoDay') }}</option>
+                {% for day in data.days %}<option value="{{ day.value }}"{% if day.value == row.day %} selected{% endif %}>{{ day.label }}</option>{% endfor %}
+              </select>
+            </label>
+            <label>{{ __t('church:tasksOwner') }}
+              <select data-owner>
+                <option value="">{{ __t('church:tasksNoOwner') }}</option>
+                {% for person in data.people %}<option value="{{ person.id }}"{% if person.id == row.owner %} selected{% endif %}>{{ person.name }}</option>{% endfor %}
+              </select>
+            </label>
+            <label><input data-remove type="checkbox"> {{ __t('church:tasksRemove') }}</label>
+          </li>
+        {% endfor %}
+      </ol>
+      <p>{{ __t('church:tasksTemplateBlankHint') }}</p>
+      <button type="submit">{{ __t('church:tasksTemplateSave') }}</button>
+    </form>
+  </main>
+  <script src="/tasks/client.js" defer></script>
+{% endblock %}

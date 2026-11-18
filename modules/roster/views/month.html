@@ -1,0 +1,75 @@
+{% extends data.outerLayout %}
+
+{% block title %}{{ __t('church:rosterMonthTitle') }} {{ data.month }}{% endblock %}
+
+{% block main %}
+  <main id="main" class="church-main">
+    <h1>{{ __t('church:rosterMonthTitle') }} {{ data.month }}</h1>
+    <p><a href="/roster">{{ __t('church:rosterBack') }}</a>
+      · <a href="/roster/{{ data.month }}/print">{{ __t('church:rosterPrint') }}</a></p>
+
+    {% if data.notice %}
+      <p role="status" data-roster-notice>{{ __t('church:rosterMailResult', { sent: data.notice.sent, refused: data.notice.refused }) }}</p>
+    {% endif %}
+
+    <p data-roster-state>
+      {% if data.published %}{{ __t('church:rosterStatusPublished') }}. {{ __t('church:rosterPublishedHelp') }}
+      {% elif data.suggested %}{{ __t('church:rosterSuggestedHelp') }}
+      {% else %}{{ __t('church:rosterStatusDraft') }}. {{ __t('church:rosterDraftHelp') }}{% endif %}
+    </p>
+
+    <section aria-labelledby="warnings-heading">
+      <h2 id="warnings-heading">{{ __t('church:rosterWarnings') }}</h2>
+      {% if data.warnings | length %}
+        <ul data-roster-warnings>
+          {% for warning in data.warnings %}<li data-warning="{{ warning.type }}">{{ warning.message }}</li>{% endfor %}
+        </ul>
+      {% else %}
+        <p>{{ __t('church:rosterNoWarnings') }}</p>
+      {% endif %}
+    </section>
+
+    <form method="post" action="/roster/{{ data.month }}/{{ 'swap' if data.published else 'save' }}" id="roster-form">
+      {% for block in data.blocks %}
+        <fieldset>
+          <legend>{{ block.name }}{% if block.monthly %} ({{ __t('church:rosterAllMonth') }}){% endif %}</legend>
+          {% for row in block.rows %}
+            <div>
+              {% if row.date %}<strong>{{ row.date }}</strong>{% endif %}
+              {% for slot in row.slots %}
+                <label>
+                  {{ __t('church:rosterSlot') }} {{ slot.number }}
+                  <span class="visually-hidden">{{ block.name }} {{ row.date }}</span>
+                  <select name="{{ slot.field }}">
+                    <option value="">{{ __t('church:rosterUnfilled') }}</option>
+                    {% for choice in slot.choices %}
+                      <option value="{{ choice.id }}"{% if choice.id == slot.chosen %} selected{% endif %}>{{ choice.name }}</option>
+                    {% endfor %}
+                  </select>
+                </label>
+              {% endfor %}
+            </div>
+          {% endfor %}
+        </fieldset>
+      {% endfor %}
+
+      {% if data.published %}
+        <button type="submit">{{ __t('church:rosterSwapButton') }}</button>
+      {% else %}
+        <button type="submit">{{ __t('church:rosterSaveButton') }}</button>
+        <button type="submit" formaction="/roster/{{ data.month }}/publish">{{ __t('church:rosterPublishButton') }}</button>
+      {% endif %}
+    </form>
+
+    <section aria-labelledby="away-heading">
+      <h2 id="away-heading">{{ __t('church:rosterAwayHeading') }}</h2>
+      {% if data.away | length %}
+        <ul>
+          {% for span in data.away %}<li>{{ span.name }}: {{ span.from }}{% if span.to != span.from %} – {{ span.to }}{% endif %}</li>{% endfor %}
+        </ul>
+      {% else %}
+        <p>{{ __t('church:rosterNoAway') }}</p>
+      {% endif %}
+    </section>
+  </main>
+{% endblock %}
