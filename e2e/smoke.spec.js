@@ -48,6 +48,15 @@ test.describe('home page', () => {
     const response = await request.get('/es/');
     expect(response.status()).toBe(404);
   });
+
+  test('a missing page shows our own not-found page', async ({ page }) => {
+    const response = await page.goto('/definitely-missing');
+    expect(response.status()).toBe(404);
+    await expect(page.locator('[data-demo-banner]')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Page not found' })).toBeVisible();
+    const results = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze();
+    expect(results.violations).toEqual([]);
+  });
 });
 
 test.describe('admin login', () => {
