@@ -14,6 +14,7 @@ module.exports = defineConfig({
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? 'list' : 'line',
   globalSetup: require.resolve('./e2e/global-setup.js'),
+  globalTeardown: require.resolve('./e2e/global-teardown.js'),
   use: {
     baseURL: `http://localhost:${port}`,
     // GitHub's ubuntu runners ship Google Chrome, so CI needs no browser
@@ -22,7 +23,8 @@ module.exports = defineConfig({
     channel: process.env.PW_CHANNEL || 'chrome'
   },
   webServer: {
-    command: 'node app.js',
+    // The log is kept so the teardown can fail the run on server-side errors.
+    command: 'node app.js 2>&1 | tee e2e/.server.log',
     url: `http://localhost:${port}/`,
     timeout: 240_000,
     reuseExistingServer: !process.env.CI,

@@ -1,0 +1,13 @@
+{# Apostrophe's own notFound.html extends a "layout.html" nobody provides, which
+   logged "template not found: @apostrophecms/page:layout.html" on every 404. #}
+{% extends data.outerLayout %}
+
+{% block title %}{{ __t('church:pageNotFoundTitle') }}{% endblock %}
+
+{% block main %}
+  <main id="main" class="church-main">
+    <h1>{{ __t('church:pageNotFoundTitle') }}</h1>
+    <p>{{ __t('church:pageNotFoundBody') }}</p>
+    <p><a class="btn" href="/">{{ __t('church:backHome') }}</a></p>
+  </main>
+{% endblock %}
