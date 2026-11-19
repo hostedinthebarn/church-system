@@ -9,7 +9,8 @@ module.exports = defineConfig({
   timeout: 60_000,
   // Each browser brings many threads. Four at once go past the 512-process limit
   // of the container our agents test in, so outside CI they run one at a time.
-  workers: process.env.CI ? undefined : 1,
+  // That container sets CI too: there, PW_WORKERS=1 keeps it to one.
+  workers: process.env.PW_WORKERS ? Number(process.env.PW_WORKERS) : (process.env.CI ? undefined : 1),
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? 'list' : 'line',
   globalSetup: require.resolve('./e2e/global-setup.js'),

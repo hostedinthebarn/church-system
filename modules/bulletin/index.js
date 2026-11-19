@@ -215,6 +215,8 @@ module.exports = {
             hand[key] = doc[key];
           }
         }
+        // Real events when the church has any; until then its demo source.
+        const realEvents = self.apos.event ? await self.apos.event.bulletinData(req, date) : null;
         const eventChoices = {};
         for (const choice of (doc && doc.eventChoices) || []) {
           eventChoices[choice.eventId] = {
@@ -229,7 +231,7 @@ module.exports = {
           site: site(),
           assignments: rosterData.assignments,
           names: rosterData.names,
-          events: sources.events ? sources.events(date) : [],
+          events: realEvents || (sources.events ? sources.events(date) : []),
           eventChoices,
           includeBirthdays: wantDirectory,
           people: directory.people,

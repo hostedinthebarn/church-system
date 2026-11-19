@@ -29,7 +29,7 @@ npm run test:unit  # fast: no database or browser needed
 npm run test:db    # record types and the audit trail, needs MongoDB at APOS_MONGODB_URI
 ```
 
-The browser tests (`npm run test:e2e`) start the app on port 3100 and need MongoDB plus Google Chrome. They use their own database, `church-system-e2e`, on the same MongoDB server, and reset it to the made-up demo households on every start; they never touch the database `APOS_MONGODB_URI` names. Without Chrome, run `npx playwright install chromium` and set `PW_CHANNEL=chromium`.
+The browser tests (`npm run test:e2e`) start the app on port 3100 and need MongoDB plus Google Chrome. They use their own database, `church-system-e2e`, on the same MongoDB server, and reset it to the made-up demo households on every start; they never touch the database `APOS_MONGODB_URI` names. Playwright runs one worker unless `CI` is set; set `PW_WORKERS=1` to force one worker where `CI` is set but processes are limited (an agent container). Without Chrome, run `npx playwright install chromium` and set `PW_CHANNEL=chromium`.
 
 ### How it's laid out
 

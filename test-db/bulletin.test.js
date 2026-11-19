@@ -168,3 +168,29 @@ test('birthdays and anniversaries stay out unless the church switches them on, a
     site.bulletin.switches = before;
   }
 });
+
+test('once the church has real events, the calendar panel lists them and not the demo ones; a members-only one waits for the tick', async () => {
+  const eventReq = apos.task.getReq({ mode: 'draft' });
+  const add = async fields => apos.event.publish(eventReq, await apos.event.insert(eventReq, {
+    ...apos.event.newInstance(),
+    startTime: '18:30:00',
+    endTime: '19:30:00',
+    dateType: 'single',
+    ...fields
+  }));
+  const potluck = await add({ title: 'Real potluck', startDate: '2026-11-18', place: 'Fellowship hall' });
+  const elders = await add({ title: 'Real elders', startDate: '2026-11-19', publicEvent: false });
+  await add({ title: 'Too far off', startDate: '2026-12-20' });
+  const model = await apos.bulletin.model(req, DATE, await apos.bulletin.findWeek(req, DATE));
+  const ids = () => model.sections.find(s => s.id === 'calendar').blocks[0].items.map(i => i.id);
+  assert.ok(ids().includes(potluck.aposDocId));
+  assert.ok(!ids().some(id => id.startsWith('demo-')), 'the demo source is not used once events exist');
+  assert.ok(!ids().includes(elders.aposDocId), 'members-only stays out until the office ticks it');
+  const text = JSON.stringify(model.sections.find(s => s.id === 'calendar'));
+  assert.match(text, /Real potluck/);
+  assert.match(text, /6:30 pm/, 'Chicago wall-clock time, whatever the server zone');
+  assert.doesNotMatch(text, /Too far off/);
+  await apos.bulletin.save(req, DATE, { eventChoices: { [elders.aposDocId]: { membersOk: true } } });
+  const ticked = await apos.bulletin.model(req, DATE, await apos.bulletin.findWeek(req, DATE));
+  assert.ok(ticked.sections.find(s => s.id === 'calendar').blocks[0].items.some(i => i.id === elders.aposDocId));
+});
