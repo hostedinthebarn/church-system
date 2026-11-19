@@ -23,7 +23,8 @@ const { googleCalendarUrl } = require('../../../lib/ical.js');
 const {
   occurrencesToChange, topUp
 } = require('@church-system/calendar-logic');
-const { instantToLocal } = require('@church-system/calendar-logic');
+const { instantToLocal, localToInstant } = require('@church-system/calendar-logic');
+const { addDays } = require('@church-system/calendar-logic/src/dates.js');
 const rules = require('../../../lib/rules.js');
 
 // What an editor may change on one or many occurrences. The date is only for
@@ -498,6 +499,43 @@ module.exports = {
         return `${day.format(piece.start)}, ${time.format(piece.start)} – ${time.format(piece.end)}`;
       },
       // The plain shape the feeds and the Google Calendar link take.
+      // The published events near a bulletin date, in the shape the bulletin
+      // logic wants (events-poc.md "Where an event goes"). Returns null when
+      // the church has no events at all, so the bulletin can fall back to its
+      // demo source; an empty list means events exist but none are near.
+      // announceFrom defaults to 14 days before the start, as announce.js does.
+      async bulletinData(req, date) {
+        const published = self.apos.task.getReq({
+          role: 'admin',
+          mode: 'published'
+        });
+        if (!await self.apos.doc.db.findOne({
+          type: self.name,
+          aposMode: 'published'
+        })) {
+          return null;
+        }
+        const from = new Date(localToInstant(addDays(date, -1), '00:00'));
+        const to = new Date(localToInstant(addDays(date, 16), '00:00'));
+        const pieces = await self.find(published, {
+          start: {
+            $gte: from,
+            $lt: to
+          }
+        }).sort({ start: 1 }).limit(500).toArray();
+        return pieces.map(piece => ({
+          id: piece.aposDocId,
+          title: piece.title,
+          startsAt: piece.start.toISOString(),
+          announceFrom: piece.announceFrom
+            ? new Date(localToInstant(piece.announceFrom, '00:00')).toISOString()
+            : new Date(piece.start.getTime() - 14 * 86400000).toISOString(),
+          isRegularService: Boolean(piece.regularService),
+          status: piece.status || 'scheduled',
+          location: piece.place || '',
+          visibility: piece.publicEvent === false ? 'members' : 'public'
+        }));
+      },
       feedShape(piece, absoluteUrl) {
         const local = instantToLocal(piece.start);
         return {

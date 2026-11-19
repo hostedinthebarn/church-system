@@ -410,3 +410,30 @@ test('series fields sent by a client are ignored', async () => {
   });
   assert.deepEqual(pick(saved, SERIES_LINK), pick(draft, SERIES_LINK));
 });
+
+test('the demo seed makes an Events page and events, so the feeds are not empty (LGC-70)', async () => {
+  const demo = require('../lib/demo-data.js');
+  const result = await demo.seed(apos, { reset: true, today: '2026-11-19' });
+  assert.ok(result.events >= 4);
+  const page = await apos.doc.db.findOne({ type: '@apostrophecms/event-page', aposMode: 'published' });
+  assert.ok(page, 'an Events page exists');
+  const worship = await apos.doc.db.findOne({
+    type: '@apostrophecms/event', aposMode: 'published', title: 'Sunday worship', isClone: { $ne: true }
+  });
+  assert.equal(worship.startDate, '2026-11-22');
+  assert.equal(worship.start.toISOString(), '2026-11-22T16:00:00.000Z');
+  const ics = (await apos.http.get('/calendar/public.ics', { fullResponse: true })).body;
+  assert.match(ics, /SUMMARY:Sunday worship/);
+  assert.match(ics, /SUMMARY:CANCELLED: Singing night/);
+  assert.doesNotMatch(ics, /Elders' meeting/);
+  // Seeding again with a reset leaves one page, not two.
+  await demo.seed(apos, { reset: true, today: '2026-11-19' });
+  assert.equal(await apos.doc.db.countDocuments({ type: '@apostrophecms/event-page', aposMode: 'published' }), 1);
+});
+
+test('an unknown address gets Apostrophe\'s 404 page, not a template error (LGC-49)', async () => {
+  const res = await apos.http.get('/no-such-page', { fullResponse: true, originalResponse: true }).catch(e => e);
+  assert.equal(res.status, 404);
+  const body = res.body && typeof res.body.getReader === 'function' ? await new Response(res.body).text() : String(res.body);
+  assert.match(body, /noindex/, 'the 404 page is the site layout, so it is noindexed like the rest');
+});
