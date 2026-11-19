@@ -156,7 +156,4 @@ test('print page and PDF are two 14 x 8.5 in pages', async ({ page }) => {
   const text = body.toString('latin1');
   expect((text.match(/\/Type\s*\/Page[^s]/g) || []).length).toBe(2);
   expect((text.match(/\/MediaBox\s*\[\s*0\s+0\s+1008\s+612\s*\]/g) || []).length).toBe(2);
-  if (process.env.E2E_SAVE_PDF) {
-    require('node:fs').writeFileSync(process.env.E2E_SAVE_PDF, body);
-  }
 });
