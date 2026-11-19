@@ -2,8 +2,19 @@ const { test, expect } = require('@playwright/test');
 const AxeBuilder = require('@axe-core/playwright').default;
 
 const AXE_TAGS = [ 'wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa' ];
-const DATE = '2026-11-15';
-const OTHER = '2026-11-22';
+
+// The demo events are dated from today (lib/demo-data.js): the elders' meeting
+// (members-only) falls 9 days after the coming Sunday and the fellowship meal 13
+// days after it, so the Sunday a week after that one has both in its two weeks.
+function sundayAfterNext() {
+  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
+  const day = new Date(`${today}T00:00:00Z`);
+  day.setUTCDate(day.getUTCDate() + (7 - day.getUTCDay()) % 7 + 7);
+  return day;
+}
+const iso = (day, plus = 0) => new Date(day.getTime() + plus * 86400000).toISOString().slice(0, 10);
+const DATE = iso(sundayAfterNext());
+const OTHER = iso(sundayAfterNext(), 7);
 const PASSWORD = process.env.E2E_ADMIN_PASSWORD || 'e2e-only-password';
 
 test.describe.configure({ mode: 'serial' });
@@ -34,7 +45,7 @@ test('the screens are for the office; the public sees only a signed-off week', a
   expect(post.status()).toBeGreaterThanOrEqual(400);
   expect((await request.get('/bulletin/not-a-date')).status()).toBe(404);
   // A week nobody has saved is not found.
-  expect((await request.get('/bulletin/2026-12-06')).status()).toBe(404);
+  expect((await request.get(`/bulletin/${iso(sundayAfterNext(), 70)}`)).status()).toBe(404);
 });
 
 test('edit screen: fill, save, overflow signal, sign-off rule', async ({ page }) => {
@@ -51,7 +62,7 @@ test('edit screen: fill, save, overflow signal, sign-off rule', async ({ page })
   await expect(preview.locator('[data-section="serving"]')).toContainText('unfilled');
   await expect(preview.locator('[data-section="calendar"]')).toContainText('Fellowship meal');
   await expect(preview.locator('[data-section="calendar"]')).toContainText('CANCELLED');
-  await expect(preview.locator('[data-section="calendar"]')).not.toContainText('Elders and deacons');
+  await expect(preview.locator('[data-section="calendar"]')).not.toContainText('Elders\' meeting');
   await expect(preview.locator('[data-section="birthdays"]')).toHaveCount(0);
 
   // Panels fit.
@@ -62,7 +73,7 @@ test('edit screen: fill, save, overflow signal, sign-off rule', async ({ page })
   // Tick the members-only event: it appears after saving.
   await page.getByLabel('Members-only: put it in the bulletin').check();
   await page.getByRole('button', { name: 'Save' }).click();
-  await expect(preview.locator('[data-section="calendar"]')).toContainText('Elders and deacons');
+  await expect(preview.locator('[data-section="calendar"]')).toContainText('Elders\' meeting');
 
   // Too much text: the panel is flagged and sign-off is refused.
   const long = Array.from({ length: 80 }, (_, i) => `Announcement line number ${i} with some words`).join('\n\n');
@@ -102,7 +113,7 @@ test('website page: a signed-off week is public, without the prayer list or memb
   await page.getByLabel('Members-only: put it in the bulletin').check();
   await page.getByRole('button', { name: 'Save' }).click();
   await expect(page.locator('.preview [data-section="prayer"]')).toContainText('Zed Prayer');
-  await expect(page.locator('.preview [data-section="calendar"]')).toContainText('Elders and deacons');
+  await expect(page.locator('.preview [data-section="calendar"]')).toContainText('Elders\' meeting');
   await page.getByRole('button', { name: 'Sign off', exact: true }).click();
   await expect(page.locator('[data-bulletin-status]')).toHaveText('Signed off');
 
@@ -112,13 +123,15 @@ test('website page: a signed-off week is public, without the prayer list or memb
   const html = await response.text();
   expect(html).not.toContain('Prayer List');
   expect(html).not.toContain('Zed Prayer');
-  expect(html).not.toContain('Elders and deacons');
+  expect(html).not.toContain('Elders\' meeting');
   expect(html).toContain('Fellowship meal');
   expect(html).toContain('data-demo-banner');
 
   const anon = await (await browser.newContext({ baseURL: test.info().project.use.baseURL })).newPage();
   await anon.goto(`/bulletin/${DATE}`);
-  await expect(anon.getByRole('heading', { level: 1 })).toContainText('Sunday, November 15, 2026');
+  await expect(anon.getByRole('heading', { level: 1 })).toContainText(new Date(`${DATE}T00:00:00Z`).toLocaleDateString('en-US', {
+    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC'
+  }));
   const results = await new AxeBuilder({ page: anon }).withTags(AXE_TAGS).analyze();
   expect(results.violations).toEqual([]);
   await anon.context().close();
