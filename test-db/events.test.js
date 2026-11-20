@@ -437,3 +437,132 @@ test('an unknown address gets Apostrophe\'s 404 page, not a template error (LGC-
   const body = res.body && typeof res.body.getReader === 'function' ? await new Response(res.body).text() : String(res.body);
   assert.match(body, /noindex/, 'the 404 page is the site layout, so it is noindexed like the rest');
 });
+
+// LGC-64: the admin editor saves one occurrence with a plain PUT, so the event
+// module decides from the save itself (and ?seriesScope=) what it was.
+async function newestOf(group) {
+  return (await all(group)).sort((a, b) => (a.ruleDate < b.ruleDate ? 1 : -1))[0];
+}
+
+async function openSeries(title) {
+  const parent = await event.insert(req, {
+    ...event.newInstance(),
+    ...base,
+    title,
+    place: 'Auditorium',
+    startDate: '2027-01-06',
+    dateType: 'repeat',
+    repeatPattern: 'weekly',
+    repeatEnds: 'never'
+  });
+  return parent.eventGroupId;
+}
+
+test('a direct save of a series occurrence with no scope is "this one only" (the top-up skips it)', async () => {
+  const group = await openSeries('Direct save');
+  const newest = await newestOf(group);
+  const draft = await event.findOneForEditing(req, { _id: newest._id });
+  draft.place = 'Fellowship hall';
+  draft.title = 'Direct save: guest';
+  await event.update(req, draft);
+  await event.topUpSeries(req, { today: addDaysIso(rulesToday(), 35) });
+  const after = await all(group);
+  const fresh = after.filter(o => o.ruleDate > newest.ruleDate);
+  assert.ok(fresh.length >= 4);
+  for (const o of fresh) {
+    assert.equal(o.place, 'Auditorium');
+    assert.equal(o.title, 'Direct save');
+  }
+  const edited = after.find(o => o._id === newest._id);
+  assert.equal(edited.seriesException, true);
+  assert.equal(edited.place, 'Fellowship hall');
+});
+
+test('a direct save that changes nothing, and a save of a single event, set no exception', async () => {
+  const group = await openSeries('No change');
+  const [ first ] = await all(group);
+  const draft = await event.findOneForEditing(req, { _id: first._id });
+  await event.update(req, draft);
+  assert.notEqual((await apos.doc.db.findOne({ _id: first._id })).seriesException, true);
+  const single = await event.insert(req, {
+    ...event.newInstance(),
+    ...base,
+    title: 'Just once'
+  });
+  single.place = 'Elsewhere';
+  await event.update(req, single);
+  assert.notEqual((await apos.doc.db.findOne({ _id: single._id })).seriesException, true);
+});
+
+test('?seriesScope=following saves this occurrence and the ones after it, with no exception', async () => {
+  const group = await openSeries('Following save');
+  const before = await all(group);
+  const second = before[1];
+  const draft = await event.findOneForEditing(req, { _id: second._id });
+  draft.place = 'Chapel';
+  await event.update(req.clone({ query: { seriesScope: 'following' } }), draft);
+  const after = await all(group);
+  assert.equal(after[0].place, 'Auditorium', 'earlier occurrences keep theirs');
+  for (const o of after.slice(1)) {
+    assert.equal(o.place, 'Chapel', o.ruleDate);
+    assert.notEqual(o.seriesException, true, o.ruleDate);
+  }
+});
+
+// A direct save, as the admin form makes it. The form's prompt sends the choice
+// as `_seriesScope`; without one a content change is a one-off (LGC-64).
+async function weeklySeries(title) {
+  return event.insert(req, {
+    ...event.newInstance(),
+    ...base,
+    title,
+    startDate: '2027-01-06',
+    dateType: 'repeat',
+    repeatPattern: 'weekly',
+    repeatEnds: 'never'
+  });
+}
+function saveReq(scope) {
+  const r = apos.task.getReq({ mode: 'draft' });
+  r.body = scope ? { _seriesScope: scope } : {};
+  return r;
+}
+
+test('a direct save of a series occurrence with no choice is a one-off, so the top-up skips it', async () => {
+  const parent = await weeklySeries('Direct guard');
+  const newest = await newestOf(parent.eventGroupId);
+  await event.update(saveReq(null), {
+    ...newest,
+    place: 'Parking lot'
+  });
+  assert.equal((await newestOf(parent.eventGroupId)).seriesException, true);
+  await event.topUpSeries(req, { today: addDaysIso(rulesToday(), 35) });
+  const fresh = (await all(parent.eventGroupId)).filter(o => o.ruleDate > newest.ruleDate);
+  assert.ok(fresh.length >= 4);
+  assert.ok(fresh.every(o => o.place !== 'Parking lot' && !o.seriesException));
+});
+
+test('a direct save with "this one only" is a one-off; "this and all after" reaches the later ones', async () => {
+  const parent = await weeklySeries('Scoped saves');
+  const drafts = (await all(parent.eventGroupId)).sort((a, b) => (a.ruleDate < b.ruleDate ? -1 : 1));
+  const second = drafts[1];
+  await event.update(saveReq('this'), {
+    ...second,
+    place: 'Only here'
+  });
+  let now = (await all(parent.eventGroupId)).sort((a, b) => (a.ruleDate < b.ruleDate ? -1 : 1));
+  assert.equal(now[1].place, 'Only here');
+  assert.equal(now[1].seriesException, true);
+  assert.notEqual(now[2].place, 'Only here');
+
+  const third = now[2];
+  await event.update(saveReq('following'), {
+    ...third,
+    place: 'From now on'
+  });
+  now = (await all(parent.eventGroupId)).sort((a, b) => (a.ruleDate < b.ruleDate ? -1 : 1));
+  assert.notEqual(now[2].seriesException, true);
+  assert.equal(now[2].place, 'From now on');
+  assert.equal(now[now.length - 1].place, 'From now on');
+  assert.notEqual(now[1].place, 'From now on', 'earlier ones are left alone');
+});
