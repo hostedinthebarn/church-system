@@ -294,5 +294,12 @@
   "rosterSwapOutSubject": "Roster change: {{role}}, {{when}}",
   "rosterSwapOutBody": "Hello {{name}},\n\nYou are no longer down for {{role}} ({{when}}). Thank you.",
   "rosterSwapInSubject": "Roster change: you are serving {{role}}, {{when}}",
-  "rosterSwapInBody": "Hello {{name}},\n\nYou are now down for {{role}} ({{when}}). If you can't, please tell the office."
+  "rosterSwapInBody": "Hello {{name}},\n\nYou are now down for {{role}} ({{when}}). If you can't, please tell the office.",
+  "eventSeriesPromptHeading": "Change this one only, or this and all after?",
+  "eventSeriesPromptBody": "This event repeats. Choose how far your changes go.",
+  "eventSeriesSave": "Save",
+  "eventSeriesScopeLabel": "Apply to",
+  "eventSeriesThis": "This one only",
+  "eventSeriesFollowing": "This and all after",
+  "eventSeriesCancel": "Cancel"
 }

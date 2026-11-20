@@ -41,7 +41,11 @@ const MOVING_FIELDS = [ 'startDate', 'startTime', 'endTime', 'place', 'allDay' ]
 module.exports = {
   improve: '@apostrophecms/event',
   options: {
-    alias: 'event'
+    alias: 'event',
+    // The editor asks "this one only, or this and all after?" (LGC-64).
+    components: {
+      editorModal: 'AposEventEditor'
+    }
   },
   fields(self) {
     return {
@@ -225,6 +229,36 @@ module.exports = {
             piece.ruleDate = piece.startDate;
           }
         },
+        // A direct save of a series occurrence is a one-off unless the editor
+        // said "this and all after" (the admin prompt sends _seriesScope).
+        // Saves from editSeries, the top-up, publishing and localizing don't
+        // come through here as edits: the stored draft is compared, so only a
+        // changed field counts. Keeps the guard true for REST and MCP saves too.
+        async markSeriesException(req, piece) {
+          if (piece.aposMode !== 'draft' || !piece.eventGroupId || !piece._id || req.seriesEditing) {
+            return;
+          }
+          if (self.seriesScopeOf(req) === 'following') {
+            return;
+          }
+          const stored = await self.apos.doc.db.findOne({ _id: piece._id });
+          if (!stored || stored.seriesException) {
+            return;
+          }
+          const changed = [ ...SERIES_FIELDS, ...ONE_ONLY_FIELDS ].some(key => {
+            const before = stored[key] === undefined || stored[key] === null ? '' : stored[key];
+            const after = piece[key] === undefined || piece[key] === null ? '' : piece[key];
+            return before !== after;
+          });
+          if (changed) {
+            piece.seriesException = true;
+            // Same as editSeries: moving an occurrence marks it "changed".
+            if (piece.status === 'scheduled' && stored.status === 'scheduled' &&
+              MOVING_FIELDS.some(key => (stored[key] || '') !== (piece[key] || ''))) {
+              piece.status = 'changed';
+            }
+          }
+        },
         async setContactName(req, piece) {
           const id = (piece._contact && piece._contact[0] && piece._contact[0].aposDocId) ||
             (piece.contactIds && piece.contactIds[0]);
@@ -262,6 +296,24 @@ module.exports = {
           }
         }
       },
+      afterSave: {
+        // "This and all after" from the admin editor: the form has saved this
+        // occurrence, so carry the same changes to the ones after it.
+        async applyToFollowing(req, piece) {
+          if (req.seriesEditing || piece.aposMode !== 'draft' || !piece.eventGroupId ||
+            self.seriesScopeOf(req) !== 'following') {
+            return;
+          }
+          const changes = {};
+          for (const key of SERIES_FIELDS) {
+            changes[key] = piece[key];
+          }
+          // The status is the one thing the form didn't necessarily mean to
+          // spread: a cancelled occurrence doesn't cancel the series.
+          delete changes.status;
+          await self.editSeries(req, piece._id, 'following', changes);
+        }
+      },
       afterPublish: {
         // Replaces the stock handler, which looked children up through a query
         // that couldn't see the group id after publishing.
@@ -285,6 +337,12 @@ module.exports = {
   },
   methods(self) {
     return {
+      // The scope the admin prompt chose, sent in the body (`_seriesScope`) or
+      // the query (`seriesScope`); null when the save didn't say.
+      seriesScopeOf(req) {
+        const raw = (req.body && req.body._seriesScope) || (req.query && req.query.seriesScope);
+        return self.apos.launder.select(raw, [ 'this', 'following' ], null);
+      },
       // Chicago wall-clock to UTC instants (replaces the stock method).
       denormalizeDatesAndTimes(piece) {
         if (piece.dateType !== 'consecutive') {
@@ -351,7 +409,11 @@ module.exports = {
       // records. Works on drafts; with { publish: true } it publishes each
       // changed occurrence that has been published before.
       async editSeries(req, at, scope, changes, { publish = false } = {}) {
-        const draftReq = req.clone({ mode: 'draft' });
+        // Saves made here are already scoped; the direct-save guard skips them.
+        const draftReq = req.clone({
+          mode: 'draft',
+          seriesEditing: true
+        });
         const opened = await self.findOneForEditing(draftReq, { _id: at });
         if (!opened) {
           throw self.apos.error('notfound');

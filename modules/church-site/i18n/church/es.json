@@ -294,5 +294,12 @@
   "rosterSwapOutSubject": "Cambio en la lista: {{role}}, {{when}}",
   "rosterSwapOutBody": "Hola {{name}},\n\nYa no está asignado a {{role}} ({{when}}). Gracias.",
   "rosterSwapInSubject": "Cambio en la lista: usted sirve en {{role}}, {{when}}",
-  "rosterSwapInBody": "Hola {{name}},\n\nAhora está asignado a {{role}} ({{when}}). Si no puede, avise a la oficina."
+  "rosterSwapInBody": "Hola {{name}},\n\nAhora está asignado a {{role}} ({{when}}). Si no puede, avise a la oficina.",
+  "eventSeriesPromptHeading": "¿Cambiar solo este, o este y todos los siguientes?",
+  "eventSeriesPromptBody": "Este evento se repite. Elija hasta dónde llegan los cambios.",
+  "eventSeriesSave": "Guardar",
+  "eventSeriesScopeLabel": "Aplicar a",
+  "eventSeriesThis": "Solo este",
+  "eventSeriesFollowing": "Este y todos los siguientes",
+  "eventSeriesCancel": "Cancelar"
 }
