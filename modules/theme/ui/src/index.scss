@@ -352,3 +352,53 @@ legend { padding: 0 0.4rem; font-weight: 700; }
     display: none;
   }
 }
+
+// ---------- month calendar (LGC-42) ----------
+// The phone list and the desktop grid are both in the page; CSS shows one.
+// display: none takes the hidden one out of the tab order and the
+// accessibility tree.
+
+.cal-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cal-month { margin: 0; flex: 1; text-align: center; }
+
+.cal-list > li { margin: 1rem 0; padding-bottom: 0.5rem; border-bottom: 1px solid #8c8c8c; }
+.cal-list h3 { margin: 0 0 0.25rem; }
+.cal-list ul li { margin: 0.4rem 0; }
+
+.cal-grid { display: none; }
+
+@media (min-width: 48rem) {
+  .cal-list { display: none; }
+
+  .cal-grid {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+  }
+
+  .cal-grid th,
+  .cal-grid td {
+    padding: 0.3rem;
+    border: 1px solid #8c8c8c;
+    vertical-align: top;
+    font-size: 0.9rem;
+    overflow-wrap: anywhere;
+  }
+
+  .cal-grid td { height: 6rem; }
+  .cal-grid td.outside { background: #f2f2f2; }
+  .cal-grid td[aria-current='date'] { outline: 3px solid var(--church-accent); outline-offset: -3px; }
+  .cal-grid ul li { margin: 0.2rem 0; }
+}
+
+.cal-day { font-weight: 700; }
+.cal-event.cancelled a { color: #4d4d4d; }
+.cal-time { font-weight: 600; }

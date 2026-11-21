@@ -54,3 +54,11 @@ Events are `@apostrophecms/event` 1.0.2, extended in `modules/@apostrophecms/eve
 - Open-ended series are kept filled 12 months ahead by a nightly task: `node app.js @apostrophecms/event:top-up`. Run it from cron or a systemd timer. It is safe to run twice.
 - Feeds: `/calendar/public.ics` (public events) and `/calendar/member/<token>.ics` (a private link per member, made, replaced and turned off at `/calendar/subscribe`).
 - Every event page has an "Add to Google Calendar" link.
+
+### Month calendar (LGC-42)
+
+- `/calendar?month=YYYY-MM` shows one month, with Previous and Next links and a jump-to-month form (month and year, works without JavaScript; it sends `m` and `y` and is redirected to the `month=` address). A missing or bad `month` means the current month in America/Chicago, never an error. Years 1000 to 9998 are accepted.
+- One page, two renderings: a day-by-day list for phones and a real `<table>` for desktop; CSS (`.cal-list`, `.cal-grid` in `modules/theme`) shows one and hides the other with `display: none`.
+- Visibility is decided in the query (`church-calendar` `monthEvents`): anonymous visitors get public events, a signed-in member also gets members-only ones. Cancelled events stay, struck through and labelled "Cancelled"; members-only ones are labelled "Members". Pages for a signed-in member are `private, no-store`, and every response says `Vary: Cookie`: **any cache added later must vary on signed-in state, or members-only titles leak.**
+- A multi-day event shows on every day it touches. Open-ended series are only kept filled 12 months ahead (the nightly top-up task), so months further out show only one-off events; that is expected.
+- The month grid and the month picker rules are in `@church-system/calendar-logic` (`src/month.js`), tested to 100% coverage.
