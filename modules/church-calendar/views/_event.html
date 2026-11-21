@@ -1,0 +1,8 @@
+{# One event, as a link (or plain text when it has no page), with its marks.
+   Strikethrough alone isn't enough (WCAG 1.4.1), so "Cancelled" is also text. #}
+<span class="cal-event{% if event.cancelled %} cancelled{% endif %}">
+  {% if event.time and event.isFirstDay %}<span class="cal-time">{{ event.time }}</span> {% endif %}
+  {% if event.url %}<a href="{{ event.url }}">{% if event.cancelled %}<del>{{ event.title }}</del>{% else %}{{ event.title }}{% endif %}</a>{% else %}{% if event.cancelled %}<del>{{ event.title }}</del>{% else %}{{ event.title }}{% endif %}{% endif %}
+  {% if event.cancelled %}<span class="tag grey">{{ __t('church:eventStatusCancelled') }}</span>{% endif %}
+  {% if event.membersOnly %}<span class="tag">{{ __t('church:calMembers') }}</span>{% endif %}
+</span>
