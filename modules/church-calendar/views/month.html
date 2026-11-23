@@ -3,13 +3,9 @@
 {% block title %}{{ data.title }} · {{ __t('church:calTitle') }}{% endblock %}
 
 {% block main %}
-  {% set site = apos.modules['church-site'].site() %}
-  <header class="church-header church-nav">
-    <p class="church-name"><a href="/"><strong>{{ site.name }}</strong></a></p>
-    <p class="home-links"><a href="/calendar/subscribe">{{ __t('church:calSubscribeTitle') }}</a></p>
-  </header>
   <main id="main" class="church-main calendar">
     <h1>{{ __t('church:calTitle') }}</h1>
+    <p><a href="/calendar/subscribe">{{ __t('church:calSubscribeTitle') }}</a></p>
 
     <nav class="cal-nav" aria-label="{{ __t('church:calMonthNav') }}">
       {% if data.prevUrl %}<a class="btn ghost" rel="prev" href="{{ data.prevUrl }}">{{ __t('church:calPrev') }}</a>{% else %}<span></span>{% endif %}
