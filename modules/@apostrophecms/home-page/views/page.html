@@ -10,6 +10,7 @@
       <p class="church-name"><strong>{{ site.name }}</strong></p>
     {% endif %}
     <p class="home-links">
+      <a class="church-signin" href="/calendar">{{ __t('church:calTitle') }}</a>
       <a class="church-signin" href="/members/directory">{{ __t('church:directoryTitle') }}</a>
       {% if not data.user %}
         <a class="church-signin" href="/sign-in">{{ __t('church:memberSignIn') }}</a>

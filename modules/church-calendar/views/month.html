@@ -1,0 +1,93 @@
+{% extends data.outerLayout %}
+
+{% block title %}{{ data.title }} · {{ __t('church:calTitle') }}{% endblock %}
+
+{% block main %}
+  {% set site = apos.modules['church-site'].site() %}
+  <header class="church-header church-nav">
+    <p class="church-name"><a href="/"><strong>{{ site.name }}</strong></a></p>
+    <p class="home-links"><a href="/calendar/subscribe">{{ __t('church:calSubscribeTitle') }}</a></p>
+  </header>
+  <main id="main" class="church-main calendar">
+    <h1>{{ __t('church:calTitle') }}</h1>
+
+    <nav class="cal-nav" aria-label="{{ __t('church:calMonthNav') }}">
+      {% if data.prevUrl %}<a class="btn ghost" rel="prev" href="{{ data.prevUrl }}">{{ __t('church:calPrev') }}</a>{% else %}<span></span>{% endif %}
+      <h2 class="cal-month">{{ data.title }}</h2>
+      {% if data.nextUrl %}<a class="btn ghost" rel="next" href="{{ data.nextUrl }}">{{ __t('church:calNext') }}</a>{% else %}<span></span>{% endif %}
+    </nav>
+    {% if data.todayUrl %}<p><a href="{{ data.todayUrl }}">{{ __t('church:calThisMonth') }}</a></p>{% endif %}
+
+    {% if data.empty %}<p role="status">{{ __t('church:calNoEvents') }}</p>{% endif %}
+    {% if not data.signedIn %}
+      <p class="muted">{{ __t('church:calSignInHint') }} <a href="/sign-in">{{ __t('church:memberSignIn') }}</a></p>
+    {% endif %}
+
+    {# Phone: the days that have events, one after another. #}
+    {% if not data.empty %}
+      <ol class="cal-list plain">
+        {% for day in data.days %}
+          <li{% if day.isToday %} aria-current="date"{% endif %}>
+            <h3>{{ day.label }}{% if day.isToday %} <span class="tag">{{ __t('church:calToday') }}</span>{% endif %}</h3>
+            <ul class="plain">
+              {% for event in day.events %}
+                <li>{% include "_event.html" %}</li>
+              {% endfor %}
+            </ul>
+          </li>
+        {% endfor %}
+      </ol>
+    {% endif %}
+
+    {# Desktop: the same days as a grid. CSS shows one and hides the other. #}
+    <table class="cal-grid">
+      <caption class="visually-hidden">{{ data.title }}</caption>
+      <thead>
+        <tr>
+          {% for name in data.weekdays %}<th scope="col">{{ name }}</th>{% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for week in data.weeks %}
+          <tr>
+            {% for day in week %}
+              <td class="{% if not day.inMonth %}outside{% endif %}"{% if day.isToday %} aria-current="date"{% endif %}>
+                {% if day.inMonth %}
+                  <span class="cal-day">{{ day.day }}</span>
+                  {% if day.events.length %}
+                    <ul class="plain">
+                      {% for event in day.events %}
+                        <li>{% include "_event.html" %}</li>
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
+                {% endif %}
+              </td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <form class="cal-picker" method="get" action="/calendar">
+      <fieldset>
+        <legend>{{ __t('church:calPickerLegend') }}</legend>
+        <div class="fgrid">
+          <div class="field">
+            <label for="cal-m">{{ __t('church:calPickerMonth') }}</label>
+            <select id="cal-m" name="m">
+              {% for name in data.monthNames %}
+                <option value="{{ loop.index }}"{% if loop.index == data.monthNumber %} selected{% endif %}>{{ name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <label for="cal-y">{{ __t('church:calPickerYear') }}</label>
+            <input id="cal-y" name="y" type="number" inputmode="numeric" min="1000" max="9998" value="{{ data.year }}" required>
+          </div>
+        </div>
+        <button class="btn" type="submit">{{ __t('church:calGo') }}</button>
+      </fieldset>
+    </form>
+  </main>
+{% endblock %}
