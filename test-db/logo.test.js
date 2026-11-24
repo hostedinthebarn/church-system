@@ -116,7 +116,7 @@ test('with no logo uploaded, the site name stands in: header text, cover text, n
   assert.match(print, /class="church logo-text">La Grange Church of Christ</);
   assert.ok(!print.includes('<img'));
   const home = await apos.http.get('/', { parse: false });
-  assert.match(home, /class="church-name"><strong>La Grange Church of Christ/);
+  assert.match(home, /class="church-name"><a href="\/"><strong>La Grange Church of Christ/);
   assert.ok(!home.includes('church-logo'));
 });
 

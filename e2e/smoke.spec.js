@@ -10,8 +10,8 @@ test.describe('home page', () => {
     expect(response.headers()['x-robots-tag']).toContain('noindex');
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
     await expect(page.locator('[data-demo-banner]')).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Member sign-in' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Give' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Member sign-in' }).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Give' }).first()).toBeVisible();
   });
 
   test('uses the self-hosted fonts, and shows the name as text until a logo is uploaded', async ({ page }) => {

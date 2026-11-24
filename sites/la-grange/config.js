@@ -29,6 +29,12 @@ module.exports = {
       time: '6:30 pm'
     }
   ],
+  // From the church's home page, read 2026-11-13 (public-home-poc.md).
+  address: '646 E Hwy 71 Business, La Grange, TX 78945',
+  // The church's existing email sign-up (a link out; the list itself is part of
+  // the go-live email decision, not the POC).
+  currentSiteUrl: 'https://www.lagrangecoc.com',
+  mailchimpUrl: 'https://lagrangecoc.us8.list-manage.com/subscribe?u=14fc3df9d155df4b78daba87d&id=6b457556b9',
   contact: {
     email: 'info@lagrangecoc.com',
     phone: '(979) 968-5676'
