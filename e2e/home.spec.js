@@ -63,8 +63,8 @@ test.describe('phone, signed out', () => {
     await expect(events).not.toContainText('Singing night');
     await expect(events.getByRole('link', { name: 'See the full calendar' })).toHaveAttribute('href', '/calendar');
     await expect(events.getByRole('link', { name: /Subscribe on your phone/ })).toHaveAttribute('href', /^webcal:.*\/calendar\/public\.ics$/);
-    await expect(events.getByRole('link', { name: /Add to Google Calendar/ })).toHaveAttribute('href', /calendar\.google\.com/);
-    await expect(page.getByRole('link', { name: /Sign up for the email list/ })).toHaveAttribute('href', /list-manage\.com/);
+    await expect(events.getByRole('link', { name: /Add to Google Calendar/ })).toHaveAttribute('href', /^https:\/\/calendar\.google\.com\/calendar\/r\?cid=webcal/);
+    await expect(page.getByRole('link', { name: /Sign up for the email list/ })).toHaveAttribute('href', /^https:\/\/[a-z0-9.-]+\.list-manage\.com\//);
     await expect(page.getByRole('heading', { level: 3 })).not.toHaveCount(0);
     await expect(page.locator('footer')).toContainText('Wednesday Bible class');
   });
