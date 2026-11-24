@@ -407,3 +407,261 @@ legend { padding: 0 0.4rem; font-weight: 700; }
 .cal-day { font-weight: 700; }
 .cal-event.cancelled a { color: #4d4d4d; }
 .cal-time { font-weight: 600; }
+
+// ---------- site header and menu (LGC-33) ----------
+// Sign-in sits beside the menu button and is never inside the menu. The header
+// is not sticky: a sticky bar can cover the focused control (WCAG 2.4.11).
+
+:focus-visible {
+  outline: 3px solid var(--church-brand);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px var(--church-focus);
+}
+
+.site-header {
+  background: var(--church-paper);
+  border-bottom: 1px solid #d0d0d0;
+}
+
+.site-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  max-width: 70rem;
+  margin: 0 auto;
+  padding: 0.5rem 1rem;
+  min-height: 4.5rem;
+}
+
+.site-header .church-name { margin: 0; font-size: 1.25rem; }
+.site-header .church-name a { color: var(--church-ink); text-decoration: none; }
+
+.site-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.site-header .church-signin {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  border-radius: 6px;
+  background: var(--church-brand);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.menu-btn {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--church-brand);
+  border-radius: 6px;
+  color: var(--church-brand);
+  background: var(--church-paper);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.site-nav {
+  max-width: 70rem;
+  margin: 0 auto;
+  padding: 0 1rem 0.5rem;
+}
+
+.site-nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 0.75rem;
+  color: var(--church-ink);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.site-nav a:hover { text-decoration: underline; }
+
+// Without JavaScript the menu is simply open. With it, the button shows and
+// the menu opens and closes on narrow screens.
+@media (max-width: 860px) {
+  .js-menu .site-nav { display: none; }
+  .js-menu .site-nav.open { display: block; }
+  .js-menu .site-nav ul { flex-direction: column; }
+}
+
+@media (min-width: 861px) {
+  .menu-btn { display: none !important; }
+  .js-menu .site-nav { display: block; }
+}
+
+// ---------- the home page (LGC-33) ----------
+
+.btn.light {
+  color: var(--church-brand);
+  background: var(--church-paper);
+  border-color: var(--church-paper);
+}
+
+.home .btn, .home-footer .btn {
+  border-color: var(--church-brand);
+  background: var(--church-brand);
+  color: #fff;
+}
+
+.home .btn.ghost {
+  color: var(--church-brand);
+  background: var(--church-paper);
+}
+
+.home .home-signup .btn.light,
+.home-footer .btn.light {
+  color: var(--church-brand);
+  background: #fff;
+  border-color: #fff;
+}
+
+.home h1, .home h2, .home h3 { font-weight: 500; line-height: 1.2; }
+.home a { color: var(--church-brand); }
+
+.home-wrap {
+  max-width: 70rem;
+  margin: 0 auto;
+  padding: 3rem 1rem;
+}
+
+.home-hero {
+  display: grid;
+  gap: 1.5rem;
+  justify-items: center;
+  padding: 5rem 1rem 4rem;
+  text-align: center;
+  color: #fff;
+  // Placeholder for the photograph: a plain colour band, so no text sits on a photo.
+  background: var(--church-brand);
+}
+
+.home-hero h1 { margin: 0; font-size: clamp(2.1rem, 5vw, 3.2rem); }
+.home .home-hero .btn { color: var(--church-brand); background: #fff; border-color: #fff; }
+
+.home-intro {
+  max-width: 51rem;
+  margin: 3rem auto 1.5rem;
+  padding: 0 1rem;
+  text-align: center;
+  font-style: italic;
+  color: #3d3d3d;
+}
+
+.home-quick {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem 1.5rem;
+  margin: 0 auto 2rem;
+}
+
+.home-quick a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 0.5rem;
+  font-weight: 500;
+}
+
+.home-panel { background: var(--church-panel); }
+
+.home-events li {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid #d0d0d0;
+}
+
+.home-events h3 { margin: 0 0 0.25rem; font-size: 1.15rem; }
+.home-events p { margin: 0; font-size: 1rem; }
+
+.home-date {
+  padding: 0.5rem 0.25rem;
+  border-radius: 6px;
+  color: #fff;
+  background: var(--church-brand);
+  text-align: center;
+  font-family: var(--church-font-heading);
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.home-date b { display: block; font-size: 1.6rem; font-weight: 600; }
+
+.home-event-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.home-signup {
+  padding: 3rem 1rem;
+  text-align: center;
+  color: #fff;
+  background: var(--church-brand);
+}
+
+.home-signup h2 { margin-top: 0; }
+
+.home-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.home-card {
+  padding: 1.5rem;
+  border-radius: 4px;
+  background: var(--church-panel);
+}
+
+.home-card h3 { font-size: 1.3rem; }
+.home-card p { margin: 0; font-size: 1rem; }
+
+.home-footer {
+  max-width: none;
+  padding: 3rem 1rem 2rem;
+  color: #fff;
+  background: var(--church-brand);
+}
+
+.home-footer a { color: #fff; }
+.home-footer .btn.light { color: var(--church-brand); }
+
+.home-footer-cols {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 1.2fr;
+  gap: 2rem;
+  max-width: 70rem;
+  margin: 0 auto;
+}
+
+.home-footer h2 { font-size: 1.15rem; }
+
+@media (max-width: 860px) {
+  .home-cards, .home-footer-cols { grid-template-columns: 1fr; }
+  .home-hero { padding: 3rem 1rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}

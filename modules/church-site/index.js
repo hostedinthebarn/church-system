@@ -25,6 +25,11 @@ module.exports = {
       site() {
         return self.options.site;
       },
+      // Service times, contact details and links, as the office set them in
+      // the site settings, falling back to the site's config.
+      info(settings) {
+        return self.info(settings);
+      },
       // The pages' @font-face rules, linked to the self-hosted files.
       fontFaceCss() {
         return self.apos.template.safe(fonts.fontFaceCss());
@@ -33,6 +38,24 @@ module.exports = {
   },
   methods(self) {
     return {
+      info(settings) {
+        const site = self.options.site;
+        const set = settings || {};
+        const times = (set.serviceTimes || []).filter(item => item && item.label);
+        const phone = set.phone || (site.contact && site.contact.phone) || '';
+        return {
+          serviceTimes: times.length ? times : (site.serviceTimes || []),
+          address: set.address || site.address || '',
+          phone,
+          // tel: links take digits and a leading plus only.
+          phoneHref: phone.replace(/[^\d+]/g, ''),
+          email: set.email || (site.contact && site.contact.email) || '',
+          giveUrl: set.giveUrl || site.giveUrl || '',
+          mailchimpUrl: set.mailchimpUrl || site.mailchimpUrl || '',
+          // The church's existing website, for what the POC hasn't ported.
+          currentSiteUrl: site.currentSiteUrl || ''
+        };
+      },
       // The uploaded logo from the site-wide settings, as { src, alt }, or
       // null when none is set (dev, tests, CI): callers then show the church's
       // name as text. The original upload is used, so a larger replacement
@@ -79,6 +102,9 @@ module.exports = {
     const available = fonts.files();
     return {
       get: {
+        // The POC is never indexed: the headers and meta tags say so, and so
+        // does this (LGC-33).
+        '/robots.txt': (req, res) => res.type('text/plain').send('User-agent: *\nDisallow: /\n'),
         // Self-hosted Jost and Inter: only the files listed in lib/fonts.js.
         '/church-fonts/:file': (req, res) => {
           const file = available.get(req.params.file);

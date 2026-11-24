@@ -1,6 +1,5 @@
-{% set site = apos.modules['church-site'].site() %}
-<header class="church-header church-nav">
-  <p class="church-name"><a href="/"><strong>{{ site.name }}</strong></a></p>
+{# The site header (name, sign-in, menu) is in the layout; this is the members' own bar. #}
+<div class="church-header church-nav">
   {% if data.nav %}
     <nav class="member-nav" aria-label="{{ __t('church:memberNavLabel') }}">
       <a href="/members/directory">{{ __t('church:directoryTitle') }}</a>
@@ -17,4 +16,4 @@
       {% if data.nav.office %}<span class="tag office">{{ __t('church:officeAdmin') }}</span>{% endif %}
     </p>
   {% endif %}
-</header>
+</div>

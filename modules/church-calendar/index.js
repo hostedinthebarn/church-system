@@ -12,6 +12,7 @@ const { buildFeed } = require('../../lib/ical.js');
 const { canSignIn } = require('../../lib/signin.js');
 const rules = require('../../lib/rules.js');
 const { addDays } = require('@church-system/calendar-logic/src/dates.js');
+const { instantToLocal } = require('@church-system/calendar-logic');
 const {
   buildMonth, monthBounds, monthFromQuery, monthKey, shiftMonth
 } = require('@church-system/calendar-logic/src/month.js');
@@ -25,6 +26,9 @@ const MONTH_LIMIT = 1000;
 // A subscriber's calendar keeps what happened in the last 60 days.
 const LOOK_BACK_DAYS = 60;
 const FEED_LIMIT = 5000;
+// The home page's Upcoming Events: the next few, never more than this.
+const HOME_LIMIT = 5;
+const TIME_ZONE = 'America/Chicago';
 
 function hashToken(token) {
   return crypto.createHash('sha256').update(String(token)).digest('hex');
@@ -147,6 +151,63 @@ module.exports = {
           cancelled: piece.status === 'cancelled',
           membersOnly: piece.publicEvent === false
         }));
+      },
+      // The home page's Upcoming Events (LGC-33): the next few events anyone
+      // may see, leaving out regular services (they are in the footer),
+      // cancelled events, and events whose announce-from date hasn't come.
+      // An empty announce-from counts as announced: nothing prompts the office
+      // for it yet. Public only, even for a signed-in member: this is the
+      // public page. "Today" is the date in Texas, not UTC.
+      async upcomingEvents(req, limit = HOME_LIMIT, now = new Date()) {
+        const today = instantToLocal(now).date;
+        const viewer = self.apos.task.getReq({
+          role: 'anon',
+          mode: 'published',
+          locale: req.locale || 'en'
+        });
+        const pieces = await self.apos.event.find(viewer, {
+          endDate: { $gte: today },
+          publicEvent: { $ne: false },
+          regularService: { $ne: true },
+          status: { $ne: 'cancelled' },
+          $or: [
+            { announceFrom: null },
+            { announceFrom: '' },
+            { announceFrom: { $lte: today } }
+          ]
+        }).sort({
+          startDate: 1,
+          start: 1
+        }).limit(limit).toArray();
+        const locale = req.locale || 'en';
+        const part = options => new Intl.DateTimeFormat(locale, {
+          ...options,
+          timeZone: TIME_ZONE
+        });
+        const weekday = part({ weekday: 'short' });
+        const day = part({ day: 'numeric' });
+        const month = part({ month: 'short' });
+        return pieces.map(piece => ({
+          title: piece.title,
+          url: piece._url || null,
+          weekday: weekday.format(piece.start),
+          day: day.format(piece.start),
+          month: month.format(piece.start),
+          when: self.apos.event.whenText(piece, locale),
+          place: piece.place || '',
+          changed: piece.status === 'changed'
+        }));
+      },
+      // Everything the home page's events block needs.
+      async homeEvents(req) {
+        const subscribe = self.absoluteUrl(req, PUBLIC_PATH) || '';
+        const webcal = subscribe.replace(/^https?:/, 'webcal:');
+        return {
+          events: await self.upcomingEvents(req),
+          webcal,
+          // Google adds the feed by address, so it only works on a public host.
+          google: webcal ? `https://calendar.google.com/calendar/r?cid=${encodeURIComponent(webcal)}` : ''
+        };
       },
       async monthPage(req, month) {
         const locale = req.locale || 'en';

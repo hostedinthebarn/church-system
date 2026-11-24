@@ -46,7 +46,7 @@ function suite(viewportName, viewport) {
       await expect(events(page)).toContainText('Singing night');
       await expect(page.locator('main')).not.toContainText('Elders');
       await expect(page.locator(desktop ? '.cal-list' : '.cal-grid')).toBeHidden();
-      await expect(page.getByRole('link', { name: 'Member sign-in' })).toBeVisible();
+      await expect(page.getByRole('link', { name: 'Member sign-in' }).first()).toBeVisible();
     });
 
     test('a cancelled event is struck through and says Cancelled', async ({ page }) => {

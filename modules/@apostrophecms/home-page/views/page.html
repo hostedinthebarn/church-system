@@ -1,43 +1,114 @@
 {% extends data.outerLayout %}
 
+{# The option 1 home page (LGC-33), ported from reference/mockups/home-option-1.
+   Images are placeholders: the hero is a plain colour band and the Latest
+   Message has no artwork until the church supplies photos. #}
 {% block main %}
+  {% set info = apos.modules['church-site'].info(data.global) %}
   {% set site = apos.modules['church-site'].site() %}
-  <header class="church-header">
-    {# The logo is uploaded in the site settings; until then the name shows. #}
-    {% if data.global.logo %}
-      <img class="church-logo" src="{{ apos.attachment.url(data.global.logo, { size: 'full' }) }}" alt="{{ data.global.logoAlt or site.name }}">
-    {% else %}
-      <p class="church-name"><strong>{{ site.name }}</strong></p>
-    {% endif %}
-    <p class="home-links">
-      <a class="church-signin" href="/calendar">{{ __t('church:calTitle') }}</a>
-      <a class="church-signin" href="/members/directory">{{ __t('church:directoryTitle') }}</a>
-      {% if not data.user %}
-        <a class="church-signin" href="/sign-in">{{ __t('church:memberSignIn') }}</a>
-      {% endif %}
-    </p>
-    {% if data.user %}
-      <nav aria-label="{{ __t('church:memberLinks') }}">
-        <a href="/away">{{ __t('church:awayTitle') }}</a>
-        {% if data.user.role == 'admin' %} · <a href="/roster">{{ __t('church:rosterTitle') }}</a>{% endif %}
-      </nav>
-    {% endif %}
-  </header>
-  <main id="main" class="church-main">
-    <h1>{{ __t('church:welcome') }}</h1>
-    <p>{{ __t('church:homeIntro') }}</p>
-    <h2>{{ __t('church:serviceTimes') }}</h2>
-    <ul>
-      {% for item in site.serviceTimes %}
-        <li>{{ item.label }}: {{ item.time }}</li>
-      {% endfor %}
+  {% set page = data.page %}
+  {% set home = data.home or { events: [] } %}
+  {% set defaultCards = [
+    { title: __t('church:homeCard1Title'), text: __t('church:homeCard1Text') },
+    { title: __t('church:homeCard2Title'), text: __t('church:homeCard2Text') },
+    { title: __t('church:homeCard3Title'), text: __t('church:homeCard3Text') },
+    { title: __t('church:homeCard4Title'), text: __t('church:homeCard4Text') }
+  ] %}
+  {% set cards = page.missionCards if (page.missionCards and page.missionCards.length) else defaultCards %}
+
+  <main id="main" class="home">
+    <section class="home-hero" aria-labelledby="home-hero-h">
+      <h1 id="home-hero-h">{{ page.heroTitle or __t('church:homeHeroTitle') }}</h1>
+      <a class="btn" href="#mission">{{ page.heroButtonLabel or __t('church:homeHeroButton') }}</a>
+    </section>
+
+    <p class="home-intro">{{ page.intro or __t('church:homeMissionIntro') }}</p>
+
+    <ul class="home-quick plain">
+      <li><a href="#contact">{{ __t('church:homeQuickLocation') }}</a></li>
+      <li><a href="/calendar">{{ __t('church:homeQuickCalendar') }}</a></li>
+      {% if info.email %}<li><a href="mailto:{{ info.email }}">{{ __t('church:homeQuickMessage') }}</a></li>{% endif %}
     </ul>
+
+    <section class="home-panel" id="events" aria-labelledby="events-h" data-upcoming-events>
+      <div class="home-wrap">
+        <h2 id="events-h">{{ __t('church:homeEventsTitle') }}</h2>
+        {% if home.events.length %}
+          <ol class="home-events plain">
+            {% for event in home.events %}
+              <li>
+                <div class="home-date" aria-hidden="true">{{ event.weekday }}<b>{{ event.day }}</b>{{ event.month }}</div>
+                <div>
+                  <h3>{% if event.url %}<a href="{{ event.url }}">{{ event.title }}</a>{% else %}{{ event.title }}{% endif %}</h3>
+                  <p>{{ event.when }}{% if event.place %} · {{ event.place }}{% endif %}</p>
+                  {% if event.changed %}<p><strong>{{ __t('church:homeEventsChanged') }}</strong></p>{% endif %}
+                </div>
+              </li>
+            {% endfor %}
+          </ol>
+        {% else %}
+          <p role="status">{{ __t('church:homeEventsNone') }}</p>
+        {% endif %}
+        <ul class="home-event-links plain">
+          <li><a class="btn" href="/calendar">{{ __t('church:homeEventsCalendar') }}</a></li>
+          {% if home.webcal %}
+            <li><a class="btn ghost" href="{{ home.webcal }}">{{ __t('church:homeEventsSubscribe') }}</a></li>
+            <li><a class="btn ghost" href="{{ home.google }}" rel="noopener" target="_blank">{{ __t('church:homeEventsGoogle') }} <span class="visually-hidden">{{ __t('church:opensNewTab') }}</span></a></li>
+          {% endif %}
+        </ul>
+      </div>
+    </section>
+
+    <section class="home-wrap home-latest" id="latest" aria-labelledby="latest-h">
+      <h2 id="latest-h">{{ __t('church:homeLatestHeading') }}</h2>
+      <p>{{ page.latestBlurb or __t('church:homeLatestDefaultBlurb') }}</p>
+      {% if page.latestTitle and page.latestUrl %}
+        <p><a class="btn" href="{{ page.latestUrl }}">{{ __t('church:homeLatestListen', { title: page.latestTitle }) }}</a></p>
+      {% else %}
+        <p class="muted">{{ __t('church:homeLatestNone') }}</p>
+      {% endif %}
+    </section>
+
+    {% if info.mailchimpUrl %}
+      <section class="home-signup" aria-labelledby="signup-h">
+        <h2 id="signup-h">{{ __t('church:homeSignupTitle') }}</h2>
+        <a class="btn light" href="{{ info.mailchimpUrl }}" rel="noopener" target="_blank">{{ __t('church:homeSignupButton') }} <span class="visually-hidden">{{ __t('church:opensNewTab') }}</span></a>
+      </section>
+    {% endif %}
+
+    <section class="home-wrap" id="mission" aria-labelledby="mission-h">
+      <h2 id="mission-h">{{ __t('church:homeMissionTitle') }}</h2>
+      <div class="home-cards">
+        {% for card in cards %}
+          <div class="home-card"><h3>{{ card.title }}</h3><p>{{ card.text }}</p></div>
+        {% endfor %}
+      </div>
+    </section>
   </main>
-  <footer class="church-footer">
-    <h2>{{ __t('church:contact') }}</h2>
-    <p>{{ site.city }}</p>
-    <p>{{ __t('church:email') }}: <a href="mailto:{{ site.contact.email }}">{{ site.contact.email }}</a></p>
-    <p>{{ __t('church:phone') }}: <a href="tel:{{ site.contact.phone }}">{{ site.contact.phone }}</a></p>
-    <p><a href="{{ site.giveUrl }}">{{ __t('church:give') }}</a></p>
+
+  <footer class="church-footer home-footer" id="contact">
+    <div class="home-footer-cols">
+      <div>
+        <h2>{{ site.name }}</h2>
+        <p>{{ __t('church:homeAbout') }}</p>
+      </div>
+      <div>
+        <h2>{{ __t('church:serviceTimes') }}</h2>
+        <ul class="plain">
+          {% for item in info.serviceTimes %}
+            <li>{{ item.label }}: {{ item.time or __t('church:timesToBeConfirmed') }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div>
+        <h2>{{ __t('church:contact') }}</h2>
+        <ul class="plain">
+          {% if info.phone %}<li>{{ __t('church:phone') }}: <a href="tel:{{ info.phoneHref }}">{{ info.phone }}</a></li>{% endif %}
+          {% if info.email %}<li>{{ __t('church:email') }}: <a href="mailto:{{ info.email }}">{{ info.email }}</a></li>{% endif %}
+          {% if info.address %}<li>{{ __t('church:homeAddress') }}: <a href="https://maps.google.com/?q={{ info.address | urlencode }}">{{ info.address }}</a></li>{% endif %}
+        </ul>
+        {% if info.giveUrl %}<p><a class="btn light" href="{{ info.giveUrl }}">{{ __t('church:give') }}</a></p>{% endif %}
+      </div>
+    </div>
   </footer>
 {% endblock %}

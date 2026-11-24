@@ -19,5 +19,39 @@
       <a href="/demo" data-demo-link>{{ __t('church:demoResetLink') }}</a>
     {% endif %}
   </p>
+  {% set site = apos.modules['church-site'].site() %}
+  {% set info = apos.modules['church-site'].info(data.global) %}
+  {# The sign-in button sits beside the menu button, outside the menu, so a
+     returning member never has to open it (public-home-poc.md). #}
+  <header class="site-header">
+    <div class="site-header-bar">
+      {% if data.global.logo %}
+        <a class="church-home" href="/"><img class="church-logo" src="{{ apos.attachment.url(data.global.logo, { size: 'full' }) }}" alt="{{ data.global.logoAlt or site.name }}"></a>
+      {% else %}
+        <p class="church-name"><a href="/"><strong>{{ site.name }}</strong></a></p>
+      {% endif %}
+      <div class="site-header-actions">
+        {% if data.user %}
+          <a class="church-signin" href="/members">{{ __t('church:membersArea') }}</a>
+        {% else %}
+          <a class="church-signin" href="/sign-in">{{ __t('church:memberSignIn') }}</a>
+        {% endif %}
+        <button type="button" class="menu-btn" aria-expanded="false" aria-controls="main-nav" data-menu-button hidden>{{ __t('church:menu') }}</button>
+      </div>
+    </div>
+    <nav id="main-nav" class="site-nav" aria-label="{{ __t('church:mainNav') }}" data-main-nav>
+      <ul>
+        <li><a href="/">{{ __t('church:home') }}</a></li>
+        <li><a href="/calendar">{{ __t('church:calTitle') }}</a></li>
+        <li><a href="{{ info.giveUrl }}">{{ __t('church:give') }}</a></li>
+        {% if data.user %}
+          <li><a href="/members">{{ __t('church:membersArea') }}</a></li>
+        {% else %}
+          <li><a href="/sign-in">{{ __t('church:memberSignIn') }}</a></li>
+        {% endif %}
+        {% if info.currentSiteUrl %}<li><a href="{{ info.currentSiteUrl }}">{{ __t('church:visitCurrentSite') }}</a></li>{% endif %}
+      </ul>
+    </nav>
+  </header>
   {{ super() }}
 {% endblock %}
