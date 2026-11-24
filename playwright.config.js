@@ -33,6 +33,8 @@ module.exports = defineConfig({
       APOS_MONGODB_URI: e2eMongoUri(),
       // Made-up households (lib/demo-data.js), reset on every start.
       CHURCH_SEED_DEMO: 'reset',
+      // The Reset demo page works only in demo mode.
+      CHURCH_DEMO_MODE: '1',
       CHURCH_PDF_COMPRESS: '0'
     }
   }

@@ -1,0 +1,34 @@
+{% extends data.outerLayout %}
+
+{% block title %}{{ __t('church:demoResetTitle') }}{% endblock %}
+
+{% block main %}
+  <main id="main" class="church-main">
+    <h1>{{ __t('church:demoResetTitle') }}</h1>
+
+    {% if data.result %}
+      <p role="status" data-demo-result>{{ __t('church:demoResetDone', { households: data.result.households, people: data.result.people }) }}</p>
+    {% endif %}
+    {% if data.error %}
+      <p role="alert" data-demo-error>{% if data.error == 'token' %}{{ __t('church:demoResetError_token') }}{% elif data.error == 'off' %}{{ __t('church:demoResetError_off') }}{% else %}{{ __t('church:demoResetError_confirm') }}{% endif %}</p>
+    {% endif %}
+
+    {% if data.enabled %}
+      <p>{{ __t('church:demoResetIntro') }}</p>
+      <ul>
+        <li>{{ __t('church:demoResetRemoves') }}</li>
+        <li>{{ __t('church:demoResetKeeps') }}</li>
+      </ul>
+      <form method="post" action="/demo/reset" data-demo-form>
+        <input type="hidden" name="token" value="{{ data.token }}">
+        <p>
+          <label for="demo-confirm">{{ __t('church:demoResetConfirmLabel', { word: data.word }) }}</label><br>
+          <input type="text" id="demo-confirm" name="confirm" autocomplete="off" required>
+        </p>
+        <button type="submit">{{ __t('church:demoResetButton') }}</button>
+      </form>
+    {% else %}
+      <p data-demo-off>{{ __t('church:demoResetOff') }}</p>
+    {% endif %}
+  </main>
+{% endblock %}
