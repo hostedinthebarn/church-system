@@ -35,7 +35,7 @@ test('every address is example.com, and a different one is refused', () => {
   assert.equal(new Set(emails).size, emails.length, 'one person per address');
   seed.assertSafe(plan);
   plan.households[10].people[0].email = 'someone@gmail.com';
-  assert.throws(() => seed.assertSafe(plan), /example\.com/);
+  assert.throws(() => seed.assertSafe(plan), /^Error: The demo seed only uses example\.com addresses; .+ has someone@gmail\.com\.$/);
 });
 
 test('the household shapes the data model needs are all there', () => {
