@@ -15,6 +15,7 @@ async function start(extra = {}) {
       // from them, such as the sign-in email, read as they do in the real app.
       'church-site': { options: { site: require('../sites/la-grange/config.js') } },
       'church-audit': {},
+      'church-demo': { options: { enabled: true } },
       person: {},
       household: {},
       'person-relationship': {},

@@ -97,6 +97,9 @@ module.exports = {
       // Writes one entry. Also used by code that changes a record directly,
       // such as the household's generated name.
       async record(req, action, doc, changes) {
+        if (self.paused) {
+          return;
+        }
         // `actingUser` is set when a record is saved on someone's behalf, as
         // when a member edits their household through the directory.
         const user = req && (req.actingUser || req.user);
@@ -116,6 +119,17 @@ module.exports = {
             : null,
           changes
         });
+      },
+      // Runs `fn` with the trail switched off. Only the demo reset uses it, so
+      // that putting back the seed does not write an entry for every record.
+      // Edits made by anyone else while it runs are not recorded either.
+      async withoutAudit(fn) {
+        self.paused = true;
+        try {
+          return await fn();
+        } finally {
+          self.paused = false;
+        }
       },
       // Office admins only; the newest first. `recordId` narrows to one record.
       async list(req, { recordId, limit = 100 } = {}) {

@@ -45,6 +45,11 @@ a { color: var(--church-accent); }
   background: var(--church-banner-bg);
 }
 
+.demo-banner a {
+  color: inherit;
+  text-decoration: underline;
+}
+
 .church-header,
 .church-main,
 .church-footer {

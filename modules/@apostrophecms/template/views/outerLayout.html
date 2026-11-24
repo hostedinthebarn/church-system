@@ -14,7 +14,11 @@
 {# The banner sits here, not in beforeMain, because Apostrophe's login page
    replaces beforeMain and the banner must show on every page. #}
 {% block mainAnchor %}
-  <p class="demo-banner" data-demo-banner>{{ __t('church:demoBanner') }}</p>
+  <p class="demo-banner" data-demo-banner>{{ __t('church:demoBanner') }}
+    {% if data.user and data.user.role == 'admin' and apos.churchDemo and apos.churchDemo.enabled() %}
+      <a href="/demo" data-demo-link>{{ __t('church:demoResetLink') }}</a>
+    {% endif %}
+  </p>
   {% set site = apos.modules['church-site'].site() %}
   {% set info = apos.modules['church-site'].info(data.global) %}
   {# The sign-in button sits beside the menu button, outside the menu, so a
