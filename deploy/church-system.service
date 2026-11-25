@@ -1,0 +1,24 @@
+# /etc/systemd/system/church-system.service
+[Unit]
+Description=church-system (ApostropheCMS)
+After=network-online.target mongod.service
+Wants=network-online.target
+
+[Service]
+User=lgc
+Group=lgc
+WorkingDirectory=/opt/lgc/current
+EnvironmentFile=/etc/lgc/env
+Environment=HOME=/opt/lgc
+ExecStart=/usr/bin/node app.js
+Restart=on-failure
+RestartSec=5s
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+
+[Install]
+WantedBy=multi-user.target

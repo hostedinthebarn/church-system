@@ -1,0 +1,13 @@
+# /etc/systemd/system/church-system-topup.service: keeps open-ended event series filled 12 months ahead.
+[Unit]
+Description=church-system: top up repeating events
+After=mongod.service
+
+[Service]
+Type=oneshot
+User=lgc
+Group=lgc
+WorkingDirectory=/opt/lgc/current
+EnvironmentFile=/etc/lgc/env
+Environment=HOME=/opt/lgc
+ExecStart=/usr/bin/node app.js @apostrophecms/event:top-up

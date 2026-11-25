@@ -1,0 +1,10 @@
+# /etc/systemd/system/church-system-topup.timer
+[Unit]
+Description=church-system: top up repeating events nightly
+
+[Timer]
+OnCalendar=*-*-* 03:30
+Persistent=true
+
+[Install]
+WantedBy=timers.target

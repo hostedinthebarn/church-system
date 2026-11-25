@@ -24,8 +24,16 @@ How the proof-of-concept server is built. It is written for any church running t
 
 ## Deploying the app
 
-Not written yet: it arrives with the first deploy. The rules it will follow:
+`deploy/deploy.sh <ssh-host> [git-ref]` (the ref defaults to `origin/main`). It:
 
-- **Allowlist, never denylist.** Only the files the app needs go to the server; the deploy never copies the repository wholesale.
-- **Scan what ships** for secret-shaped text before it leaves, and stop on any hit.
-- **Check from outside afterwards:** real pages answer 200, and sensitive paths (`/.git/config`, `/.env`, `package.json` and the like) answer 404 or 403. A deploy isn't done until it's been checked from the public internet.
+1. **Takes only the app's files from git** (`app.js`, `package.json`, the lockfile, `lib/`, `modules/`, `packages/`, `sites/` and the licence files), never the working tree. Tests, notes and spikes don't leave the machine.
+2. **Scans exactly what ships** for secret-shaped text. Each reviewed false positive is a row in the script (a file and the exact phrase), and any other hit stops the deploy without printing the match.
+3. On the server: unpacks into `/opt/lgc/releases/<sha>`, writes `release-id` (Apostrophe needs one in production and there's no git there), runs `npm ci --omit=dev`, links `public/uploads` and `data` to `/var/lib/lgc`, and builds the assets.
+4. **Checks the web root** holds only web asset types, then switches `/opt/lgc/current` and restarts `church-system.service`.
+5. **Checks the result on the server:** `/`, `/calendar` and `/sign-in` answer 200, and source and config paths (`/package.json`, `/app.js`, `/release-id`, `/.env`, `/.git/config`, `/data/`, `/lib/…`, `/modules/…`, `/sites/…`, `/node_modules/…`, `/dev/outbox`) answer 404 or 403 after redirects. It keeps the three newest releases, so a rollback is pointing `current` at the previous one and restarting.
+
+Once the site is public, check the same paths again from the internet.
+
+Units: `church-system.service` (the app, as the `lgc` user, with `EnvironmentFile=/etc/lgc/env`) and `church-system-topup.timer` (keeps repeating events filled 12 months ahead, nightly). The bulletin PDF needs Google Chrome on the server (`google-chrome-stable` from Google's apt repository).
+
+Settings in `/etc/lgc/env`: `APOS_MONGODB_URI`, `NODE_ENV=production`, `PORT`, `CHURCH_ADDRESS=127.0.0.1`, `CHURCH_TRUST_PROXY=1`, `APOS_BASE_URL`, `CHURCH_SESSION_SECRET`, `CHURCH_DEMO_MODE=1` (demo only) and the mail settings.
