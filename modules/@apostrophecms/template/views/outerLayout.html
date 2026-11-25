@@ -39,25 +39,40 @@
         <button type="button" class="menu-btn" aria-expanded="false" aria-controls="main-nav" data-menu-button hidden>{{ __t('church:menu') }}</button>
       </div>
     </div>
+    {% set here = (data.url or '/').split('?')[0] %}
+    {% macro tab(here, href, label, exact=false) %}
+      {% set on = (here == href) if exact else (here == href or here.indexOf(href + '/') == 0) %}
+      <li><a href="{{ href }}"{% if on %} aria-current="page"{% endif %}>{{ label }}</a></li>
+    {% endmacro %}
     <nav id="main-nav" class="site-nav" aria-label="{{ __t('church:mainNav') }}" data-main-nav>
       <ul>
-        <li><a href="/">{{ __t('church:home') }}</a></li>
-        <li><a href="/calendar">{{ __t('church:calTitle') }}</a></li>
+        {{ tab(here, '/', __t('church:home'), true) }}
+        {{ tab(here, '/calendar', __t('church:calTitle')) }}
         <li><a href="{{ info.giveUrl }}">{{ __t('church:give') }}</a></li>
-        {% if data.user %}
-          <li><a href="/members">{{ __t('church:membersArea') }}</a></li>
-          {% if data.user.role == 'admin' %}
-            <li><a href="/bulletin/this-week">{{ __t('church:officeNavBulletin') }}</a></li>
-            <li><a href="/bulletin">{{ __t('church:officeNavBulletins') }}</a></li>
-            <li><a href="/tasks">{{ __t('church:tasksTitle') }}</a></li>
-            <li><a href="/roster">{{ __t('church:rosterTitle') }}</a></li>
-          {% endif %}
-        {% else %}
-          <li><a href="/sign-in">{{ __t('church:memberSignIn') }}</a></li>
-        {% endif %}
+        {% if not data.user %}{{ tab(here, '/sign-in', __t('church:memberSignIn')) }}{% endif %}
         {% if info.currentSiteUrl %}<li><a href="{{ info.currentSiteUrl }}">{{ __t('church:visitCurrentSite') }}</a></li>{% endif %}
       </ul>
     </nav>
   </header>
+  {% if data.user %}
+    <nav class="member-toolbar" aria-label="{{ __t('church:memberToolbar') }}">
+      <div class="member-toolbar-inner">
+        <ul>
+          {{ tab(here, '/members/directory', __t('church:directoryTitle')) }}
+          {{ tab(here, '/calendar/subscribe', __t('church:calSubscribeTitle')) }}
+          {{ tab(here, '/away', __t('church:awayTitle')) }}
+        </ul>
+        {% if data.user.role == 'admin' %}
+          <p class="toolbar-group" id="office-tools">{{ __t('church:officeTools') }}</p>
+          <ul aria-labelledby="office-tools">
+            {{ tab(here, '/bulletin/this-week', __t('church:officeNavBulletin')) }}
+            {{ tab(here, '/bulletin', __t('church:officeNavBulletins'), true) }}
+            {{ tab(here, '/tasks', __t('church:tasksTitle')) }}
+            {{ tab(here, '/roster', __t('church:rosterTitle')) }}
+          </ul>
+        {% endif %}
+      </div>
+    </nav>
+  {% endif %}
   {{ super() }}
 {% endblock %}

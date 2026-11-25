@@ -183,11 +183,15 @@ test('the office finds the bulletin: list, this week, links, no admin-bar entry'
   await signIn(page);
   const thisWeek = iso(new Date(sundayAfterNext().getTime() - 7 * 86400000));
 
-  // The header links straight to this week's edit screen.
+  // The members' toolbar links straight to this week's edit screen; the public
+  // menu carries no office pages.
   await page.goto('/');
-  await page.locator('#main-nav').getByRole('link', { name: 'This week\'s bulletin' }).click();
+  await expect(page.locator('#main-nav').getByRole('link', { name: 'This week\'s bulletin' })).toHaveCount(0);
+  await page.locator('.member-toolbar').getByRole('link', { name: 'This week\'s bulletin' }).click();
   await expect(page).toHaveURL(new RegExp(`/bulletin/${thisWeek}/edit$`));
   await expect(page.getByRole('button', { name: 'Sign off' })).toBeVisible();
+  // The edit screen has a way back.
+  await expect(page.getByRole('link', { name: /All bulletins/ })).toHaveAttribute('href', '/bulletin');
 
   // The list shows nine Sundays with this week marked, and links to each.
   await page.goto('/bulletin');

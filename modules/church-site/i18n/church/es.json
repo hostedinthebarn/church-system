@@ -402,5 +402,7 @@
   "bulletinStart": "[es] Start",
   "bulletinOpen": "[es] Open",
   "bulletinWebsiteVersion": "[es] Website version",
-  "tasksOpenBulletin": "[es] Open the bulletin"
+  "tasksOpenBulletin": "[es] Open the bulletin",
+  "memberToolbar": "[es] Members' pages",
+  "officeTools": "[es] Office"
 }

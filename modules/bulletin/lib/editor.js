@@ -38,7 +38,11 @@ const S = {
   panels: 'Panel fit',
   warnings: 'Check before signing off',
   saved: 'Saved.',
-  failed: 'That did not work: '
+  failed: 'That did not work: ',
+  barLabel: 'Bulletin',
+  allBulletins: 'All bulletins',
+  membersArea: 'Members area',
+  home: 'Home'
 };
 
 function label(id, text, extra = '') {
@@ -155,6 +159,12 @@ function renderEditor({
     next.push(`<button type="button" data-status="draft">${esc(S.backToDraft)}</button>`);
   }
   const body = `${demoBanner ? `<p class="demo-banner" data-demo-banner>${esc(demoBanner)}</p>` : ''}
+<nav class="editor-bar" aria-label="${esc(S.barLabel)}">
+<a class="back" href="/bulletin"><span aria-hidden="true">←</span> ${esc(S.allBulletins)}</a>
+<span class="spacer"></span>
+<a href="/members">${esc(S.membersArea)}</a>
+<a href="/">${esc(S.home)}</a>
+</nav>
 <main id="main" class="editor">
 <h1>${esc(S.title)}: ${esc(model.heading)}</h1>
 <p>Status: <strong data-bulletin-status>${esc(S.status[status])}</strong></p>
@@ -178,6 +188,15 @@ ${sheetCss()}
 .editor h1, .editor h2 { font-family: ${FONT_HEADING}; }
 .editor .preview { max-width: 100%; }
 .demo-banner { background: #fde68a; padding: .5rem 1rem; margin: 0; }
+.editor-bar { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; padding: .5rem 1rem; background: #f4eff7; border-bottom: 1px solid #ded3e6; font: 600 1rem/1.5 ${FONT_BODY}; }
+.editor-bar .spacer { flex: 1; }
+.editor-bar a { display: inline-flex; align-items: center; gap: .35rem; min-height: 44px; padding: 0 1rem; border: 2px solid #59256d; border-radius: 999px; color: #59256d; background: #fff; text-decoration: none; }
+.editor-bar a:hover { background: #ebe2f1; }
+.editor-bar a.back { color: #fff; background: #59256d; }
+.editor button { min-height: 44px; padding: 0 1.25rem; border: 2px solid #59256d; border-radius: 6px; color: #59256d; background: #fff; font: 600 1rem/1 ${FONT_BODY}; cursor: pointer; }
+.editor button[data-action="save"], .editor button[data-status="signedOff"] { color: #fff; background: #59256d; }
+.editor button:hover { filter: brightness(1.1); }
+.editor :focus-visible { outline: 3px solid #59256d; outline-offset: 2px; box-shadow: 0 0 0 6px #f2b134; }
 fieldset { margin: 0 0 1rem; } textarea { max-width: 100%; }
 `;
   return renderDocument({
