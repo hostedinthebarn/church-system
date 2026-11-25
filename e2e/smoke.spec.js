@@ -96,7 +96,6 @@ test.describe('emailed-link sign-in', () => {
 
   test('a link that was never issued does not sign anyone in', async ({ page }) => {
     await page.goto('/sign-in/verify?token=not-a-real-token');
-    await page.getByRole('button', { name: 'Sign in' }).click();
     await expect(page.getByRole('alert')).toContainText('expired');
   });
 

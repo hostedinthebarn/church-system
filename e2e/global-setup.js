@@ -23,8 +23,8 @@ async function signIn(browser, baseURL, email, file) {
   await page.getByRole('status').waitFor();
   await page.goto('/dev/outbox');
   const link = page.locator('li', { hasText: email }).first().getByRole('link');
+  // The link's page signs in by itself (ADR-0002).
   await link.click();
-  await page.getByRole('button', { name: 'Sign in' }).click();
   await page.waitForURL(url => url.pathname === '/');
   await context.storageState({ path: file });
   await context.close();
