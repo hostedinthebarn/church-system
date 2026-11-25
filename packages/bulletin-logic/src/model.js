@@ -67,7 +67,15 @@ export function buildBulletin({
     assignments, names, sunday: weekOf, roles
   });
   if (serving.unfilled) {
-    warnings.push({ code: 'unfilled', message: `${serving.unfilled} serving slot(s) are still unfilled.` });
+    // The serving panel covers this Sunday and next, so say which Sunday the
+    // gaps are on: they are usually next month's roster, not yet built.
+    const dates = Object.keys(serving.unfilledByDate).filter(date => serving.unfilledByDate[date]);
+    warnings.push({
+      code: 'unfilled',
+      dates,
+      message: `${serving.unfilled} serving slot(s) are still unfilled: ${dates
+        .map(date => `${serving.unfilledByDate[date]} on ${longDate(date)}`).join(', ')}.`
+    });
   }
   const eventList = fillEvents({ events, printDate: weekOf, choices: eventChoices });
   const figuresDate = hand.figuresDate || previousSunday(weekOf);

@@ -45,6 +45,8 @@ test('a week is built from hand, standing, events and roster', () => {
   assert.equal(get(model, 'birthdays').empty, true);
   assert.equal(get(model, 'missions').empty, true);
   assert.deepEqual(model.warnings.map(w => w.code), [ 'unfilled' ]);
+  assert.ok(model.warnings[0].dates.length > 0);
+  assert.match(model.warnings[0].message, /unfilled: \d+ on \w+day, \w+ \d+, 2026/);
   // sorted by panel then order
   const panels = model.sections.map(s => s.panel);
   assert.deepEqual(panels, [ ...panels ].sort());
