@@ -44,7 +44,7 @@ The browser tests (`npm run test:e2e`) start the app on port 3100 and need Mongo
 - Spanish (`/es`) is configured but hidden: visitors get a 404, signed-in editors can reach it. All interface text goes through `__t('church:...')`, and `test/i18n.test.js` fails on any literal text in our templates.
 - The POC is noindexed everywhere (`X-Robots-Tag` and a meta tag) and every page carries a "Demo data" banner.
 - In production, set `CHURCH_SESSION_SECRET`; the app refuses to start without it.
-- Mail settings (environment, no secrets in the repo): `CHURCH_MAIL` (`fake`, the default, or `resend`), `CHURCH_MAIL_ALLOWLIST` (exact addresses and `@domain` entries, separated by commas or spaces; defaults to `@example.com` for the fake sender and to nothing, so everything refused, for Resend), `RESEND_API_KEY` and `CHURCH_MAIL_FROM` (Resend only). Links are built from `APOS_BASE_URL`; in production no link is sent without it. Behind a proxy, set the `trustProxy` option on `@apostrophecms/express` so the rate limit sees real client IPs.
+- Mail settings (environment, no secrets in the repo): `CHURCH_MAIL` (`fake`, the default, or `resend`), `CHURCH_MAIL_ALLOWLIST` (exact addresses and `@domain` entries, separated by commas or spaces; defaults to `@example.com` for the fake sender and to nothing, so everything refused, for Resend), `RESEND_API_KEY` and `CHURCH_MAIL_FROM` (Resend only). Links are built from `APOS_BASE_URL`; in production no link is sent without it. Behind a proxy or tunnel, set `CHURCH_TRUST_PROXY=1` so the rate limit sees real client IPs, and `CHURCH_ADDRESS=127.0.0.1` so the app listens on loopback only.
 
 ### Events and calendar feeds (LGC-41)
 

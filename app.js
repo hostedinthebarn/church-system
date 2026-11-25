@@ -14,6 +14,11 @@ require('apostrophe')({
     '@apostrophecms/express': {
       options: {
         port: process.env.PORT || 3000,
+        // Behind a tunnel or proxy, listen on loopback only (CHURCH_ADDRESS=127.0.0.1)
+        // and trust the proxy's X-Forwarded-For (CHURCH_TRUST_PROXY=1), so the
+        // sign-in rate limit counts real visitors, not the proxy. Both off by default.
+        ...(process.env.CHURCH_ADDRESS ? { address: process.env.CHURCH_ADDRESS } : {}),
+        ...(process.env.CHURCH_TRUST_PROXY === '1' ? { trustProxy: true } : {}),
         session: { secret: sessionSecret || 'poc-dev-only-not-a-secret' }
       }
     },
