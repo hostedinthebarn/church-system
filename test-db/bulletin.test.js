@@ -41,6 +41,35 @@ test('one bulletin a week, a title from the date, and a Sunday is required', asy
     title: 'Blank',
     weekOf: ''
   }));
+  // A Monday: its serving list would read days the roster never fills.
+  const monday = new Date(Date.parse(`${DATE}T12:00:00Z`) + 86400000).toISOString().slice(0, 10);
+  await assert.rejects(() => apos.bulletin.insert(req, {
+    ...apos.bulletin.newInstance(),
+    title: 'Monday',
+    weekOf: monday
+  }), /is for a Sunday/);
+});
+
+test('a bulletin saved on a weekday before the check can still be archived', async () => {
+  const monday = '2026-11-30';
+  await apos.doc.db.insertOne({
+    _id: 'stray-monday:en:draft',
+    aposDocId: 'stray-monday',
+    aposLocale: 'en:draft',
+    aposMode: 'draft',
+    type: 'bulletin',
+    title: `Bulletin ${monday}`,
+    slug: 'bulletin-stray-monday',
+    weekOf: monday,
+    status: 'draft',
+    archived: false,
+    visibility: 'public'
+  });
+  const stray = await apos.bulletin.find(req, { _id: 'stray-monday:en:draft' }).archived(null).toObject();
+  stray.archived = true;
+  await apos.bulletin.update(req, stray);
+  const after = await apos.doc.db.findOne({ _id: 'stray-monday:en:draft' });
+  assert.equal(after.archived, true);
 });
 
 test('saving keeps the typed text and the office ticks; a members-only event stays out until ticked', async () => {

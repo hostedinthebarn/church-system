@@ -124,6 +124,12 @@ module.exports = {
           if (!DATE_RE.test(doc.weekOf || '')) {
             throw self.apos.error('invalid', 'Give the Sunday this bulletin is for.', { field: 'weekOf' });
           }
+          // A bulletin is for a Sunday: its "Those Serving" reads the roster's
+          // Sundays, so any other day shows every slot unfilled (a Monday
+          // 11/30 bulletin did, 2026-11-25). Archiving a wrong one still works.
+          if (!doc.archived && new Date(`${doc.weekOf}T12:00:00Z`).getUTCDay() !== 0) {
+            throw self.apos.error('invalid', 'A bulletin is for a Sunday. Pick the Sunday it is for.', { field: 'weekOf' });
+          }
           doc.title = `Bulletin ${doc.weekOf}`;
         }
       },
