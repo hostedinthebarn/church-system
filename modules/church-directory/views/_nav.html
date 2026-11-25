@@ -6,13 +6,6 @@
       {% if data.nav.householdId %}
         <a href="/members/household/{{ data.nav.householdId }}">{{ __t('church:myHousehold') }}</a>
       {% endif %}
-      <a href="/calendar/subscribe">{{ __t('church:calSubscribeTitle') }}</a>
-      <a href="/away">{{ __t('church:awayTitle') }}</a>
-      {% if data.nav.office %}
-        <a href="/bulletin/this-week">{{ __t('church:officeNavBulletin') }}</a>
-        <a href="/tasks">{{ __t('church:tasksTitle') }}</a>
-        <a href="/roster">{{ __t('church:rosterTitle') }}</a>
-      {% endif %}
       <form method="post" action="/members/sign-out" class="inline-form">
         <input type="hidden" name="token" value="{{ data.nav.token }}">
         <button type="submit" class="btn ghost">{{ __t('church:signOut') }}</button>

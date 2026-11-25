@@ -493,7 +493,79 @@ legend { padding: 0 0.4rem; font-weight: 700; }
   text-decoration: none;
 }
 
-.site-nav a:hover { text-decoration: underline; }
+.site-nav a {
+  border-bottom: 3px solid transparent;
+}
+
+.site-nav a:hover { border-bottom-color: #c9b8d6; }
+
+// The current page reads as the selected tab, not only by colour.
+.site-nav a[aria-current='page'] {
+  border-bottom-color: var(--church-brand);
+  color: var(--church-brand);
+  font-weight: 700;
+}
+
+// ---------- the members' toolbar: on every page once signed in ----------
+
+.member-toolbar {
+  background: #f4eff7;
+  border-bottom: 1px solid #ded3e6;
+}
+
+.member-toolbar-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  max-width: 70rem;
+  margin: 0 auto;
+  padding: 0.5rem 1rem;
+}
+
+.member-toolbar ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.member-toolbar a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 1rem;
+  border: 2px solid var(--church-brand);
+  border-radius: 999px;
+  color: var(--church-brand);
+  background: var(--church-paper);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.member-toolbar a:hover { background: #ebe2f1; }
+
+.member-toolbar a[aria-current='page'] {
+  color: var(--church-paper);
+  background: var(--church-brand);
+}
+
+.toolbar-group {
+  margin: 0 0 0 0.5rem;
+  padding-left: 1rem;
+  border-left: 2px solid #ded3e6;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #4a3d55;
+}
+
+@media (max-width: 860px) {
+  .toolbar-group { flex-basis: 100%; margin: 0; padding: 0; border: 0; }
+}
 
 // Without JavaScript the menu is simply open. With it, the button shows and
 // the menu opens and closes on narrow screens.

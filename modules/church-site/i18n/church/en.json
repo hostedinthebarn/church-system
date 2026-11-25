@@ -402,5 +402,7 @@
   "bulletinStart": "Start",
   "bulletinOpen": "Open",
   "bulletinWebsiteVersion": "Website version",
-  "tasksOpenBulletin": "Open the bulletin"
+  "tasksOpenBulletin": "Open the bulletin",
+  "memberToolbar": "Members' pages",
+  "officeTools": "Office"
 }
