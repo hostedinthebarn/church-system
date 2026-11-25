@@ -233,12 +233,13 @@ test.describe('the office', () => {
 test.describe('the signed-in bar', () => {
   test.use({ storageState: auth('other') });
 
-  test('one bar: name, My household and Sign out sit in the members toolbar on every page', async ({ page }) => {
+  test('the name and Sign out sit in the header, My household in the toolbar, on every page', async ({ page }) => {
     for (const url of [ '/members/directory', '/calendar', '/' ]) {
       await page.goto(url);
-      const bar = page.locator('.member-toolbar .toolbar-account');
-      await expect(bar).toContainText('Signed in as');
-      await expect(bar.getByRole('button', { name: 'Sign out' })).toBeVisible();
+      const head = page.locator('.site-header-actions');
+      await expect(head.locator('.header-who')).toContainText('Pat');
+      await expect(head.getByRole('button', { name: 'Sign out' })).toBeVisible();
+      await expect(page.locator('.member-toolbar').getByRole('link', { name: 'My household' })).toBeVisible();
     }
     // The directory no longer carries a bar of its own.
     await page.goto('/members/directory');
@@ -258,7 +259,7 @@ test('Sign out works from a page that is not the directory', async ({ browser, b
   await page.locator('input[type="password"]').press('Enter');
   await page.waitForURL(url => !url.pathname.startsWith('/login'));
   await page.goto('/calendar');
-  await page.locator('.toolbar-account').getByRole('button', { name: 'Sign out' }).click();
+  await page.locator('.site-header-actions').getByRole('button', { name: 'Sign out' }).click();
   await expect(page).toHaveURL(/\/$/);
   await expect(page.locator('.member-toolbar')).toHaveCount(0);
   await context.close();

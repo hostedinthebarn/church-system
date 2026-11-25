@@ -147,10 +147,30 @@ test.describe('signed in', () => {
       height: 800
     }
   });
-  test('the header says Members area, beside the menu button', async ({ page }) => {
+  test('the header has Sign out beside the menu button', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('.site-header-actions').getByRole('link', { name: 'Members area' })).toBeVisible();
+    const signOut = page.locator('.site-header-actions').getByRole('button', { name: 'Sign out' });
+    const menu = page.getByRole('button', { name: 'Menu' });
+    await expect(signOut).toBeVisible();
+    const a = await signOut.boundingBox();
+    const b = await menu.boundingBox();
+    expect(Math.abs(a.y - b.y)).toBeLessThan(a.height);
     await expect(page.getByRole('link', { name: 'Member sign-in' })).toHaveCount(0);
+    await noAxeViolations(page);
+  });
+});
+
+test.describe('the office at desktop width', () => {
+  test.use({ storageState: auth('office'), viewport: { width: 1280, height: 800 } });
+  test('the toolbar is two rows: the members pages, then the office', async ({ page }) => {
+    await page.goto('/members/directory');
+    const rows = page.locator('.member-toolbar .member-toolbar-inner');
+    await expect(rows).toHaveCount(2);
+    for (const row of await rows.all()) {
+      const tops = await row.locator('li a').evaluateAll(links => [ ...new Set(links.map(l => Math.round(l.getBoundingClientRect().top))) ]);
+      expect(tops.length, 'each toolbar row fits on one line').toBe(1);
+    }
+    await expect(page.locator('.site-header-actions .header-who')).toContainText('Casey');
     await noAxeViolations(page);
   });
 });
