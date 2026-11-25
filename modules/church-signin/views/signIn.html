@@ -7,6 +7,21 @@
     <h1>{{ __t('church:signinTitle') }}</h1>
     {% if data.state == 'sent' %}
       <p role="status">{{ __t('church:signinSent') }}</p>
+      {% if data.email %}
+        <form method="post" action="/sign-in/code" class="code-form">
+          <input type="hidden" name="email" value="{{ data.email }}">
+          {% if data.codeError == 'limited' %}
+            <p role="alert">{{ __t('church:signinLimited') }}</p>
+          {% elif data.codeError %}
+            <p role="alert" id="code-error">{{ __t('church:signinCodeWrong') }}</p>
+          {% endif %}
+          <p>
+            <label for="signin-code">{{ __t('church:signinCodeLabel') }}</label><br>
+            <input id="signin-code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9 ]{6,7}" maxlength="7" required{% if data.codeError %} aria-describedby="code-error" aria-invalid="true"{% endif %}>
+          </p>
+          <button type="submit">{{ __t('church:signinCodeSubmit') }}</button>
+        </form>
+      {% endif %}
     {% else %}
       {% if data.state == 'limited' %}
         <p role="alert">{{ __t('church:signinLimited') }}</p>

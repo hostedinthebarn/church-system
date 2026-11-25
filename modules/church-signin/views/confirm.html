@@ -6,8 +6,12 @@
   <main id="main" class="church-main">
     <h1>{{ __t('church:signinConfirmTitle') }}</h1>
     {% if data.token %}
-      <p>{{ __t('church:signinConfirmBody') }}</p>
-      <form method="post" action="/sign-in/verify">
+      {# Signs in by itself as the page loads (the theme's script submits
+         [data-auto-signin]); a mail scanner that only fetches the link never
+         runs it, so it can't spend it (ADR-0002). The button is the fallback
+         without JavaScript. #}
+      <p role="status">{{ __t('church:signinConfirmBody') }}</p>
+      <form method="post" action="/sign-in/verify" data-auto-signin>
         <input type="hidden" name="token" value="{{ data.token }}">
         <button type="submit">{{ __t('church:signinConfirmButton') }}</button>
       </form>

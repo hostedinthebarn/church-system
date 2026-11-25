@@ -41,6 +41,23 @@ function memoryStore() {
       }
       token.usedAt = now;
       return token;
+    },
+    async consumeCode(email, codeHash, now) {
+      const token = tokens.find(t => t.email === email && t.codeHash === codeHash && !t.usedAt && t.expiresAt > now);
+      if (!token) {
+        return null;
+      }
+      token.usedAt = now;
+      return token;
+    },
+    async missCode(email, now, maxTries) {
+      const token = tokens.find(t => t.email === email && !t.usedAt && t.expiresAt > now);
+      if (token) {
+        token.codeMisses += 1;
+        if (token.codeMisses >= maxTries) {
+          token.usedAt = now;
+        }
+      }
     }
   };
 }
@@ -67,9 +84,9 @@ function setup({
       allowlist
     }),
     findPerson: async email => people.find(p => p.email === email) || null,
-    buildMessage: ({ url, minutes }) => ({
+    buildMessage: ({ url, code, minutes }) => ({
       subject: 'Sign in',
-      text: `${url} (${minutes})`
+      text: `${url} code ${code} (${minutes})`
     }),
     log: (level, name, data) => logs.push({
       level,
@@ -295,4 +312,61 @@ test('canSignIn and roleFor', () => {
   assert.equal(canSignIn(null, today), false);
   assert.equal(roleFor(adult()), 'guest');
   assert.equal(roleFor(adult({ officeAdmin: true })), 'admin');
+});
+
+// ---------- the code (LGC-94, ADR-0002) ----------
+
+async function sentCode(env, email = 'jo@example.com') {
+  await env.signin.requestLink({ email, ip: '1.1.1.1', verifyUrl: 'https://church.test/sign-in/verify' });
+  const text = env.sender.outbox().at(-1).text;
+  return {
+    token: decodeURIComponent(/token=([^\s&]+)/.exec(text)[1]),
+    code: /code (\d{3} \d{3})/.exec(text)[1]
+  };
+}
+
+test('the email carries a link and a 6-digit code; the code signs in, once', async () => {
+  const env = setup();
+  const { code, token } = await sentCode(env);
+  assert.match(code, /^\d{3} \d{3}$/);
+  const ok = await env.signin.redeemCode({ email: 'Jo@Example.com', code, ip: '2.2.2.2' });
+  assert.deepEqual(ok, { ok: true, personId: 'p1' });
+  // One sign-in: the code and the link are spent together.
+  assert.equal((await env.signin.redeemCode({ email: 'jo@example.com', code, ip: '2.2.2.2' })).ok, false);
+  assert.equal((await env.signin.redeem({ token, ip: '2.2.2.2' })).ok, false);
+});
+
+test('using the link spends the code too', async () => {
+  const env = setup();
+  const { code, token } = await sentCode(env);
+  assert.equal((await env.signin.redeem({ token, ip: '2.2.2.2' })).ok, true);
+  assert.equal((await env.signin.redeemCode({ email: 'jo@example.com', code: code.replace(' ', ''), ip: '2.2.2.2' })).ok, false);
+});
+
+test('five wrong codes end the sign-in, even for the right code after', async () => {
+  const env = setup();
+  const { code } = await sentCode(env);
+  const wrong = code === '000 000' ? '111111' : '000000';
+  for (let i = 0; i < 5; i++) {
+    assert.equal((await env.signin.redeemCode({ email: 'jo@example.com', code: wrong, ip: `9.9.9.${i}` })).ok, false);
+  }
+  assert.equal((await env.signin.redeemCode({ email: 'jo@example.com', code, ip: '2.2.2.2' })).ok, false);
+});
+
+test('the code expires with the link, and needs the right address', async () => {
+  const clock = { now: NOW };
+  const env = setup({ clock });
+  const { code } = await sentCode(env);
+  assert.equal((await env.signin.redeemCode({ email: 'someone@example.com', code, ip: '2.2.2.2' })).ok, false);
+  clock.now = new Date(NOW.getTime() + 16 * 60 * 1000);
+  assert.equal((await env.signin.redeemCode({ email: 'jo@example.com', code, ip: '2.2.2.2' })).ok, false);
+});
+
+test('wrong codes from one IP are limited across addresses', async () => {
+  const env = setup({ options: { failedRedeemsPerIp: 3 } });
+  await sentCode(env);
+  for (let i = 0; i < 3; i++) {
+    await env.signin.redeemCode({ email: `x${i}@example.com`, code: '123456', ip: '6.6.6.6' });
+  }
+  assert.equal((await env.signin.redeemCode({ email: 'jo@example.com', code: '123456', ip: '6.6.6.6' })).reason, 'rate-limit');
 });
