@@ -108,6 +108,27 @@ test('edit screen has no axe violations', async ({ page }) => {
   expect(results.violations).toEqual([]);
 });
 
+test('edit screen: actions stay in view, warnings link to their fix, preview fits', async ({ page }) => {
+  await signIn(page);
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto(`/bulletin/${DATE}/edit`);
+  const bar = page.locator('.action-bar');
+  // Scrolled to the first box, Save and Sign off are still on screen.
+  await page.locator('#hand-announcements').scrollIntoViewIfNeeded();
+  await expect(bar.getByRole('button', { name: 'Save' })).toBeInViewport();
+  await expect(bar.getByRole('button', { name: 'Sign off', exact: true })).toBeInViewport();
+  const unfilled = page.locator('[data-warning="unfilled"]');
+  if (await unfilled.count()) {
+    await expect(unfilled.getByRole('link', { name: 'Open the roster' })).toHaveAttribute('href', `/roster/${DATE.slice(0, 7)}`);
+  }
+  // The preview is scaled into its column, not cut off or scrolled sideways.
+  const box = await page.locator('.preview').boundingBox();
+  const sheet = await page.locator('[data-preview-scale]').boundingBox();
+  expect(sheet.width).toBeLessThanOrEqual(box.width + 1);
+  // The section switches are settings, folded away.
+  await expect(page.locator('details.settings')).not.toHaveAttribute('open', '');
+});
+
 test('website page: a signed-off week is public, without the prayer list or members-only events', async ({ page, request, browser }) => {
   await signIn(page);
   await page.goto(`/bulletin/${DATE}/edit`);
