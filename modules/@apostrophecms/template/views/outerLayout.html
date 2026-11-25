@@ -73,6 +73,17 @@
             {{ tab(here, '/roster', __t('church:rosterTitle')) }}
           </ul>
         {% endif %}
+        {% if data.memberBar %}
+          {% set me = data.memberBar %}
+          <div class="toolbar-account">
+            <p class="who">{{ __t('church:signedInAs', { name: me.name }) }}{% if me.office %} <span class="tag office">{{ __t('church:officeAdmin') }}</span>{% endif %}</p>
+            {% if me.householdId %}<ul>{{ tab(here, '/members/household/' + me.householdId, __t('church:myHousehold')) }}</ul>{% endif %}
+            <form method="post" action="/members/sign-out" class="inline-form">
+              <input type="hidden" name="token" value="{{ me.token }}">
+              <button type="submit" class="btn ghost">{{ __t('church:signOut') }}</button>
+            </form>
+          </div>
+        {% endif %}
       </div>
     </nav>
   {% endif %}

@@ -233,7 +233,8 @@ test('the button: an office admin needs the page token and the typed word, then 
   const page = await apos.http.get('/demo', { jar });
   assert.match(page, /data-demo-form/);
   assert.match(page, /data-demo-link/, 'the banner links to the page for office admins');
-  const token = /name="token" value="([^"]+)"/.exec(page)[1];
+  // The demo form's own token: the members' toolbar has a Sign out form too.
+  const token = /data-demo-form>\s*<input type="hidden" name="token" value="([^"]+)"/.exec(page)[1];
   await db().updateOne({ type: 'person', email: 'sam.sample@example.com' }, { $set: { firstName: 'Edited' } });
   const send = body => apos.http.post('/demo/reset', {
     body,

@@ -229,3 +229,37 @@ test.describe('the office', () => {
     await noAxeViolations(page);
   });
 });
+
+test.describe('the signed-in bar', () => {
+  test.use({ storageState: auth('other') });
+
+  test('one bar: name, My household and Sign out sit in the members toolbar on every page', async ({ page }) => {
+    for (const url of [ '/members/directory', '/calendar', '/' ]) {
+      await page.goto(url);
+      const bar = page.locator('.member-toolbar .toolbar-account');
+      await expect(bar).toContainText('Signed in as');
+      await expect(bar.getByRole('button', { name: 'Sign out' })).toBeVisible();
+    }
+    // The directory no longer carries a bar of its own.
+    await page.goto('/members/directory');
+    await expect(page.locator('.member-nav')).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'My household' })).toHaveCount(1);
+  });
+});
+
+// Its own session (the office admin's password sign-in), so signing out does
+// not end the stored member sessions the other specs share.
+test('Sign out works from a page that is not the directory', async ({ browser, baseURL }) => {
+  const context = await browser.newContext({ baseURL });
+  const page = await context.newPage();
+  await page.goto('/login');
+  await page.locator('input[type="text"], input[name="username"]').first().fill('e2e-admin');
+  await page.locator('input[type="password"]').fill(process.env.E2E_ADMIN_PASSWORD || 'e2e-only-password');
+  await page.locator('input[type="password"]').press('Enter');
+  await page.waitForURL(url => !url.pathname.startsWith('/login'));
+  await page.goto('/calendar');
+  await page.locator('.toolbar-account').getByRole('button', { name: 'Sign out' }).click();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.locator('.member-toolbar')).toHaveCount(0);
+  await context.close();
+});
