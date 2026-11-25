@@ -386,5 +386,21 @@
   "homeCard4Title": "Redeem Our County",
   "homeCard4Text": "If there are people in need, we are to help them. If there are people who are lost, we are to tell them about Jesus. Our mission is to leave our mark on the places where we live so that others will come to know God and glorify him.",
   "timesToBeConfirmed": "To be confirmed",
-  "opensNewTab": "(opens in a new tab)"
+  "opensNewTab": "(opens in a new tab)",
+  "officeNavBulletin": "This week's bulletin",
+  "officeNavBulletins": "Bulletins",
+  "bulletinListTitle": "Bulletins",
+  "bulletinListIntro": "Open a Sunday to type its boxes, check the preview and sign it off. A signed-off bulletin appears on the website.",
+  "bulletinColSunday": "Sunday",
+  "bulletinColStatus": "Status",
+  "bulletinColActions": "Actions",
+  "bulletinThisWeekTag": "this week",
+  "bulletinStatus_none": "Not started",
+  "bulletinStatus_draft": "Draft",
+  "bulletinStatus_signedOff": "Signed off",
+  "bulletinStatus_printed": "Printed",
+  "bulletinStart": "Start",
+  "bulletinOpen": "Open",
+  "bulletinWebsiteVersion": "Website version",
+  "tasksOpenBulletin": "Open the bulletin"
 }

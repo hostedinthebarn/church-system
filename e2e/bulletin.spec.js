@@ -174,3 +174,34 @@ test('print page and PDF are two 14 x 8.5 in pages', async ({ page }) => {
   expect((text.match(/\/Type\s*\/Page[^s]/g) || []).length).toBe(2);
   expect((text.match(/\/MediaBox\s*\[\s*0\s+0\s+1008\s+612\s*\]/g) || []).length).toBe(2);
 });
+
+test('the office finds the bulletin: list, this week, links, no admin-bar entry', async ({ page, request }) => {
+  // Nobody else sees the list or the shortcut.
+  expect((await request.get('/bulletin', { maxRedirects: 0 })).status()).toBe(404);
+  expect((await request.get('/bulletin/this-week', { maxRedirects: 0 })).status()).toBe(404);
+
+  await signIn(page);
+  const thisWeek = iso(new Date(sundayAfterNext().getTime() - 7 * 86400000));
+
+  // The header links straight to this week's edit screen.
+  await page.goto('/');
+  await page.locator('#main-nav').getByRole('link', { name: 'This week\'s bulletin' }).click();
+  await expect(page).toHaveURL(new RegExp(`/bulletin/${thisWeek}/edit$`));
+  await expect(page.getByRole('button', { name: 'Sign off' })).toBeVisible();
+
+  // The list shows nine Sundays with this week marked, and links to each.
+  await page.goto('/bulletin');
+  await expect(page.locator('tbody tr')).toHaveCount(9);
+  const current = page.locator('tr.this-week');
+  await expect(current).toContainText(thisWeek);
+  await current.getByRole('link', { name: /Open|Start/ }).click();
+  await expect(page).toHaveURL(new RegExp(`/bulletin/${thisWeek}/edit$`));
+
+  // Apostrophe's generic Bulletins manager, whose Publish cannot work, is gone.
+  await page.goto('/');
+  await expect(page.locator('#apos-admin-bar')).toBeVisible();
+  await expect(page.locator('#apos-admin-bar').getByText('Bulletins', { exact: true })).toHaveCount(0);
+
+  const results = await new AxeBuilder({ page: await (async () => { await page.goto('/bulletin'); return page; })() }).withTags(AXE_TAGS).analyze();
+  expect(results.violations).toEqual([]);
+});

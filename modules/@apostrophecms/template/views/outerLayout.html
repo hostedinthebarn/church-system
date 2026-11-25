@@ -46,6 +46,12 @@
         <li><a href="{{ info.giveUrl }}">{{ __t('church:give') }}</a></li>
         {% if data.user %}
           <li><a href="/members">{{ __t('church:membersArea') }}</a></li>
+          {% if data.user.role == 'admin' %}
+            <li><a href="/bulletin/this-week">{{ __t('church:officeNavBulletin') }}</a></li>
+            <li><a href="/bulletin">{{ __t('church:officeNavBulletins') }}</a></li>
+            <li><a href="/tasks">{{ __t('church:tasksTitle') }}</a></li>
+            <li><a href="/roster">{{ __t('church:rosterTitle') }}</a></li>
+          {% endif %}
         {% else %}
           <li><a href="/sign-in">{{ __t('church:memberSignIn') }}</a></li>
         {% endif %}

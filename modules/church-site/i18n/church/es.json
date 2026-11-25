@@ -386,5 +386,21 @@
   "homeCard4Title": "[es] Redeem Our County",
   "homeCard4Text": "[es] If there are people in need, we are to help them. If there are people who are lost, we are to tell them about Jesus. Our mission is to leave our mark on the places where we live so that others will come to know God and glorify him.",
   "timesToBeConfirmed": "[es] To be confirmed",
-  "opensNewTab": "[es] (opens in a new tab)"
+  "opensNewTab": "[es] (opens in a new tab)",
+  "officeNavBulletin": "[es] This week's bulletin",
+  "officeNavBulletins": "[es] Bulletins",
+  "bulletinListTitle": "[es] Bulletins",
+  "bulletinListIntro": "[es] Open a Sunday to type its boxes, check the preview and sign it off. A signed-off bulletin appears on the website.",
+  "bulletinColSunday": "[es] Sunday",
+  "bulletinColStatus": "[es] Status",
+  "bulletinColActions": "[es] Actions",
+  "bulletinThisWeekTag": "[es] this week",
+  "bulletinStatus_none": "[es] Not started",
+  "bulletinStatus_draft": "[es] Draft",
+  "bulletinStatus_signedOff": "[es] Signed off",
+  "bulletinStatus_printed": "[es] Printed",
+  "bulletinStart": "[es] Start",
+  "bulletinOpen": "[es] Open",
+  "bulletinWebsiteVersion": "[es] Website version",
+  "tasksOpenBulletin": "[es] Open the bulletin"
 }
