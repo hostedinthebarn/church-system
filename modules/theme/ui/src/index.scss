@@ -117,6 +117,33 @@ a { color: var(--church-accent); }
 
 .btn.small { min-height: 44px; font-size: 0.95rem; }
 
+// A plain <button> on our pages looks like .btn too: outlined, and filled when
+// it submits a form. Before this, "Send me a link", "Sign in", "Tick" and
+// "Add" showed as tiny browser-default buttons (UX walkthrough 2026-11-25).
+// Apostrophe's own buttons (apos-*) are left alone.
+main button:not(.btn):not([class*='apos-']) {
+  display: inline-block;
+  min-height: 44px;
+  padding: 0.5rem 1.1rem;
+  box-sizing: border-box;
+  border: 2px solid var(--church-accent);
+  border-radius: 6px;
+  color: var(--church-accent);
+  background: var(--church-paper);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+main form button[type='submit']:not(.btn):not([class*='apos-']),
+main form button:not([type]):not(.btn):not([class*='apos-']) {
+  color: var(--church-paper);
+  background: var(--church-accent);
+}
+
+main button:not(.btn):not([class*='apos-']):hover { filter: brightness(1.1); }
+
+
 .tag {
   display: inline-block;
   padding: 0 0.5rem;
@@ -168,6 +195,7 @@ input[type='search']:not(.apos-input),
 input[type='tel']:not(.apos-input),
 input[type='email']:not(.apos-input),
 input[type='date']:not(.apos-input),
+input[type='number']:not(.apos-input),
 select:not(.apos-input) {
   width: 100%;
   min-height: 44px;
