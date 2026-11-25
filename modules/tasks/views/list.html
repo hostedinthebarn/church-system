@@ -7,7 +7,7 @@
     <h1>{{ __t('church:tasksTitle') }}</h1>
     <p>
       {% if data.isCurrent %}{{ __t('church:tasksThisWeek') }}{% else %}{{ __t('church:tasksPastWeek') }}{% endif %}:
-      <time datetime="{{ data.weekStart }}">{{ data.weekStart }}</time> – <time datetime="{{ data.weekEnd }}">{{ data.weekEnd }}</time>
+      <time datetime="{{ data.weekStart }}">{{ data.weekStart | churchDate('medium', data.locale) }}</time> – <time datetime="{{ data.weekEnd }}">{{ data.weekEnd | churchDate('medium', data.locale) }}</time>
     </p>
     <nav aria-label="{{ __t('church:tasksWeeks') }}">
       {% if data.older %}<a href="/tasks/week/{{ data.older }}">{{ __t('church:tasksOlder') }}</a>{% endif %}
@@ -33,7 +33,7 @@
               <strong>{{ item.title }}</strong>
             {% endif %}
             {% if item.id and ('build-bulletin' in item.id or 'print-bulletin' in item.id) %}<a href="/bulletin/this-week">{{ __t('church:tasksOpenBulletin') }}</a>{% endif %}
-            {% if item.dueDate %}<span>{{ __t('church:tasksDue') }} <time datetime="{{ item.dueDate }}">{{ item.dueDate }}</time></span>{% endif %}
+            {% if item.dueDate %}<span>{{ __t('church:tasksDue') }} <time datetime="{{ item.dueDate }}">{{ item.dueDate | churchDate('short', data.locale) }}</time></span>{% endif %}
             {% if item.fromLastWeek %}<span>({{ __t('church:tasksFromLastWeek') }})</span>{% endif %}
             {% if item.kind == 'system' %}<span>({{ __t('church:tasksSystem') }})</span>{% endif %}
             {% if item.done %}

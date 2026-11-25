@@ -197,7 +197,8 @@ test('the office finds the bulletin: list, this week, links, no admin-bar entry'
   await page.goto('/bulletin');
   await expect(page.locator('tbody tr')).toHaveCount(9);
   const current = page.locator('tr.this-week');
-  await expect(current).toContainText(thisWeek);
+  await expect(current.locator(`time[datetime="${thisWeek}"]`)).toHaveCount(1);
+  await expect(current).not.toContainText(thisWeek); // shown as a readable date, not ISO
   await current.getByRole('link', { name: /Open|Start/ }).click();
   await expect(page).toHaveURL(new RegExp(`/bulletin/${thisWeek}/edit$`));
 
@@ -205,6 +206,14 @@ test('the office finds the bulletin: list, this week, links, no admin-bar entry'
   await page.goto('/');
   await expect(page.locator('#apos-admin-bar')).toBeVisible();
   await expect(page.locator('#apos-admin-bar').getByText('Bulletins', { exact: true })).toHaveCount(0);
+  // The office keeps Pages, Events and Images; our own screens' types are gone.
+  const bar = page.locator('#apos-admin-bar');
+  for (const gone of [ 'People', 'Households', 'Rosters', 'Away dates', 'Users' ]) {
+    await expect(bar.getByText(gone, { exact: true })).toHaveCount(0);
+  }
+  for (const kept of [ 'Pages', 'Events', 'Images', 'Church setup' ]) {
+    await expect(bar.getByText(kept, { exact: true }).first()).toBeVisible();
+  }
 
   const results = await new AxeBuilder({ page: await (async () => { await page.goto('/bulletin'); return page; })() }).withTags(AXE_TAGS).analyze();
   expect(results.violations).toEqual([]);

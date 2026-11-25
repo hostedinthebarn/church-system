@@ -17,7 +17,7 @@
       <tbody>
         {% for week in data.weeks %}
           <tr{% if week.thisWeek %} class="this-week" aria-current="date"{% endif %}>
-            <td><time datetime="{{ week.date }}">{{ week.date }}</time>{% if week.thisWeek %} <strong>({{ __t('church:bulletinThisWeekTag') }})</strong>{% endif %}</td>
+            <td><time datetime="{{ week.date }}">{{ week.date | churchDate('long', data.locale) }}</time>{% if week.thisWeek %} <strong>({{ __t('church:bulletinThisWeekTag') }})</strong>{% endif %}</td>
             <td data-status="{{ week.status }}">{% if week.status == 'signedOff' %}{{ __t('church:bulletinStatus_signedOff') }}{% elif week.status == 'printed' %}{{ __t('church:bulletinStatus_printed') }}{% elif week.status == 'draft' %}{{ __t('church:bulletinStatus_draft') }}{% else %}{{ __t('church:bulletinStatus_none') }}{% endif %}</td>
             <td>
               <a class="btn" href="/bulletin/{{ week.date }}/edit">{% if week.status == 'none' %}{{ __t('church:bulletinStart') }}{% else %}{{ __t('church:bulletinOpen') }}{% endif %}</a>

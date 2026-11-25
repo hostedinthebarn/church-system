@@ -20,6 +20,13 @@ module.exports = {
     // Spanish is configured but hidden until the church decides to use it.
     hiddenLocales: [ 'es' ]
   },
+  init(self) {
+    // {{ value | churchDate('short', data.locale) }}: see lib/dates.js.
+    const { formatDate } = require('../../lib/dates.js');
+    self.apos.template.addFilter({
+      churchDate: (value, style, locale) => formatDate(value, style, locale, self.options.site && self.options.site.timeZone)
+    });
+  },
   helpers(self) {
     return {
       site() {
@@ -126,6 +133,14 @@ module.exports = {
       },
       // Runs after Apostrophe has set req.locale and req.user. Visitors get a
       // plain 404 for a hidden locale; signed-in editors can still reach it.
+      // Members (role guest) never edit, so they get the public page, not
+      // Apostrophe's admin bar with its logo, language picker and account menu.
+      memberScene(req, res, next) {
+        if (req.user && req.user.role === 'guest') {
+          req.scene = 'public';
+        }
+        return next();
+      },
       hideLocales(req, res, next) {
         if (!req.user && self.options.hiddenLocales.includes(req.locale)) {
           return res.status(404).send('Not found');

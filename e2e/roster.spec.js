@@ -53,7 +53,9 @@ test('the office sees the suggested month with warnings, saves it and publishes 
 test('the printable list is plain and accessible', async ({ page }) => {
   await signIn(page);
   await page.goto(`/roster/${MONTH}/print`);
-  await expect(page.getByRole('heading', { name: `Servers for ${MONTH}` })).toBeVisible();
+  // The month reads as a month ("December 2026"), in the page's locale.
+  const monthName = new Date(`${MONTH}-01T12:00:00Z`).toLocaleDateString('en', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+  await expect(page.getByRole('heading', { name: `Servers for ${monthName}` })).toBeVisible();
   await expect(page.getByRole('table').first()).toBeVisible();
   const axe = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze();
   expect(axe.violations).toEqual([]);

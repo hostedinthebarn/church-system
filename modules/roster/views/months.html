@@ -9,7 +9,7 @@
     <ul>
       {% for item in data.months %}
         <li>
-          <a href="/roster/{{ item.month }}">{{ item.month }}</a>:
+          <a href="/roster/{{ item.month }}">{{ item.month | churchDate('month', data.locale) }}</a>:
           {% if item.status == 'published' %}{{ __t('church:rosterStatusPublished') }}
           {% elif item.status == 'draft' %}{{ __t('church:rosterStatusDraft') }}
           {% else %}{{ __t('church:rosterStatusNone') }}{% endif %}
