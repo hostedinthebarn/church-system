@@ -404,5 +404,10 @@
   "bulletinWebsiteVersion": "[es] Website version",
   "tasksOpenBulletin": "[es] Open the bulletin",
   "memberToolbar": "[es] Members' pages",
-  "officeTools": "[es] Office"
+  "officeTools": "[es] Office",
+  "tasksOverdue": "[es] Overdue",
+  "tasksOwnerOf": "[es] Owner of {{task}}",
+  "tasksDoneHeading": "[es] Done this week ({{count}})",
+  "tasksAllDone": "[es] Nothing left to do this week.",
+  "tasksOpenHeading": "[es] Still to do"
 }

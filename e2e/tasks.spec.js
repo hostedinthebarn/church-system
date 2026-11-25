@@ -31,10 +31,19 @@ test('this week: the template is there, add a one-off, tick it', async ({ page }
   await page.getByLabel('Task', { exact: true }).fill(title);
   await page.getByLabel('Day').selectOption('friday');
   await page.getByRole('button', { name: 'Add task' }).click();
-  const row = page.locator('li', { hasText: title });
+  const row = page.locator('.task-card', { hasText: title });
   await expect(row).toBeVisible();
-  await row.getByRole('button', { name: 'Tick' }).click();
-  await expect(page.locator('li', { hasText: title })).toContainText('Done by');
+  // One card per task: a real checkbox labelled with the task, an owner select
+  // labelled for it, and the due day in words.
+  await expect(row.getByText('Due Fri,')).toBeVisible();
+  await expect(row.getByLabel(`Owner of ${title}`)).toBeVisible();
+  await row.getByRole('checkbox', { name: title }).check();
+  // Done tasks fold away under "Done this week (n)".
+  const done = page.locator('details.done-tasks');
+  await expect(done.locator('summary')).toContainText('Done this week');
+  await expect(page.locator('.task-card', { hasText: title })).toHaveCount(0);
+  await done.locator('summary').click();
+  await expect(done.locator('li', { hasText: title })).toContainText('Done by');
 });
 
 test('the tasks screens have no axe violations', async ({ page }) => {
