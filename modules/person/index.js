@@ -143,6 +143,14 @@ module.exports = {
         label: 'Show the baptism date to members',
         def: false
       },
+      // A real tester's own record in the demo: a demo reset keeps this person,
+      // their household and their sign-in account (lib/demo-data.js keptRecords).
+      keepOnDemoReset: {
+        type: 'boolean',
+        label: 'Keep through a demo reset',
+        help: 'For a real tester. A demo reset keeps this person, their household and their sign-in.',
+        def: false
+      },
       _household: {
         type: 'relationship',
         label: 'Household',
@@ -161,7 +169,7 @@ module.exports = {
       },
       office: {
         label: 'Office',
-        fields: [ 'status', 'inactiveReason', 'officeAdmin', 'remindersOff', 'baptismDate', 'showBaptism' ]
+        fields: [ 'status', 'inactiveReason', 'officeAdmin', 'remindersOff', 'baptismDate', 'showBaptism', 'keepOnDemoReset' ]
       }
     }
   },

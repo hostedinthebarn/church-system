@@ -252,3 +252,59 @@ test('the button: an office admin needs the page token and the typed word, then 
   assert.equal((await db().findOne({ type: 'person', email: 'sam.sample@example.com' })).firstName, 'Sam');
   assert.equal(await db().countDocuments({ type: 'household' }), 45);
 });
+
+test('a person ticked "Keep through a demo reset" survives it, with their household and sign-in', async () => {
+  await demo.seed(apos, {
+    full: true,
+    reset: true,
+    today
+  });
+  const house = await apos.household.insert(adminReq, {
+    ...apos.household.newInstance(),
+    title: 'Realtester'
+  });
+  const kept = await apos.person.insert(adminReq, {
+    ...apos.person.newInstance(),
+    firstName: 'Real',
+    lastName: 'Realtester',
+    email: 'real.tester@example.com',
+    dateOfBirth: '1970-01-01',
+    keepOnDemoReset: true,
+    householdIds: [ house._id ]
+  });
+  const user = await apos.user.insert(adminReq, {
+    ...apos.user.newInstance(),
+    title: 'Real tester',
+    username: `person-${kept.aposDocId || kept._id}`,
+    email: 'real.tester@example.com',
+    role: 'guest',
+    personId: kept._id,
+    password: 'not-used-0123456789-not-used'
+  });
+  const unticked = await apos.person.insert(adminReq, {
+    ...apos.person.newInstance(),
+    firstName: 'Gone',
+    lastName: 'Realtester',
+    dateOfBirth: '1970-01-01',
+    householdIds: [ house._id ]
+  });
+
+  const result = await apos.churchDemo.reset(adminReq);
+  assert.equal(result.households, 45, 'the seed still comes back beside a kept household');
+  assert.ok(await db().countDocuments({ type: 'person' }) > 100);
+  assert.ok(await db().findOne({ _id: kept._id }), 'the ticked person stays');
+  assert.ok(await db().findOne({ _id: house._id }), 'their household stays');
+  assert.ok(await db().findOne({ _id: user._id }), 'their sign-in stays');
+  assert.equal(await db().countDocuments({ _id: unticked._id }), 0, 'an unticked extra person goes');
+
+  // A tick on a seeded demo person is ignored, so the re-seed can't collide.
+  const sam = await db().findOne({ type: 'person', email: 'sam.sample@example.com' });
+  await db().updateOne({ _id: sam._id }, { $set: { keepOnDemoReset: true } });
+  assert.equal((await apos.churchDemo.reset(adminReq)).households, 45);
+  assert.notEqual((await db().findOne({ _id: sam._id })).keepOnDemoReset, true, 'Sam is made fresh');
+
+  // The harder start-over (seed with reset) keeps them too, account included.
+  await demo.seed(apos, { reset: true, today });
+  assert.ok(await db().findOne({ _id: kept._id }));
+  assert.ok(await db().findOne({ _id: user._id }));
+});
