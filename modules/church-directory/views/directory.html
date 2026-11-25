@@ -3,15 +3,11 @@
 {% block title %}{{ __t('church:directoryTitle') }}{% endblock %}
 
 {% block main %}
-  {% include "_nav.html" %}
   <main id="main" class="church-main directory directory-{{ data.layout }}">
     <h1>{{ __t('church:directoryTitle') }}</h1>
 
     <p class="actions">
       <a class="btn" href="/members/directory.pdf" download>{{ __t('church:downloadPdf') }}</a>
-      {% if data.nav.householdId %}
-        <a class="btn ghost" href="/members/household/{{ data.nav.householdId }}">{{ __t('church:myHousehold') }}</a>
-      {% endif %}
     </p>
 
     <form class="search" role="search" method="get" action="/members/directory">

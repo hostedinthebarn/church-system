@@ -33,6 +33,26 @@ module.exports = {
   },
   handlers(self) {
     return {
+      // Who is signed in, for the members' toolbar on every page: the name,
+      // their household and the token the Sign out form posts.
+      '@apostrophecms/page:beforeSend': {
+        async memberBar(req) {
+          if (!req.user || !req.session) {
+            return;
+          }
+          const viewer = await self.viewerFor(req.user);
+          if (viewer) {
+            req.data.memberBar = {
+              // People are stored "Sample, Sam" for the directory's order; a
+              // greeting reads first name first.
+              name: String(viewer.name || '').replace(/^([^,]+),\s*(.+)$/, '$2 $1'),
+              office: viewer.role === 'admin',
+              householdId: viewer.householdId,
+              token: self.token(req)
+            };
+          }
+        }
+      },
       'apostrophe:ready': {
         async seedDemo() {
           const mode = process.env.CHURCH_SEED_DEMO;

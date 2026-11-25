@@ -4,9 +4,8 @@
 
 {% block main %}
   {% set hh = data.household %}
-  {% include "_nav.html" %}
   <main id="main" class="church-main household">
-    <p class="crumb"><a href="/members/directory">{{ __t('church:directoryTitle') }}</a></p>
+    <p class="crumb"><a href="/members/directory"><span aria-hidden="true">←</span> {{ __t('church:directoryTitle') }}</a></p>
     <h1>{{ hh.name }}</h1>
     {% if hh.own %}<p class="muted">{{ __t('church:yourHousehold') }}</p>{% endif %}
     {% if hh.optOut %}<p class="hidden-note">{{ __t('church:householdOptedOut') }}</p>{% endif %}

@@ -1150,3 +1150,32 @@ legend { padding: 0 0.4rem; font-weight: 700; }
   align-items: center;
   min-height: 44px;
 }
+
+// The signed-in person at the toolbar's end: name, My household, Sign out.
+.toolbar-account {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  margin-left: auto;
+}
+
+.toolbar-account .who { flex-basis: auto; margin: 0; font-size: 0.95rem; color: #3d3346; }
+.toolbar-account form { margin: 0; }
+.toolbar-account button {
+  min-height: 44px;
+  padding: 0 1rem;
+  border: 2px solid var(--church-brand);
+  border-radius: 999px;
+  color: var(--church-brand);
+  background: var(--church-paper);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.toolbar-account button:hover { background: #ebe2f1; }
+
+@media (max-width: 860px) {
+  .toolbar-account { flex-basis: 100%; margin-left: 0; }
+}
