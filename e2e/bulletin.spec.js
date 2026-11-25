@@ -32,7 +32,11 @@ async function save(page, date, text) {
     await page.goto(`/bulletin/${date}/edit`);
   }
   await page.locator('#hand-announcements').fill(text);
+  const saved = page.waitForResponse(r => r.url().endsWith(`/bulletin/${date}/save`) && r.ok());
   await page.getByRole('button', { name: 'Save' }).click();
+  await saved;
+  // A fresh load, so the box shows what the server stored, not what was typed.
+  await page.goto(`/bulletin/${date}/edit`);
   await expect(page.locator('#hand-announcements')).toHaveValue(text);
 }
 

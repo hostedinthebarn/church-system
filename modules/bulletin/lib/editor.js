@@ -133,7 +133,12 @@ function renderEditor({
 }) {
   const status = (doc && doc.status) || 'draft';
   const view = viewFor(model, 'print');
-  const hand = (doc && doc.hand) || {};
+  // save() stores each typed box as a field on the doc itself (doc.devotional,
+  // ...), so read them from there. Reading doc.hand showed every box empty,
+  // and pressing Save then wiped the week's text.
+  const hand = Object.fromEntries(handFields()
+    .filter(field => doc && typeof doc[field.key] === 'string')
+    .map(field => [ field.key, doc[field.key] ]));
   const choices = (doc && doc.eventChoices) || [];
   const warnings = model.warnings.length
     ? `<ul>${model.warnings.map(w => `<li>${esc(w.message)}</li>`).join('')}</ul>`
