@@ -36,7 +36,7 @@ test.describe('phone, signed out', () => {
     await expect(page.locator('#main-nav')).toBeHidden();
   });
 
-  test('the menu opens and closes by keyboard and lists the five links', async ({ page }) => {
+  test('the menu opens and closes by keyboard and lists the four links', async ({ page }) => {
     await page.goto('/');
     const menu = page.getByRole('button', { name: 'Menu' });
     await menu.focus();
@@ -44,7 +44,7 @@ test.describe('phone, signed out', () => {
     await expect(menu).toHaveAttribute('aria-expanded', 'true');
     const nav = page.getByRole('navigation', { name: 'Main' });
     await expect(nav.getByRole('link')).toHaveText([
-      'Home', 'Calendar', 'Give', 'Member sign-in', 'Visit our current website'
+      'Home', 'Calendar', 'Give', 'Member sign-in'
     ]);
     await noAxeViolations(page);
     await page.keyboard.press('Escape');
