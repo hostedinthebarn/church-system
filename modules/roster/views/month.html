@@ -1,10 +1,10 @@
 {% extends data.outerLayout %}
 
-{% block title %}{{ __t('church:rosterMonthTitle') }} {{ data.month }}{% endblock %}
+{% block title %}{{ __t('church:rosterMonthTitle') }} {{ data.month | churchDate('month', data.locale) }}{% endblock %}
 
 {% block main %}
   <main id="main" class="church-main">
-    <h1>{{ __t('church:rosterMonthTitle') }} {{ data.month }}</h1>
+    <h1>{{ __t('church:rosterMonthTitle') }} {{ data.month | churchDate('month', data.locale) }}</h1>
     <p><a href="/roster">{{ __t('church:rosterBack') }}</a>
       · <a href="/roster/{{ data.month }}/print">{{ __t('church:rosterPrint') }}</a></p>
 
@@ -35,11 +35,11 @@
           <legend>{{ block.name }}{% if block.monthly %} ({{ __t('church:rosterAllMonth') }}){% endif %}</legend>
           {% for row in block.rows %}
             <div>
-              {% if row.date %}<strong>{{ row.date }}</strong>{% endif %}
+              {% if row.date %}<strong>{{ row.date | churchDate('short', data.locale) }}</strong>{% endif %}
               {% for slot in row.slots %}
                 <label>
                   {{ __t('church:rosterSlot') }} {{ slot.number }}
-                  <span class="visually-hidden">{{ block.name }} {{ row.date }}</span>
+                  <span class="visually-hidden">{{ block.name }} {{ row.date | churchDate('short', data.locale) }}</span>
                   <select name="{{ slot.field }}">
                     <option value="">{{ __t('church:rosterUnfilled') }}</option>
                     {% for choice in slot.choices %}
@@ -65,7 +65,7 @@
       <h2 id="away-heading">{{ __t('church:rosterAwayHeading') }}</h2>
       {% if data.away | length %}
         <ul>
-          {% for span in data.away %}<li>{{ span.name }}: {{ span.from }}{% if span.to != span.from %} – {{ span.to }}{% endif %}</li>{% endfor %}
+          {% for span in data.away %}<li>{{ span.name }}: {{ span.from | churchDate('short', data.locale) }}{% if span.to != span.from %} – {{ span.to | churchDate('short', data.locale) }}{% endif %}</li>{% endfor %}
         </ul>
       {% else %}
         <p>{{ __t('church:rosterNoAway') }}</p>

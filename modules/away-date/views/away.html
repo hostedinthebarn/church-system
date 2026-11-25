@@ -12,11 +12,11 @@
         <ul data-away-list>
           {% for span in data.spans %}
             <li>
-              {{ span.name }}: {{ span.from }}{% if span.to != span.from %} – {{ span.to }}{% endif %}
+              {{ span.name }}: {{ span.from | churchDate('medium', data.locale) }}{% if span.to != span.from %} – {{ span.to | churchDate('medium', data.locale) }}{% endif %}
               <form method="post" action="/away/remove" class="away-remove">
                 <input type="hidden" name="household" value="{{ data.household.id }}">
                 <input type="hidden" name="id" value="{{ span.id }}">
-                <button type="submit">{{ __t('church:awayRemove') }}<span class="visually-hidden"> {{ span.name }} {{ span.from }}</span></button>
+                <button type="submit">{{ __t('church:awayRemove') }}<span class="visually-hidden"> {{ span.name }} {{ span.from | churchDate('medium', data.locale) }}</span></button>
               </form>
             </li>
           {% endfor %}
