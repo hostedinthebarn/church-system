@@ -75,6 +75,29 @@ test.describe('phone, signed out', () => {
   });
 });
 
+test('the option 1 look: wave and icons are decoration, Latest Message has its art panel (LGC-83)', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto('/');
+  await expect(page.locator('.home-wave')).toHaveAttribute('aria-hidden', 'true');
+  const icons = page.locator('.home-quick svg');
+  expect(await icons.count()).toBeGreaterThanOrEqual(2);
+  for (const icon of await icons.all()) {
+    await expect(icon).toHaveAttribute('aria-hidden', 'true');
+  }
+  // A picture if one is uploaded, otherwise the verse on the beige panel.
+  await expect(page.locator('.home-latest-art img, .home-latest-art .home-quote')).toHaveCount(1);
+  // Desktop: one header row, Give as a button, the menu's own sign-in hidden
+  // because the sign-in button sits beside it.
+  const give = page.locator('#main-nav .nav-give a');
+  const signIn = page.locator('.site-header-actions .church-signin');
+  await expect(give).toBeVisible();
+  await expect(page.locator('#main-nav .nav-signin')).toBeHidden();
+  const a = await give.boundingBox();
+  const b = await signIn.boundingBox();
+  expect(Math.abs((a.y + a.height / 2) - (b.y + b.height / 2))).toBeLessThan(12);
+  await noAxeViolations(page);
+});
+
 test.describe('320 px (200% zoom)', () => {
   test.use({
     viewport: {

@@ -10,6 +10,14 @@
 module.exports = {
   fields: {
     add: {
+      // The hero photo and the Latest Message picture are uploads, never
+      // files in the repo (it is public, and church photos show real people).
+      heroImage: {
+        type: 'attachment',
+        fileGroup: 'images',
+        label: 'church:homeHeroImageLabel',
+        help: 'church:homeHeroImageHelp'
+      },
       heroTitle: {
         type: 'string',
         label: 'church:homeHeroTitleLabel',
@@ -56,6 +64,17 @@ module.exports = {
         type: 'url',
         label: 'church:homeLatestUrl'
       },
+      latestImage: {
+        type: 'attachment',
+        fileGroup: 'images',
+        label: 'church:homeLatestImageLabel',
+        help: 'church:homeLatestImageHelp'
+      },
+      latestQuote: {
+        type: 'string',
+        label: 'church:homeLatestQuoteLabel',
+        help: 'church:homeEmptyHelp'
+      },
       latestBlurb: {
         type: 'string',
         textarea: true,
@@ -66,7 +85,7 @@ module.exports = {
     group: {
       basics: {
         label: 'church:homeGroupHero',
-        fields: [ 'heroTitle', 'heroButtonLabel', 'intro' ]
+        fields: [ 'heroImage', 'heroTitle', 'heroButtonLabel', 'intro' ]
       },
       mission: {
         label: 'church:homeGroupMission',
@@ -74,7 +93,7 @@ module.exports = {
       },
       latest: {
         label: 'church:homeGroupLatest',
-        fields: [ 'latestTitle', 'latestUrl', 'latestBlurb' ]
+        fields: [ 'latestTitle', 'latestUrl', 'latestBlurb', 'latestImage', 'latestQuote' ]
       }
     }
   },

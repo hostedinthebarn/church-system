@@ -1,8 +1,9 @@
 {% extends data.outerLayout %}
 
-{# The option 1 home page (LGC-33), ported from reference/mockups/home-option-1.
-   Images are placeholders: the hero is a plain colour band and the Latest
-   Message has no artwork until the church supplies photos. #}
+{# The option 1 home page (LGC-33, look matched in LGC-83), ported from the
+   option 1 mockup. The hero photo and the Latest Message picture are uploads
+   on this page; without them the hero is the brand colour and the Latest
+   Message shows a verse on the beige panel. #}
 {% block main %}
   {% set info = apos.modules['church-site'].info(data.global) %}
   {% set site = apos.modules['church-site'].site() %}
@@ -17,17 +18,20 @@
   {% set cards = page.missionCards if (page.missionCards and page.missionCards.length) else defaultCards %}
 
   <main id="main" class="home">
-    <section class="home-hero" aria-labelledby="home-hero-h">
-      <h1 id="home-hero-h">{{ page.heroTitle or __t('church:homeHeroTitle') }}</h1>
-      <a class="btn" href="#mission">{{ page.heroButtonLabel or __t('church:homeHeroButton') }}</a>
+    <section class="home-hero{% if page.heroImage %} has-photo{% endif %}" aria-labelledby="home-hero-h"{% if page.heroImage %} style="background-image: linear-gradient(rgba(30, 10, 40, 0.6), rgba(30, 10, 40, 0.6)), url('{{ apos.attachment.url(page.heroImage, { size: 'max' }) }}')"{% endif %}>
+      <div class="home-hero-inner">
+        <h1 id="home-hero-h">{{ page.heroTitle or __t('church:homeHeroTitle') }}</h1>
+        <a class="btn" href="#mission">{{ page.heroButtonLabel or __t('church:homeHeroButton') }}</a>
+      </div>
+      <svg class="home-wave" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M0 40 Q 360 0 720 30 T 1440 20 V60 H0Z" fill="#fff"/><path d="M0 40 Q 360 0 720 30 T 1440 20" fill="none" stroke="currentColor" stroke-width="6"/></svg>
     </section>
 
     <p class="home-intro">{{ page.intro or __t('church:homeMissionIntro') }}</p>
 
     <ul class="home-quick plain">
-      <li><a href="#contact">{{ __t('church:homeQuickLocation') }}</a></li>
-      <li><a href="/calendar">{{ __t('church:homeQuickCalendar') }}</a></li>
-      {% if info.email %}<li><a href="mailto:{{ info.email }}">{{ __t('church:homeQuickMessage') }}</a></li>{% endif %}
+      <li><a href="#contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" focusable="false"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg><span>{{ __t('church:homeQuickLocation') }}</span></a></li>
+      <li><a href="/calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>{{ __t('church:homeQuickCalendar') }}</span></a></li>
+      {% if info.email %}<li><a href="mailto:{{ info.email }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><span>{{ __t('church:homeQuickMessage') }}</span></a></li>{% endif %}
     </ul>
 
     <section class="home-panel" id="events" aria-labelledby="events-h" data-upcoming-events>
@@ -60,13 +64,29 @@
     </section>
 
     <section class="home-wrap home-latest" id="latest" aria-labelledby="latest-h">
-      <h2 id="latest-h">{{ __t('church:homeLatestHeading') }}</h2>
-      <p>{{ page.latestBlurb or __t('church:homeLatestDefaultBlurb') }}</p>
-      {% if page.latestTitle and page.latestUrl %}
-        <p><a class="btn" href="{{ page.latestUrl }}">{{ __t('church:homeLatestListen', { title: page.latestTitle }) }}</a></p>
-      {% else %}
-        <p class="muted">{{ __t('church:homeLatestNone') }}</p>
-      {% endif %}
+      <div class="home-latest-art">
+        {% if page.latestImage %}
+          <img src="{{ apos.attachment.url(page.latestImage, { size: 'one-half' }) }}" alt="" loading="lazy">
+        {% else %}
+          <p class="home-quote">{{ page.latestQuote or __t('church:homeLatestQuote') }}</p>
+        {% endif %}
+      </div>
+      <div>
+        <h2 id="latest-h">{{ __t('church:homeLatestHeading') }}</h2>
+        <p>{{ page.latestBlurb or __t('church:homeLatestDefaultBlurb') }}</p>
+        <div class="home-player">
+          {% if page.latestTitle and page.latestUrl %}
+            <p class="home-player-title">{{ page.latestTitle }}</p>
+            {% if r/\.(mp3|m4a|ogg|wav)(\?|$)/i.test(page.latestUrl) %}
+              <audio controls preload="none" src="{{ page.latestUrl }}" aria-label="{{ page.latestTitle }}"></audio>
+            {% else %}
+              <a class="btn" href="{{ page.latestUrl }}">{{ __t('church:homeLatestListen', { title: page.latestTitle }) }}</a>
+            {% endif %}
+          {% else %}
+            <p class="muted">{{ __t('church:homeLatestNone') }}</p>
+          {% endif %}
+        </div>
+      </div>
     </section>
 
     {% if info.mailchimpUrl %}

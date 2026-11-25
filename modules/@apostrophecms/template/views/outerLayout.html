@@ -41,16 +41,17 @@
     </div>
     {# data.url is absolute when APOS_BASE_URL is set (production); keep only the path. #}
     {% set here = (data.url or "/").replace(r/^https?:\/\/[^\/]+/, "").split("?")[0] or "/" %}
-    {% macro tab(here, href, label, exact=false) %}
+    {% macro tab(here, href, label, exact=false, cls='') %}
       {% set on = (here == href) if exact else (here == href or here.indexOf(href + '/') == 0) %}
-      <li><a href="{{ href }}"{% if on %} aria-current="page"{% endif %}>{{ label }}</a></li>
+      <li{% if cls %} class="{{ cls }}"{% endif %}><a href="{{ href }}"{% if on %} aria-current="page"{% endif %}>{{ label }}</a></li>
     {% endmacro %}
     <nav id="main-nav" class="site-nav" aria-label="{{ __t('church:mainNav') }}" data-main-nav>
       <ul>
         {{ tab(here, '/', __t('church:home'), true) }}
         {{ tab(here, '/calendar', __t('church:calTitle')) }}
-        <li><a href="{{ info.giveUrl }}">{{ __t('church:give') }}</a></li>
-        {% if not data.user %}{{ tab(here, '/sign-in', __t('church:memberSignIn')) }}{% endif %}
+        <li class="nav-give"><a href="{{ info.giveUrl }}">{{ __t('church:give') }}</a></li>
+        {# On desktop the sign-in button sits beside the menu, so this one is the phone menu's. #}
+        {% if not data.user %}{{ tab(here, '/sign-in', __t('church:memberSignIn'), false, 'nav-signin') }}{% endif %}
         {% if info.currentSiteUrl %}<li><a href="{{ info.currentSiteUrl }}">{{ __t('church:visitCurrentSite') }}</a></li>{% endif %}
       </ul>
     </nav>
