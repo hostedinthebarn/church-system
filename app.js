@@ -19,7 +19,12 @@ require('apostrophe')({
         // sign-in rate limit counts real visitors, not the proxy. Both off by default.
         ...(process.env.CHURCH_ADDRESS ? { address: process.env.CHURCH_ADDRESS } : {}),
         ...(process.env.CHURCH_TRUST_PROXY === '1' ? { trustProxy: true } : {}),
-        session: { secret: sessionSecret || 'poc-dev-only-not-a-secret' }
+        session: {
+          secret: sessionSecret || 'poc-dev-only-not-a-secret',
+          // Secure when the request came in over HTTPS (behind the tunnel, read from
+          // X-Forwarded-Proto via CHURCH_TRUST_PROXY); plain HTTP locally keeps working.
+          cookie: { secure: 'auto' }
+        }
       }
     },
     '@apostrophecms/i18n': {
