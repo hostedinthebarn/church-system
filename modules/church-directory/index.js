@@ -563,8 +563,11 @@ module.exports = {
           if (change.set.email) {
             const other = await self.apos.doc.db.findOne({
               type: 'person',
-              email: change.set.email,
-              _id: { $ne: change.id }
+              _id: { $ne: change.id },
+              $or: [
+                { email: change.set.email },
+                { signinEmails: change.set.email }
+              ]
             });
             if (other) {
               throw Object.assign(new Error('That email already belongs to another person.'), {
