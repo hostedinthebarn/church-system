@@ -485,12 +485,12 @@ module.exports = {
         const older = kept.find(date => date < weekStart) || null;
         const newer = kept.slice().reverse().find(date => date > weekStart && date <= current) || null;
         const today = logic.chicagoDate(self.now());
-        const items = doc ? doc.items.map(item => ({
+        const items = (doc ? doc.items : []).map(item => ({
           ...self.view(item, names),
           // Overdue is said in words on the card, never by colour alone.
           overdue: !item.done && Boolean(item.dueDate) && item.dueDate < today,
           isBulletin: /(build|print)-bulletin$/.test(item.id || '')
-        })) : [];
+        }));
         // Not-done first, then by due date.
         items.sort((a, b) => Number(a.done) - Number(b.done) ||
           String(a.dueDate || '9999').localeCompare(String(b.dueDate || '9999')));
