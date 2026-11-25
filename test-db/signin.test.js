@@ -108,3 +108,29 @@ test('an expired link fails', async () => {
     ip: 'x'
   })).ok, false);
 });
+
+test('another sign-in address signs the same person in, and no address can belong to two people', async () => {
+  const household = await makeHousehold(apos, req);
+  const person = await makePerson(apos, req, household, {
+    email: 'main.address@example.com',
+    otherSigninEmails: 'Second.Address@example.com;  third.address@example.com, main.address@example.com'
+  });
+  const saved = await apos.doc.db.findOne({ _id: person._id });
+  assert.deepEqual(saved.signinEmails, [ 'second.address@example.com', 'third.address@example.com' ], 'tidied, without the main one');
+
+  const sentBefore = sender.outbox().length;
+  const token = await link('second.address@example.com');
+  assert.ok(token, 'the other address gets a link');
+  assert.equal(sender.outbox()[sentBefore].to, 'second.address@example.com', 'sent to the address that asked');
+  const result = await apos.churchSignin.signin.redeem({
+    token,
+    ip: 'y'
+  });
+  assert.equal(result.personId, person._id);
+
+  await assert.rejects(() => makePerson(apos, req, household, { email: 'third.address@example.com' }), /already belongs/);
+  await assert.rejects(() => makePerson(apos, req, household, {
+    email: 'fresh.address@example.com',
+    otherSigninEmails: 'main.address@example.com'
+  }), /already belongs/);
+});

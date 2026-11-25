@@ -39,10 +39,14 @@ module.exports = {
     self.signin = createSignin({
       store: self.mongoStore(),
       mailer: self.mailer,
+      // The main email or one of the person's other sign-in addresses.
       findPerson: email => self.apos.doc.db.findOne({
         type: 'person',
-        email,
-        archived: { $ne: true }
+        archived: { $ne: true },
+        $or: [
+          { email },
+          { signinEmails: email }
+        ]
       }),
       buildMessage: ({
         url, code, minutes, locale

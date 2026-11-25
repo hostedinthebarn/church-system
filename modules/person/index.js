@@ -143,6 +143,21 @@ module.exports = {
         label: 'Show the baptism date to members',
         def: false
       },
+      // A real tester's own record in the demo: a demo reset keeps this person,
+      // their household and their sign-in account (lib/demo-data.js keptRecords).
+      // More addresses that sign this person in (someone with a personal and a
+      // church address). Not shown in the directory; the main email is.
+      otherSigninEmails: {
+        type: 'string',
+        label: 'Other sign-in addresses',
+        help: 'Extra email addresses that also sign this person in, separated by commas. Not shown in the directory.'
+      },
+      keepOnDemoReset: {
+        type: 'boolean',
+        label: 'Keep through a demo reset',
+        help: 'For a real tester. A demo reset keeps this person, their household and their sign-in.',
+        def: false
+      },
       _household: {
         type: 'relationship',
         label: 'Household',
@@ -161,7 +176,7 @@ module.exports = {
       },
       office: {
         label: 'Office',
-        fields: [ 'status', 'inactiveReason', 'officeAdmin', 'remindersOff', 'baptismDate', 'showBaptism' ]
+        fields: [ 'status', 'inactiveReason', 'officeAdmin', 'remindersOff', 'baptismDate', 'showBaptism', 'otherSigninEmails', 'keepOnDemoReset' ]
       }
     }
   },
@@ -180,13 +195,24 @@ module.exports = {
       beforeSave: {
         async oneEmailOnePerson(req, doc) {
           doc.email = (doc.email || '').trim().toLowerCase();
-          if (!doc.email) {
+          // The other sign-in addresses, tidied, kept as a list for lookups.
+          doc.signinEmails = [ ...new Set(String(doc.otherSigninEmails || '')
+            .split(/[\s,;]+/)
+            .map(address => address.trim().toLowerCase())
+            .filter(address => address && address !== doc.email)) ];
+          doc.otherSigninEmails = doc.signinEmails.join(', ');
+          const mine = [ doc.email, ...doc.signinEmails ].filter(Boolean);
+          if (!mine.length) {
             return;
           }
+          // No address, main or other, may sign in two people.
           const other = await self.apos.doc.db.findOne({
             type: 'person',
-            email: doc.email,
-            _id: { $ne: doc._id }
+            _id: { $ne: doc._id },
+            $or: [
+              { email: { $in: mine } },
+              { signinEmails: { $in: mine } }
+            ]
           });
           if (other) {
             throw self.apos.error('invalid', 'That email already belongs to another person.', {
