@@ -161,12 +161,14 @@ a { color: var(--church-accent); }
 
 .search-row { display: flex; gap: 0.5rem; }
 
-input[type='text'],
-input[type='search'],
-input[type='tel'],
-input[type='email'],
-input[type='date'],
-select {
+// Apostrophe's own admin fields (.apos-input) keep Apostrophe's styling: this rule
+// once made the login username dark text on Apostrophe's dark focused box.
+input[type='text']:not(.apos-input),
+input[type='search']:not(.apos-input),
+input[type='tel']:not(.apos-input),
+input[type='email']:not(.apos-input),
+input[type='date']:not(.apos-input),
+select:not(.apos-input) {
   width: 100%;
   min-height: 44px;
   padding: 0.4rem 0.6rem;
@@ -664,4 +666,22 @@ legend { padding: 0 0.4rem; font-weight: 700; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+// Apostrophe's login screen fills the viewport by itself. With the church header
+// above it, the form was pushed down under Apostrophe's footer bar, and the page
+// jumped as it loaded (typing in that moment was lost). Only the demo banner stays,
+// pinned over the empty top of the screen.
+.apos-login-page {
+  .site-header,
+  .skip-link { display: none; }
+
+  .demo-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    margin: 0;
+  }
 }
