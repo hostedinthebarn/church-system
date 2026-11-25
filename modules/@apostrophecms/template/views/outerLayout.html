@@ -31,7 +31,14 @@
         <p class="church-name"><a href="/"><strong>{{ site.name }}</strong></a></p>
       {% endif %}
       <div class="site-header-actions">
-        {% if data.user %}
+        {% if data.user and data.memberBar %}
+          {# Who is signed in, top right like most sites; the members' toolbar below has the pages. #}
+          <p class="header-who">{{ data.memberBar.name }}{% if data.memberBar.office %} <span class="tag office">{{ __t('church:officeAdmin') }}</span>{% endif %}</p>
+          <form method="post" action="/members/sign-out" class="inline-form">
+            <input type="hidden" name="token" value="{{ data.memberBar.token }}">
+            <button type="submit" class="church-signin">{{ __t('church:signOut') }}</button>
+          </form>
+        {% elif data.user %}
           <a class="church-signin" href="/members">{{ __t('church:membersArea') }}</a>
         {% else %}
           <a class="church-signin" href="/sign-in">{{ __t('church:memberSignIn') }}</a>
@@ -60,10 +67,13 @@
       <div class="member-toolbar-inner">
         <ul>
           {{ tab(here, '/members/directory', __t('church:directoryTitle')) }}
+          {% if data.memberBar and data.memberBar.householdId %}{{ tab(here, '/members/household/' + data.memberBar.householdId, __t('church:myHousehold')) }}{% endif %}
           {{ tab(here, '/calendar/subscribe', __t('church:calSubscribeTitle')) }}
           {{ tab(here, '/away', __t('church:awayTitle')) }}
         </ul>
-        {% if data.user.role == 'admin' %}
+      </div>
+      {% if data.user.role == 'admin' %}
+        <div class="member-toolbar-inner toolbar-office">
           <p class="toolbar-group" id="office-tools">{{ __t('church:officeTools') }}</p>
           <ul aria-labelledby="office-tools">
             {{ tab(here, '/bulletin/this-week', __t('church:officeNavBulletin')) }}
@@ -71,19 +81,8 @@
             {{ tab(here, '/tasks', __t('church:tasksTitle')) }}
             {{ tab(here, '/roster', __t('church:rosterTitle')) }}
           </ul>
-        {% endif %}
-        {% if data.memberBar %}
-          {% set me = data.memberBar %}
-          <div class="toolbar-account">
-            <p class="who">{{ __t('church:signedInAs', { name: me.name }) }}{% if me.office %} <span class="tag office">{{ __t('church:officeAdmin') }}</span>{% endif %}</p>
-            {% if me.householdId %}<ul>{{ tab(here, '/members/household/' + me.householdId, __t('church:myHousehold')) }}</ul>{% endif %}
-            <form method="post" action="/members/sign-out" class="inline-form">
-              <input type="hidden" name="token" value="{{ me.token }}">
-              <button type="submit" class="btn ghost">{{ __t('church:signOut') }}</button>
-            </form>
-          </div>
-        {% endif %}
-      </div>
+        </div>
+      {% endif %}
     </nav>
   {% endif %}
   {{ super() }}
