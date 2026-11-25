@@ -237,7 +237,10 @@ module.exports = {
       // What the form sent, as an assignment list. Every slot the roles
       // define is there, empty when nothing was chosen; a person who is not
       // in the role's serving group is refused.
-      parseForm(body, month, roles) {
+      // `saved` is the month's stored assignments: a slot may keep the person
+      // already in it after they leave the group (the page still shows them),
+      // so one stale slot never blocks saving the rest.
+      parseForm(body, month, roles, saved = []) {
         const assignments = [];
         for (const role of roles) {
           const dates = role.period === 'monthly' ? [ null ] : logic.sundaysOf(month);
@@ -245,7 +248,9 @@ module.exports = {
             for (let slot = 1; slot <= role.slots; slot++) {
               const sent = body[slotName(role.id, date, slot)];
               const person = typeof sent === 'string' && sent ? sent : null;
-              if (person && !role.eligible.includes(person)) {
+              const kept = saved.some(entry => entry.role === role.id && entry.date === date &&
+                entry.slot === slot && entry.person === person);
+              if (person && !kept && !role.eligible.includes(person)) {
                 throw self.apos.error('invalid', `That person is not in the ${role.name} group.`);
               }
               assignments.push({
@@ -581,7 +586,8 @@ module.exports = {
     // Parsed from the posted form, against the roles as they are now.
     const submitted = async (req, month) => {
       const { roles } = await self.rolesAndNames();
-      return self.parseForm(req.body || {}, month, roles);
+      const doc = await self.findMonth(req, month);
+      return self.parseForm(req.body || {}, month, roles, (doc && doc.assignments) || []);
     };
     const back = (res, month, result) => {
       const query = result ? `?sent=${result.sent}&refused=${result.refused}` : '';

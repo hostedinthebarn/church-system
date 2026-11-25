@@ -7,6 +7,11 @@ const {
   renderDocument, viewFor, FONT_BODY, FONT_HEADING
 } = require('@church-system/bulletin-logic');
 
+// "2026-12" -> "December 2026", for the roster links.
+function monthName(month) {
+  return new Date(`${month}-15T12:00:00Z`).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+}
+
 const S = {
   title: 'Bulletin',
   status: {
@@ -45,7 +50,7 @@ const S = {
   home: 'Home',
   statusLabel: 'Status',
   nothingToCheck: 'Nothing to check.',
-  fixRoster: 'Open the roster',
+  fixRoster: 'Open the roster for',
   fixFigures: 'Go to the figures',
   previewHelp: 'Updates when you save.',
   actions: 'Bulletin actions',
@@ -168,13 +173,15 @@ function renderEditor({
     .map(field => [ field.key, doc[field.key] ]));
   const choices = (doc && doc.eventChoices) || [];
   // Each warning links to where it is fixed.
+  const rosterLinks = w => [ ...new Set((w.dates || [ date ]).map(day => String(day).slice(0, 7))) ]
+    .map(month => `<a href="/roster/${esc(month)}">${esc(S.fixRoster)} ${esc(monthName(month))}</a>`).join(' ');
   const fixFor = {
-    unfilled: `<a href="/roster/${esc(String(date).slice(0, 7))}">${esc(S.fixRoster)}</a>`,
+    unfilled: null,
     'figures-date': `<a href="#hand-figuresDate">${esc(S.fixFigures)}</a>`
   };
   const warnings = model.warnings.length
     ? `<ul data-bulletin-warnings>${model.warnings.map(w =>
-      `<li data-warning="${esc(w.code || '')}">${esc(w.message)}${fixFor[w.code] ? ` ${fixFor[w.code]}` : ''}</li>`).join('')}</ul>`
+      `<li data-warning="${esc(w.code || '')}">${esc(w.message)}${w.code === 'unfilled' ? ` ${rosterLinks(w)}` : fixFor[w.code] ? ` ${fixFor[w.code]}` : ''}</li>`).join('')}</ul>`
     : '';
   const next = [];
   if (status !== 'draft') {

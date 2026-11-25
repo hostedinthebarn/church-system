@@ -94,6 +94,7 @@ export function textToBlocks(text) {
 export function fillServing({ assignments = [], names = {}, sunday, roles = SERVING_ROLES }) {
   const groups = [];
   let unfilled = 0;
+  const unfilledByDate = {};
   for (const [ index, date ] of [ sunday, addDaysIso(sunday, 7) ].entries()) {
     const rows = roles.map(role => {
       const mine = assignments
@@ -102,12 +103,14 @@ export function fillServing({ assignments = [], names = {}, sunday, roles = SERV
         const found = mine.find(a => a.slot === slot);
         return found && found.person && names[found.person] ? names[found.person] : null;
       });
-      unfilled += people.filter(name => name === null).length;
+      const empty = people.filter(name => name === null).length;
+      unfilled += empty;
+      unfilledByDate[date] = (unfilledByDate[date] || 0) + empty;
       return { label: role.label, names: people };
     });
     groups.push({ heading: `${index === 0 ? 'Those Serving Today' : 'Those to Serve Next Sunday'}`, date, rows });
   }
-  return { groups, unfilled };
+  return { groups, unfilled, unfilledByDate };
 }
 
 // ---- Events ----------------------------------------------------------------

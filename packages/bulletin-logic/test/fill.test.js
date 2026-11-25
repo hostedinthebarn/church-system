@@ -57,6 +57,9 @@ test('fillServing: this Sunday and next, unfilled shown, nobody invented', () =>
   assert.deepEqual(out.groups[1].rows[0].names, [ null ]);
   assert.deepEqual(out.groups[1].rows[1].names, [ 'Cy C', null ]);
   assert.equal(out.unfilled, 3);
+  // Which Sunday the gaps are on, so the bulletin can send the office to
+  // the right month's roster.
+  assert.deepEqual(out.unfilledByDate, { '2026-11-15': 1, '2026-11-22': 2 });
 });
 
 test('fillServing: a monthly role (date null) covers both Sundays; unknown people stay unfilled; default roles', () => {
