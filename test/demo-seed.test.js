@@ -96,6 +96,14 @@ test('the events: services, a year behind, two months ahead, one members-only', 
   assert.ok(oneOffs.filter(entry => entry.startDate < TODAY).length >= 10);
   assert.ok(oneOffs.filter(entry => entry.startDate > TODAY).length >= 4);
   assert.ok(oneOffs.some(entry => entry.publicEvent === false));
+  // Christmas Eve is on the 24th, whatever day the seed runs.
+  assert.equal(events.find(entry => /Christmas Eve/.test(entry.title)).startDate, '2026-12-24');
+  assert.equal(seed.nextOn('2026-12-25', '12-24'), '2027-12-24');
+  assert.equal(seed.nextOn('2026-12-24', '12-24'), '2026-12-24');
+  // Public one-offs within the next 14 days, so Upcoming events opens close in.
+  const soon = oneOffs.filter(entry => entry.publicEvent !== false && entry.startDate > TODAY &&
+    entry.startDate <= '2026-12-08');
+  assert.ok(soon.length >= 2, `near-term public one-offs: ${soon.length}`);
 });
 
 // "Never on a schedule" (Gary): nothing starts the reset by itself.

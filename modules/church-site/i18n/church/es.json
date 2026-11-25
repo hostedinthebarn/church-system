@@ -415,5 +415,11 @@
   "rosterActionContinue": "[es] Continue",
   "rosterActionBuild": "[es] Build it",
   "rosterStatusSuggested": "[es] Suggestion",
-  "rosterWarningCount": "[es] {{count}} to check before publishing"
+  "rosterWarningCount": "[es] {{count}} to check before publishing",
+  "homeHeroImageLabel": "[es] Hero photo",
+  "homeHeroImageHelp": "[es] A wide photo behind the heading. Without one, the band is the church's colour.",
+  "homeLatestImageLabel": "[es] Latest Message picture",
+  "homeLatestImageHelp": "[es] Shown beside the Latest Message. Without one, the verse below is shown instead.",
+  "homeLatestQuoteLabel": "[es] Latest Message verse",
+  "homeLatestQuote": "[es] “Man shall not live by bread alone…” (Matt. 4:4)"
 }
