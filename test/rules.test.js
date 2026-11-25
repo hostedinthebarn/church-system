@@ -399,3 +399,15 @@ test('storedFields ignores the bookkeeping Apostrophe adds inside object fields'
   assert.deepEqual(rules.storedFields(saved), rules.storedFields(seeded));
   assert.deepEqual(rules.storedFields(saved).address, { street: '1 A St' });
 });
+
+test('bulletinSunday: today on a Sunday, else the coming Sunday, in church time', () => {
+  // Wed 25 Nov 2026, midday Texas time
+  assert.equal(rules.bulletinSunday(new Date('2026-11-25T18:00:00Z')), '2026-11-29');
+  // Saturday evening in Texas is already Sunday in UTC: still the next day's Sunday
+  assert.equal(rules.bulletinSunday(new Date('2026-11-29T03:00:00Z')), '2026-11-29');
+  // Sunday itself, morning and late evening (Monday 03:00 UTC)
+  assert.equal(rules.bulletinSunday(new Date('2026-11-29T15:00:00Z')), '2026-11-29');
+  assert.equal(rules.bulletinSunday(new Date('2026-11-30T03:00:00Z')), '2026-11-29');
+  // Monday in Texas moves on to the next Sunday
+  assert.equal(rules.bulletinSunday(new Date('2026-11-30T15:00:00Z')), '2026-12-06');
+});

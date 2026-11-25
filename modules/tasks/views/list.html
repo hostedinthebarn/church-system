@@ -32,6 +32,7 @@
               {% endif %}
               <strong>{{ item.title }}</strong>
             {% endif %}
+            {% if item.id and ('build-bulletin' in item.id or 'print-bulletin' in item.id) %}<a href="/bulletin/this-week">{{ __t('church:tasksOpenBulletin') }}</a>{% endif %}
             {% if item.dueDate %}<span>{{ __t('church:tasksDue') }} <time datetime="{{ item.dueDate }}">{{ item.dueDate }}</time></span>{% endif %}
             {% if item.fromLastWeek %}<span>({{ __t('church:tasksFromLastWeek') }})</span>{% endif %}
             {% if item.kind == 'system' %}<span>({{ __t('church:tasksSystem') }})</span>{% endif %}

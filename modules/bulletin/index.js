@@ -144,6 +144,10 @@ module.exports = {
     const config = () => (site().bulletin || {});
 
     return {
+      // Bulletins are built and signed off on /bulletin/<date>/edit. Apostrophe's
+      // generic manager offered a Publish button that cannot work for them, so
+      // the type stays out of the admin bar (LGC-87).
+      addToAdminBar() {},
       siteConfig() {
         return site();
       },
@@ -356,6 +360,9 @@ module.exports = {
         }[error.name] || 500;
         if (status === 500) {
           self.apos.util.error(error);
+        } else {
+          // A refusal is logged so it can be traced; never the typed text.
+          self.apos.util.warn(`[bulletin] refused ${req.method} ${req.path}: ${(error.data && error.data.message) || error.message}`);
         }
         res.status(status).json({ message: status === 500 ? 'Something went wrong.' : (error.data && error.data.message) || error.message });
       }
@@ -366,6 +373,36 @@ module.exports = {
 
     return {
       get: {
+        // The office's list of weeks. Before /bulletin/:date so it matches first.
+        '/bulletin': safe(async (req, res) => {
+          if (!self.adminOnly(req, res)) {
+            return;
+          }
+          const thisWeek = rules.bulletinSunday();
+          const weeks = [];
+          const start = new Date(`${thisWeek}T12:00:00Z`);
+          for (let offset = -4; offset <= 4; offset++) {
+            const day = new Date(start);
+            day.setUTCDate(day.getUTCDate() + offset * 7);
+            weeks.push(day.toISOString().slice(0, 10));
+          }
+          const docs = await self.find(req, { weekOf: { $in: weeks } }).toArray();
+          const byDate = new Map(docs.map(doc => [ doc.weekOf, doc.status || 'draft' ]));
+          res.set('Cache-Control', 'no-store');
+          return self.sendPage(req, 'list', {
+            weeks: weeks.reverse().map(date => ({
+              date,
+              status: byDate.get(date) || 'none',
+              thisWeek: date === thisWeek
+            }))
+          });
+        }),
+        '/bulletin/this-week': (req, res) => {
+          if (!self.adminOnly(req, res)) {
+            return;
+          }
+          return res.redirect(`/bulletin/${rules.bulletinSunday()}/edit`);
+        },
         '/bulletin/:date': safe(async (req, res) => {
           const date = self.validDate(req, res);
           if (!date) {
