@@ -86,7 +86,7 @@ test('the option 1 look: wave and icons are decoration, Latest Message has its a
   }
   // A picture if one is uploaded, otherwise the verse on the beige panel.
   await expect(page.locator('.home-latest-art img, .home-latest-art .home-quote')).toHaveCount(1);
-  // Desktop: one header row, Give as a button, the menu's own sign-in hidden
+  // Desktop: one header row, the menu's own sign-in hidden
   // because the sign-in button sits beside it.
   const give = page.locator('#main-nav .nav-give a');
   const signIn = page.locator('.site-header-actions .church-signin');
