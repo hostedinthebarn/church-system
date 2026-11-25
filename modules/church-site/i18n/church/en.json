@@ -404,5 +404,16 @@
   "bulletinWebsiteVersion": "Website version",
   "tasksOpenBulletin": "Open the bulletin",
   "memberToolbar": "Members' pages",
-  "officeTools": "Office"
+  "officeTools": "Office",
+  "tasksOverdue": "Overdue",
+  "tasksOwnerOf": "Owner of {{task}}",
+  "tasksDoneHeading": "Done this week ({{count}})",
+  "tasksAllDone": "Nothing left to do this week.",
+  "tasksOpenHeading": "Still to do",
+  "rosterDueNow": "Due now",
+  "rosterActionView": "View",
+  "rosterActionContinue": "Continue",
+  "rosterActionBuild": "Build it",
+  "rosterStatusSuggested": "Suggestion",
+  "rosterWarningCount": "{{count}} to check before publishing"
 }

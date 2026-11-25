@@ -3,87 +3,116 @@
 {% block title %}{{ __t('church:tasksTitle') }}{% endblock %}
 
 {% block main %}
-  <main id="main" class="church-main" data-tasks data-csrf="{{ data.csrfName }}" data-week="{{ data.weekStart }}" data-failed="{{ __t('church:tasksFailed') }}">
-    <h1>{{ __t('church:tasksTitle') }}</h1>
-    <p>
-      {% if data.isCurrent %}{{ __t('church:tasksThisWeek') }}{% else %}{{ __t('church:tasksPastWeek') }}{% endif %}:
-      <time datetime="{{ data.weekStart }}">{{ data.weekStart | churchDate('medium', data.locale) }}</time> – <time datetime="{{ data.weekEnd }}">{{ data.weekEnd | churchDate('medium', data.locale) }}</time>
-    </p>
-    <nav aria-label="{{ __t('church:tasksWeeks') }}">
-      {% if data.older %}<a href="/tasks/week/{{ data.older }}">{{ __t('church:tasksOlder') }}</a>{% endif %}
-      {% if data.newer %}<a href="{% if data.newer == data.currentWeek %}/tasks{% else %}/tasks/week/{{ data.newer }}{% endif %}">{{ __t('church:tasksNewer') }}</a>{% endif %}
-      {% if not data.isCurrent %}<a href="/tasks">{{ __t('church:tasksBackToThisWeek') }}</a>{% endif %}
-      <a href="/tasks/template">{{ __t('church:tasksTemplateLink') }}</a>
+  <main id="main" class="church-main tasks-page" data-tasks data-csrf="{{ data.csrfName }}" data-week="{{ data.weekStart }}" data-failed="{{ __t('church:tasksFailed') }}">
+    <div class="page-head">
+      <div>
+        <h1>{{ __t('church:tasksTitle') }}</h1>
+        <p class="week-range">
+          {% if data.isCurrent %}{{ __t('church:tasksThisWeek') }}{% else %}{{ __t('church:tasksPastWeek') }}{% endif %}:
+          <time datetime="{{ data.weekStart }}">{{ data.weekStart | churchDate('medium', data.locale) }}</time> – <time datetime="{{ data.weekEnd }}">{{ data.weekEnd | churchDate('medium', data.locale) }}</time>
+        </p>
+      </div>
+      <a class="secondary-link" href="/tasks/template">{{ __t('church:tasksTemplateLink') }}</a>
+    </div>
+
+    <nav class="week-nav" aria-label="{{ __t('church:tasksWeeks') }}">
+      {% if data.older %}<a class="btn ghost" href="/tasks/week/{{ data.older }}"><span aria-hidden="true">←</span> {{ __t('church:tasksOlder') }}</a>{% endif %}
+      {% if not data.isCurrent %}<a class="btn ghost" href="/tasks">{{ __t('church:tasksBackToThisWeek') }}</a>{% endif %}
+      {% if data.newer and data.newer != data.currentWeek %}<a class="btn ghost" href="/tasks/week/{{ data.newer }}">{{ __t('church:tasksNewer') }} <span aria-hidden="true">→</span></a>{% endif %}
     </nav>
+
     <p data-message role="status"></p>
 
     {% if not data.kept %}
       <p>{{ __t('church:tasksNotKept') }}</p>
     {% else %}
-      <p>{{ __t('church:tasksOpenCount', { count: data.openCount }) }}</p>
-      <ul class="tasks">
-        {% for item in data.items %}
-          <li data-item="{{ item.id }}">
-            {% if item.done %}
-              <s>{{ item.title }}</s>
-            {% else %}
-              {% if data.isCurrent %}
-                <button type="button" data-tick="{{ item.id }}">{{ __t('church:tasksTick') }}</button>
-              {% endif %}
-              <strong>{{ item.title }}</strong>
-            {% endif %}
-            {% if item.id and ('build-bulletin' in item.id or 'print-bulletin' in item.id) %}<a href="/bulletin/this-week">{{ __t('church:tasksOpenBulletin') }}</a>{% endif %}
-            {% if item.dueDate %}<span>{{ __t('church:tasksDue') }} <time datetime="{{ item.dueDate }}">{{ item.dueDate | churchDate('short', data.locale) }}</time></span>{% endif %}
-            {% if item.fromLastWeek %}<span>({{ __t('church:tasksFromLastWeek') }})</span>{% endif %}
-            {% if item.kind == 'system' %}<span>({{ __t('church:tasksSystem') }})</span>{% endif %}
-            {% if item.done %}
-              <span>
-                {% if item.resolvedBySystem %}
-                  {{ __t('church:tasksResolvedBySystem') }}
+      <h2 class="visually-hidden">{{ __t('church:tasksOpenHeading') }}</h2>
+      <p class="open-count">{{ __t('church:tasksOpenCount', { count: data.openCount }) }}</p>
+
+      {% if data.openItems | length %}
+        <ul class="task-cards">
+          {% for item in data.openItems %}
+            <li class="task-card{% if item.overdue %} overdue{% endif %}" data-item="{{ item.id }}">
+              <div class="task-main">
+                {% if data.isCurrent %}
+                  <input type="checkbox" id="tick-{{ loop.index }}" data-tick="{{ item.id }}">
+                  <label for="tick-{{ loop.index }}" class="task-title">{{ item.title }}</label>
                 {% else %}
-                  {{ __t('church:tasksDoneBy') }} {{ item.doneBy }}
+                  <span class="task-title">{{ item.title }}</span>
                 {% endif %}
-                <time datetime="{{ item.doneAt }}">{{ item.doneAtText }}</time>
-              </span>
-            {% endif %}
-            {% if data.isCurrent and not item.done %}
-              <label>{{ __t('church:tasksOwner') }}
-                <select data-owner-for="{{ item.id }}">
-                  <option value="">{{ __t('church:tasksNoOwner') }}</option>
-                  {% for person in data.people %}
-                    <option value="{{ person.id }}"{% if person.id == item.owner %} selected{% endif %}>{{ person.name }}</option>
-                  {% endfor %}
-                </select>
-              </label>
-            {% elif item.ownerName %}
-              <span>{{ __t('church:tasksOwner') }}: {{ item.ownerName }}</span>
-            {% endif %}
-          </li>
-        {% endfor %}
-      </ul>
+                <p class="task-meta">
+                  {% if item.dueDate %}
+                    <span>{{ __t('church:tasksDue') }} <time datetime="{{ item.dueDate }}">{{ item.dueDate | churchDate('short', data.locale) }}</time></span>
+                  {% endif %}
+                  {% if item.overdue %}<span class="chip warn">{{ __t('church:tasksOverdue') }}</span>{% endif %}
+                  {% if item.fromLastWeek %}<span class="chip">{{ __t('church:tasksFromLastWeek') }}</span>{% endif %}
+                  {% if item.kind == 'system' %}<span class="chip">{{ __t('church:tasksSystem') }}</span>{% endif %}
+                </p>
+              </div>
+              <div class="task-side">
+                {% if item.isBulletin %}<a class="btn ghost small" href="/bulletin/this-week">{{ __t('church:tasksOpenBulletin') }}</a>{% endif %}
+                {% if data.isCurrent %}
+                  <label class="visually-hidden" for="owner-{{ loop.index }}">{{ __t('church:tasksOwnerOf', { task: item.title }) }}</label>
+                  <select id="owner-{{ loop.index }}" class="owner" data-owner-for="{{ item.id }}">
+                    <option value="">{{ __t('church:tasksNoOwner') }}</option>
+                    {% for person in data.people %}
+                      <option value="{{ person.id }}"{% if person.id == item.owner %} selected{% endif %}>{{ person.name }}</option>
+                    {% endfor %}
+                  </select>
+                {% elif item.ownerName %}
+                  <span>{{ __t('church:tasksOwner') }}: {{ item.ownerName }}</span>
+                {% endif %}
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="empty-state">{{ __t('church:tasksAllDone') }}</p>
+      {% endif %}
+
+      {% if data.doneItems | length %}
+        <details class="done-tasks">
+          <summary>{{ __t('church:tasksDoneHeading', { count: data.doneItems | length }) }}</summary>
+          <ul>
+            {% for item in data.doneItems %}
+              <li data-item="{{ item.id }}">
+                <span class="task-title"><span aria-hidden="true">✓</span> {{ item.title }}</span>
+                <span class="task-meta">
+                  {% if item.resolvedBySystem %}{{ __t('church:tasksResolvedBySystem') }}{% else %}{{ __t('church:tasksDoneBy') }} {{ item.doneBy }}{% endif %}
+                  <time datetime="{{ item.doneAt }}">{{ item.doneAtText }}</time>
+                </span>
+              </li>
+            {% endfor %}
+          </ul>
+        </details>
+      {% endif %}
     {% endif %}
 
     {% if data.isCurrent %}
-      <h2>{{ __t('church:tasksAddTitle') }}</h2>
-      <form data-add-form>
-        <p>
-          <label for="task-title">{{ __t('church:tasksFieldTitle') }}</label><br>
-          <input id="task-title" name="title" type="text" maxlength="200" required>
-        </p>
-        <p>
-          <label for="task-day">{{ __t('church:tasksFieldDay') }}</label>
-          <select id="task-day" name="day">
-            <option value="">{{ __t('church:tasksNoDay') }}</option>
-            {% for day in data.days %}<option value="{{ day.value }}">{{ day.label }}</option>{% endfor %}
-          </select>
-          <label for="task-owner">{{ __t('church:tasksOwner') }}</label>
-          <select id="task-owner" name="owner">
-            <option value="">{{ __t('church:tasksNoOwner') }}</option>
-            {% for person in data.people %}<option value="{{ person.id }}">{{ person.name }}</option>{% endfor %}
-          </select>
-        </p>
-        <button type="submit">{{ __t('church:tasksAddButton') }}</button>
-      </form>
+      <section class="add-task" aria-labelledby="add-task-heading">
+        <h2 id="add-task-heading">{{ __t('church:tasksAddTitle') }}</h2>
+        <form data-add-form class="add-task-form">
+          <div class="field grow">
+            <label for="task-title">{{ __t('church:tasksFieldTitle') }}</label>
+            <input id="task-title" name="title" type="text" maxlength="200" required>
+          </div>
+          <div class="field">
+            <label for="task-day">{{ __t('church:tasksFieldDay') }}</label>
+            <select id="task-day" name="day">
+              <option value="">{{ __t('church:tasksNoDay') }}</option>
+              {% for day in data.days %}<option value="{{ day.value }}">{{ day.label }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <label for="task-owner">{{ __t('church:tasksOwner') }}</label>
+            <select id="task-owner" name="owner">
+              <option value="">{{ __t('church:tasksNoOwner') }}</option>
+              {% for person in data.people %}<option value="{{ person.id }}">{{ person.name }}</option>{% endfor %}
+            </select>
+          </div>
+          <button type="submit" class="btn">{{ __t('church:tasksAddButton') }}</button>
+        </form>
+      </section>
     {% endif %}
   </main>
   <script src="/tasks/client.js" defer></script>

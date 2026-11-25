@@ -14,6 +14,7 @@
 // A published month feeds the bulletin's "Those Serving" (bulletinData).
 const logic = require('@church-system/roster-logic');
 const rules = require('../../lib/rules.js');
+const { formatDate } = require('../../lib/dates.js');
 
 const MONTH_RE = /^\d{4}-(0[1-9]|1[0-2])$/;
 
@@ -510,7 +511,14 @@ module.exports = {
           month,
           published,
           blocks,
-          warnings: state.warnings,
+          // The warnings come from roster-logic as English with ISO dates; show
+          // the dates the way every other office page does.
+          warnings: state.warnings.map(warning => ({
+            ...warning,
+            message: String(warning.message || '')
+              .replace(/\b\d{4}-\d{2}-\d{2}\b/g, day => formatDate(day, 'short', req.locale))
+              .replace(/\b\d{4}-\d{2}\b/g, ym => formatDate(ym, 'month', req.locale))
+          })),
           suggested: !state.doc,
           notice,
           away: state.away.list.map(span => ({

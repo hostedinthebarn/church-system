@@ -785,3 +785,245 @@ legend { padding: 0 0.4rem; font-weight: 700; }
     margin: 0;
   }
 }
+
+// ---------- weekly tasks (LGC-89) ----------
+
+.page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.page-head h1 { margin-bottom: 0.25rem; }
+.week-range { margin: 0; color: #4a4a4a; }
+
+.secondary-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-weight: 600;
+}
+
+.week-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.open-count { font-weight: 600; }
+
+.task-cards {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.task-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d9d2df;
+  border-left: 6px solid var(--church-brand);
+  border-radius: 8px;
+  background: var(--church-paper);
+}
+
+.task-card.overdue { border-left-color: #b42318; }
+
+.task-main {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: 0.75rem;
+  flex: 1 1 18rem;
+}
+
+.task-main input[type='checkbox'] {
+  width: 28px;
+  height: 28px;
+  margin: 8px;
+  accent-color: var(--church-brand);
+  cursor: pointer;
+}
+
+.task-title { font-weight: 600; font-size: 1.05rem; cursor: pointer; }
+.task-meta {
+  grid-column: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.75rem;
+  margin: 0.25rem 0 0;
+  font-size: 0.95rem;
+  color: #4a4a4a;
+}
+
+.chip {
+  display: inline-block;
+  padding: 0 0.6rem;
+  border: 1px solid var(--church-brand);
+  border-radius: 999px;
+  color: var(--church-brand);
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.chip.warn { border-color: #b42318; color: #b42318; }
+
+.task-side {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.task-side select.owner { width: auto; min-width: 12rem; }
+
+.empty-state {
+  padding: 1rem;
+  border: 1px dashed #c9b8d6;
+  border-radius: 8px;
+  background: #faf7fc;
+}
+
+.done-tasks {
+  margin: 0 0 2rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e4dde9;
+  border-radius: 8px;
+  background: #faf7fc;
+}
+
+.done-tasks summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.done-tasks ul { margin: 0.5rem 0 0; padding: 0; list-style: none; }
+.done-tasks li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  padding: 0.5rem 0;
+  border-top: 1px solid #e4dde9;
+}
+.done-tasks .task-title { font-weight: 500; cursor: default; }
+.done-tasks .task-meta { margin: 0; }
+
+.add-task {
+  padding: 1rem;
+  border: 1px solid #e4dde9;
+  border-radius: 8px;
+}
+
+.add-task h2 { margin-top: 0; font-size: 1.2rem; }
+
+.add-task-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+.add-task-form .field { display: grid; gap: 0.25rem; flex: 0 1 12rem; }
+.add-task-form .field.grow { flex: 1 1 18rem; }
+.add-task-form label { font-weight: 600; }
+
+// ---------- servers roster (LGC-90) ----------
+
+.month-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+  padding: 0;
+  list-style: none;
+}
+
+.month-card {
+  display: grid;
+  gap: 0.5rem;
+  align-content: start;
+  padding: 1rem;
+  border: 1px solid #d9d2df;
+  border-radius: 8px;
+  background: var(--church-paper);
+}
+
+.month-card.due {
+  border: 2px solid var(--church-brand);
+  background: #faf7fc;
+}
+
+.month-card .month-name { margin: 0; font-size: 1.25rem; }
+.month-card .month-status { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0; }
+.month-card .btn { justify-self: start; }
+
+.chip.done { border-color: #1e6b3a; color: #1e6b3a; }
+.chip.muted { border-color: #6b6b6b; color: #4a4a4a; }
+
+.state-line { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+
+.notice-box {
+  margin: 1rem 0;
+  padding: 0.5rem 1rem;
+  border: 1px solid #e4dde9;
+  border-radius: 8px;
+  background: #faf7fc;
+}
+
+.notice-box.has-warnings { border-left: 6px solid #b42318; }
+.notice-box h2 { margin: 0.5rem 0; font-size: 1.1rem; }
+
+.role-card {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem 1rem;
+  border: 1px solid #d9d2df;
+  border-radius: 8px;
+}
+
+.role-card legend { padding: 0 0.5rem; font-weight: 700; font-size: 1.1rem; }
+
+.slot-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.5rem 1rem;
+  padding: 0.5rem 0;
+  border-top: 1px solid #eee8f2;
+}
+
+.slot-row:first-of-type { border-top: 0; }
+.slot-row > strong { flex: 0 0 7rem; align-self: center; }
+.slot { display: grid; gap: 0.15rem; flex: 1 1 12rem; }
+.slot-label { font-size: 0.85rem; color: #4a4a4a; }
+
+// An unfilled slot reads as one by its border as well as its "(unfilled)" text.
+.slot select:has(option[value='']:checked) { border-style: dashed; border-color: #b42318; }
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 1rem 0 2rem;
+}
+
+.notice-box summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  cursor: pointer;
+}

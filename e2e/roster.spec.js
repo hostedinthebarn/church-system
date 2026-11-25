@@ -35,7 +35,12 @@ test('the office sees the suggested month with warnings, saves it and publishes 
   await page.goto(`/roster/${MONTH}`);
   await expect(page.locator('[data-roster-state]')).toContainText('not saved yet');
   // Seven roles with empty serving groups: every slot is unfilled and says so.
+  // A long list folds under its count; the dates read as words.
+  const fold = page.locator('.notice-box summary');
+  await expect(fold).toContainText('to check before publishing');
+  await fold.click();
   await expect(page.locator('[data-warning="empty"]').first()).toBeVisible();
+  await expect(page.locator('[data-roster-warnings]')).not.toContainText(/\d{4}-\d{2}/);
   await expect(page.getByLabel(/Slot 1/).first()).toBeVisible();
   const axe = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze();
   expect(axe.violations).toEqual([]);
@@ -68,4 +73,20 @@ test('the office can open the away-dates screen and pick a household', async ({ 
   await expect(page.getByText('Choose a household.')).toBeVisible();
   const axe = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze();
   expect(axe.violations).toEqual([]);
+});
+
+test('the roster list is one card per month with one action each', async ({ page }) => {
+  await signIn(page);
+  await page.goto('/roster');
+  const cards = page.locator('.month-card');
+  expect(await cards.count()).toBeGreaterThan(2);
+  for (const card of await cards.all()) {
+    await expect(card.getByRole('link', { name: /^(Build it|Continue|View) / })).toHaveCount(1);
+    await expect(card.locator('.chip').first()).toHaveText(/Published|Draft|Not started/);
+  }
+  // A due month says so in words, not only by its border.
+  const due = page.locator('.month-card.due');
+  if (await due.count()) {
+    await expect(due.first()).toContainText('Due now');
+  }
 });

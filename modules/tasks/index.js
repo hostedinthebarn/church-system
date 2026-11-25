@@ -484,7 +484,13 @@ module.exports = {
         const kept = await self.weekList();
         const older = kept.find(date => date < weekStart) || null;
         const newer = kept.slice().reverse().find(date => date > weekStart && date <= current) || null;
-        const items = doc ? doc.items.map(item => self.view(item, names)) : [];
+        const today = logic.chicagoDate(self.now());
+        const items = (doc ? doc.items : []).map(item => ({
+          ...self.view(item, names),
+          // Overdue is said in words on the card, never by colour alone.
+          overdue: !item.done && Boolean(item.dueDate) && item.dueDate < today,
+          isBulletin: /(build|print)-bulletin$/.test(item.id || '')
+        }));
         // Not-done first, then by due date.
         items.sort((a, b) => Number(a.done) - Number(b.done) ||
           String(a.dueDate || '9999').localeCompare(String(b.dueDate || '9999')));
@@ -498,6 +504,8 @@ module.exports = {
           older,
           newer,
           openCount: items.filter(item => !item.done).length,
+          openItems: items.filter(item => !item.done),
+          doneItems: items.filter(item => item.done),
           days: self.dayChoices(req),
           currentWeek: current
         });
@@ -632,8 +640,12 @@ const CLIENT = `
       .catch(function (e) { say(root.getAttribute('data-failed') + ' ' + e.message); });
   }
   var weekStart = root.getAttribute('data-week');
-  document.querySelectorAll('[data-tick]').forEach(function (btn) {
-    btn.addEventListener('click', function () { run(post('/tasks/tick', { weekStart: weekStart, id: btn.getAttribute('data-tick') })); });
+  document.querySelectorAll('[data-tick]').forEach(function (box) {
+    box.addEventListener('change', function () {
+      if (!box.checked) { return; }
+      box.disabled = true;
+      run(post('/tasks/tick', { weekStart: weekStart, id: box.getAttribute('data-tick') }));
+    });
   });
   document.querySelectorAll('[data-owner-for]').forEach(function (sel) {
     sel.addEventListener('change', function () {
