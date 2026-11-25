@@ -1,0 +1,40 @@
+# The local copy of church-system: http://localhost:3000 (dev/README.md).
+#   npm run dev:up      start it (first start installs and seeds the demo)
+#   npm run dev:down    stop it, keeping the data
+#   npm run dev:reset   stop it and delete the data, for a fresh demo
+name: church-system-dev
+services:
+  mongo:
+    # The POC server runs MongoDB 8.0.
+    image: mongo:8.0
+    ports:
+      - 127.0.0.1:27018:27017
+    volumes:
+      - mongo-data:/data/db
+  app:
+    build:
+      context: ..
+      dockerfile: dev/Dockerfile
+    depends_on:
+      - mongo
+    ports:
+      - 127.0.0.1:3000:3000
+    volumes:
+      - ..:/app
+      # Linux builds of the packages, kept apart from the Mac's own.
+      - node-modules:/app/node_modules
+      - browsers:/ms-playwright
+    environment:
+      PORT: '3000'
+      NODE_ENV: development
+      APOS_MONGODB_URI: mongodb://mongo:27017/church-system-dev
+      # As on the POC: the demo banner and Reset demo page, and no real email
+      # (sign-in links land in /dev/outbox).
+      CHURCH_DEMO_MODE: '1'
+      CHURCH_MAIL: fake
+      BULLETIN_PDF_CHANNEL: chromium
+      DEV_ADMIN_PASSWORD: ${DEV_ADMIN_PASSWORD:-dev-only-password}
+volumes:
+  mongo-data:
+  node-modules:
+  browsers:
