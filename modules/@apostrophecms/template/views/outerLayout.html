@@ -52,7 +52,6 @@
         <li class="nav-give"><a href="{{ info.giveUrl }}">{{ __t('church:give') }}</a></li>
         {# On desktop the sign-in button sits beside the menu, so this one is the phone menu's. #}
         {% if not data.user %}{{ tab(here, '/sign-in', __t('church:memberSignIn'), false, 'nav-signin') }}{% endif %}
-        {% if info.currentSiteUrl %}<li><a href="{{ info.currentSiteUrl }}">{{ __t('church:visitCurrentSite') }}</a></li>{% endif %}
       </ul>
     </nav>
   </header>

@@ -1110,9 +1110,6 @@ legend { padding: 0 0.4rem; font-weight: 700; }
 .home-signup h2 { font-size: clamp(1.6rem, 3.5vw, 2.2rem); }
 
 // The header in one row on desktop: logo, the menu, then the sign-in button.
-.nav-give a {
-  border-bottom: 0 !important;
-}
 
 @media (min-width: 861px) {
   .site-header {
@@ -1134,14 +1131,6 @@ legend { padding: 0 0.4rem; font-weight: 700; }
 
   .site-header-actions { order: 2; }
   .site-nav .nav-signin { display: none; }
-
-  .site-nav .nav-give a {
-    margin-left: 0.25rem;
-    padding: 0 1rem;
-    border-radius: 6px;
-    color: #fff;
-    background: var(--church-brand);
-  }
 }
 
 // The logo link is a touch target like any other: at least 44px tall.
