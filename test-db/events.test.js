@@ -566,3 +566,22 @@ test('a direct save with "this one only" is a one-off; "this and all after" reac
   assert.equal(now[now.length - 1].place, 'From now on');
   assert.notEqual(now[1].place, 'From now on', 'earlier ones are left alone');
 });
+
+// LGC-92: through the REST path, a field left out takes its schema default,
+// so an API caller (the planned MCP server) can't make a hidden event by
+// sending only what it means to set. An explicit value still wins.
+test('an API insert with only title and date is public and scheduled', async () => {
+  const piece = await event.convertInsertAndRefresh(req, { ...base, title: 'Fellowship meal' });
+  assert.equal(piece.publicEvent, true);
+  assert.equal(piece.status, 'scheduled');
+  assert.notEqual(piece.visibility, 'loginRequired');
+
+  const hidden = await event.convertInsertAndRefresh(req, { ...base, title: 'Elders only', publicEvent: false });
+  assert.equal(hidden.publicEvent, false, 'what the caller sends is kept');
+});
+
+test('other piece types get their defaults the same way (household)', async () => {
+  const household = await apos.household.convertInsertAndRefresh(req, { title: 'Apicaller' });
+  assert.equal(household.autoName, true);
+  assert.equal(household.directoryOptOut, false);
+});
