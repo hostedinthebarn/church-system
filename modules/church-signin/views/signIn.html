@@ -8,7 +8,7 @@
     {% if data.state == 'sent' %}
       <p role="status">{{ __t('church:signinSent') }}</p>
       {% if data.email %}
-        <form method="post" action="/sign-in/code" class="code-form">
+        <form method="post" action="{{ data.prefix }}/sign-in/code" class="code-form">
           <input type="hidden" name="email" value="{{ data.email }}">
           {% if data.codeError == 'limited' %}
             <p role="alert">{{ __t('church:signinLimited') }}</p>
@@ -30,7 +30,7 @@
       {% else %}
         <p>{{ __t('church:signinIntro') }}</p>
       {% endif %}
-      <form method="post" action="/sign-in">
+      <form method="post" action="{{ data.prefix }}/sign-in">
         <p>
           <label for="signin-email">{{ __t('church:signinEmailLabel') }}</label><br>
           <input id="signin-email" name="email" type="email" autocomplete="email" required>
@@ -38,6 +38,6 @@
         <button type="submit">{{ __t('church:signinSubmit') }}</button>
       </form>
     {% endif %}
-    <p><a href="/">{{ __t('church:signinBackHome') }}</a></p>
+    <p><a href="{{ data.prefix }}/">{{ __t('church:signinBackHome') }}</a></p>
   </main>
 {% endblock %}

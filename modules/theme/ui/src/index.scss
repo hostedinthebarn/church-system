@@ -314,7 +314,7 @@ legend { padding: 0 0.4rem; font-weight: 700; }
   text-decoration: none;
 }
 
-.grid { display: grid; gap: 1rem; grid-template-columns: 1fr; }
+.grid { display: grid; gap: 1rem; grid-template-columns: minmax(0, 1fr); }
 
 @media (min-width: 48rem) {
   .grid { grid-template-columns: 3fr 2fr; }
@@ -331,9 +331,9 @@ legend { padding: 0 0.4rem; font-weight: 700; }
 
 .person { padding: 0.5rem 0 0.75rem; border-bottom: 1px solid #d6d6d6; }
 .person-name { font-weight: 700; font-size: 1.1rem; }
-.facts { display: grid; grid-template-columns: auto 1fr; gap: 0.2rem 0.8rem; margin: 0.4rem 0; }
+.facts { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.2rem 0.8rem; margin: 0.4rem 0; }
 .facts dt { color: #4d4d4d; }
-.facts dd { margin: 0; }
+.facts dd { margin: 0; overflow-wrap: anywhere; }
 .rel { font-size: 0.95rem; }
 .household-photo { max-width: 100%; border-radius: 8px; }
 .stamp { font-size: 0.85rem; color: #4d4d4d; }

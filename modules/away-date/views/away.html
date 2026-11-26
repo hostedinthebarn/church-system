@@ -13,7 +13,7 @@
           {% for span in data.spans %}
             <li>
               {{ span.name }}: {{ span.from | churchDate('medium', data.locale) }}{% if span.to != span.from %} – {{ span.to | churchDate('medium', data.locale) }}{% endif %}
-              <form method="post" action="/away/remove" class="away-remove">
+              <form method="post" action="{{ data.prefix }}/away/remove" class="away-remove">
                 <input type="hidden" name="household" value="{{ data.household.id }}">
                 <input type="hidden" name="id" value="{{ span.id }}">
                 <button type="submit">{{ __t('church:awayRemove') }}<span class="visually-hidden"> {{ span.name }} {{ span.from | churchDate('medium', data.locale) }}</span></button>
@@ -25,7 +25,7 @@
         <p>{{ __t('church:awayNone') }}</p>
       {% endif %}
       <h2>{{ __t('church:awayAddHeading') }}</h2>
-      <form method="post" action="/away/add" data-away-add>
+      <form method="post" action="{{ data.prefix }}/away/add" data-away-add>
         <input type="hidden" name="household" value="{{ data.household.id }}">
         <p><label>{{ __t('church:awayWho') }}
           <select name="person" required>
@@ -36,11 +36,11 @@
         <p>{{ __t('church:awayToHelp') }}</p>
         <button type="submit">{{ __t('church:awayAdd') }}</button>
       </form>
-      {% if data.office %}<p><a href="/away">{{ __t('church:awayOtherHousehold') }}</a></p>{% endif %}
+      {% if data.office %}<p><a href="{{ data.prefix }}/away">{{ __t('church:awayOtherHousehold') }}</a></p>{% endif %}
     {% else %}
       <p>{{ __t('church:awayPickHousehold') }}</p>
       <ul>
-        {% for household in data.households %}<li><a href="/away?household={{ household.id }}">{{ household.title }}</a></li>{% endfor %}
+        {% for household in data.households %}<li><a href="{{ data.prefix }}/away?household={{ household.id }}">{{ household.title }}</a></li>{% endfor %}
       </ul>
     {% endif %}
   </main>

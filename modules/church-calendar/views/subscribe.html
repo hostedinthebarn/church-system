@@ -28,11 +28,11 @@
       {% else %}
         <p>{{ __t('church:calMemberNone') }}</p>
       {% endif %}
-      <form method="post" action="/calendar/subscribe/new">
+      <form method="post" action="{{ data.prefix }}/calendar/subscribe/new">
         <button type="submit">{{ __t('church:calMemberMake') if not data.hasLink and not data.link else __t('church:calMemberReplace') }}</button>
       </form>
       {% if data.hasLink or data.link %}
-        <form method="post" action="/calendar/subscribe/off">
+        <form method="post" action="{{ data.prefix }}/calendar/subscribe/off">
           <button type="submit">{{ __t('church:calMemberTurnOff') }}</button>
         </form>
       {% endif %}
