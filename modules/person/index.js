@@ -145,6 +145,13 @@ module.exports = {
       },
       // A real tester's own record in the demo: a demo reset keeps this person,
       // their household and their sign-in account (lib/demo-data.js keptRecords).
+      // When the member saw the first-sign-in privacy screen (LGC-85): until
+      // then, /members/* sends them to /members/privacy. Set by that screen.
+      privacySeenAt: {
+        type: 'string',
+        label: 'Saw the privacy screen',
+        readOnly: true
+      },
       // More addresses that sign this person in (someone with a personal and a
       // church address). Not shown in the directory; the main email is.
       otherSigninEmails: {
@@ -176,7 +183,7 @@ module.exports = {
       },
       office: {
         label: 'Office',
-        fields: [ 'status', 'inactiveReason', 'officeAdmin', 'remindersOff', 'baptismDate', 'showBaptism', 'otherSigninEmails', 'keepOnDemoReset' ]
+        fields: [ 'status', 'inactiveReason', 'officeAdmin', 'remindersOff', 'baptismDate', 'showBaptism', 'otherSigninEmails', 'keepOnDemoReset', 'privacySeenAt' ]
       }
     }
   },

@@ -141,6 +141,12 @@ main form button:not([type]):not(.btn):not([class*='apos-']) {
   background: var(--church-accent);
 }
 
+// The second choice in a form (Keep as is, Save beside Sign off): outlined.
+main form button.secondary:not(.btn):not([class*='apos-']) {
+  color: var(--church-accent);
+  background: var(--church-paper);
+}
+
 main button:not(.btn):not([class*='apos-']):hover { filter: brightness(1.1); }
 
 
@@ -366,6 +372,13 @@ legend { padding: 0 0.4rem; font-weight: 700; }
 .church-main fieldset label {
   display: inline-block;
   margin-right: 1rem;
+}
+
+// A tick-box row keeps its layout inside a fieldset: the box, then its text
+// as one block, so a wrapped line starts under the text, not the box.
+.church-main fieldset label.check {
+  display: flex;
+  margin-right: 0;
 }
 
 .roster-print table {
@@ -1161,3 +1174,7 @@ legend { padding: 0 0.4rem; font-weight: 700; }
 // The office's own row, under the members' pages.
 .toolbar-office { padding-top: 0; }
 .toolbar-office .toolbar-group { margin-left: 0; padding-left: 0; border-left: 0; }
+
+// The privacy screen (LGC-85): the detail sits under its label, unbroken.
+.privacy-value { color: #4d4d4d; overflow-wrap: anywhere; }
+.privacy-phone { white-space: nowrap; }

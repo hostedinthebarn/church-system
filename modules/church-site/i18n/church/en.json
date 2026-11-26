@@ -424,5 +424,16 @@
   "homeLatestQuote": "“Man shall not live by bread alone…” (Matt. 4:4)",
   "signinCodeLabel": "Code from the email",
   "signinCodeSubmit": "Sign in with the code",
-  "signinCodeWrong": "That code did not work. Check it and try again, or ask for a new email."
+  "signinCodeWrong": "That code did not work. Check it and try again, or ask for a new email.",
+  "privacyTitle": "Your privacy in the directory",
+  "privacyIntro": "Before you go on: this is what other members can see about you. Tick anything you would rather keep to your own household and the church office.",
+  "privacyLegend": "Hide from other members",
+  "privacyHide_email": "Hide my email",
+  "privacyHide_cellphone": "Hide my cellphone",
+  "privacyHide_address": "Hide our address",
+  "privacyNothing": "There is no email, cellphone or address on file for you, so there is nothing to hide.",
+  "privacyAlways": "Your name and your household always show in the directory. The church office always sees everything.",
+  "privacyLater": "You can change this later from your household page.",
+  "privacySave": "Save my choices",
+  "privacyKeep": "Keep as is"
 }
