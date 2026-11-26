@@ -424,5 +424,16 @@
   "homeLatestQuote": "[es] “Man shall not live by bread alone…” (Matt. 4:4)",
   "signinCodeLabel": "Código del correo",
   "signinCodeSubmit": "Ingresar con el código",
-  "signinCodeWrong": "Ese código no funcionó. Revíselo e inténtelo de nuevo, o pida un correo nuevo."
+  "signinCodeWrong": "Ese código no funcionó. Revíselo e inténtelo de nuevo, o pida un correo nuevo.",
+  "privacyTitle": "Su privacidad en el directorio",
+  "privacyIntro": "Antes de seguir: esto es lo que otros miembros pueden ver de usted. Marque lo que prefiera reservar para su hogar y la oficina de la iglesia.",
+  "privacyLegend": "Ocultar a otros miembros",
+  "privacyHide_email": "Ocultar mi correo",
+  "privacyHide_cellphone": "Ocultar mi celular",
+  "privacyHide_address": "Ocultar nuestra dirección",
+  "privacyNothing": "No tenemos correo, celular ni dirección suyos, así que no hay nada que ocultar.",
+  "privacyAlways": "Su nombre y su hogar siempre aparecen en el directorio. La oficina de la iglesia siempre lo ve todo.",
+  "privacyLater": "Puede cambiar esto más tarde desde la página de su hogar.",
+  "privacySave": "Guardar mis opciones",
+  "privacyKeep": "Dejar como está"
 }

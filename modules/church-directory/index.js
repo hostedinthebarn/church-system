@@ -24,7 +24,7 @@ module.exports = {
     alias: 'churchDirectory',
     // The edit and sign-out forms are plain HTML forms, so they carry their
     // own token (see checkToken) instead of Apostrophe's header.
-    csrfExceptions: [ `${BASE}/household/*/edit`, `${BASE}/sign-out` ],
+    csrfExceptions: [ `${BASE}/household/*/edit`, `${BASE}/sign-out`, `${BASE}/privacy` ],
     // Layout A shows family photos, B is a phone book. B is the default until
     // a household has a photo; then A is.
     defaultLayout: null,
@@ -94,6 +94,17 @@ module.exports = {
             return null;
           }
           return self.editPage(req, viewer, req.params.id);
+        },
+        [`${BASE}/privacy`]: async (req, res) => {
+          const viewer = await self.requireViewer(req, res, { privacyPage: true });
+          if (!viewer) {
+            return null;
+          }
+          const next = self.privacyNext(req.query.next);
+          if (!viewer.privacyPending || !viewer.personId) {
+            return res.redirect(next);
+          }
+          return self.privacyPage(req, viewer, { next });
         }
       },
       post: {
@@ -106,6 +117,38 @@ module.exports = {
             return self.page(req, viewer, 'notAllowed', {}, 403);
           }
           return self.saveEdit(req, viewer, req.params.id);
+        },
+        // Save the choices (or keep them as they are) and record the screen as
+        // seen, through the audited save like any household edit.
+        [`${BASE}/privacy`]: async (req, res) => {
+          const viewer = await self.requireViewer(req, res, { privacyPage: true });
+          if (!viewer) {
+            return null;
+          }
+          if (!self.checkToken(req)) {
+            return self.page(req, viewer, 'notAllowed', {}, 403);
+          }
+          const next = self.privacyNext(req.body.next);
+          if (!viewer.personId) {
+            return res.redirect(next);
+          }
+          const doc = await self.apos.person.find(self.apos.task.getReq(), { _id: viewer.personId }).toObject();
+          if (!doc) {
+            return res.redirect(next);
+          }
+          // "Keep as is" sends `keep`; "Save my choices" applies the ticks.
+          if (!req.query.keep) {
+            const ticked = [].concat(req.body.hide || []).map(String);
+            doc.hiddenFields = [
+              ...(doc.hiddenFields || []).filter(field => !directory.HIDEABLE.includes(field)),
+              ...directory.HIDEABLE.filter(field => ticked.includes(field))
+            ];
+          }
+          doc.privacySeenAt = new Date().toISOString();
+          const system = self.apos.task.getReq();
+          system.actingUser = req.user;
+          await self.apos.person.update(system, doc);
+          return res.redirect(next);
         },
         [`${BASE}/sign-out`]: async (req, res) => {
           if (!self.checkToken(req)) {
@@ -123,7 +166,7 @@ module.exports = {
 
       // The signed-in person as the rules want them, or null (and a redirect
       // to sign-in, or a plain refusal) when they may not use the directory.
-      async requireViewer(req, res) {
+      async requireViewer(req, res, { privacyPage = false } = {}) {
         req.res.set('Cache-Control', 'no-store');
         if (!req.user) {
           res.redirect('/sign-in');
@@ -135,7 +178,49 @@ module.exports = {
           await self.page(req, null, 'notAllowed', {}, 403);
           return null;
         }
+        // First sign-in (LGC-85): a member sees the privacy screen once
+        // before anything else in the members area. The office is exempt.
+        if (viewer.privacyPending && !privacyPage) {
+          const next = req.method === 'GET' ? req.originalUrl : `${BASE}/directory`;
+          res.redirect(`${BASE}/privacy?next=${encodeURIComponent(next)}`);
+          return null;
+        }
         return viewer;
+      },
+      // Where to go after the privacy screen: only back into the members area.
+      privacyNext(raw) {
+        const next = typeof raw === 'string' ? raw : '';
+        return next.startsWith(`${BASE}/`) && !next.startsWith('//') && !next.startsWith(`${BASE}/privacy`)
+          ? next
+          : `${BASE}/directory`;
+      },
+      async privacyPage(req, viewer, { next, status = 200 } = {}) {
+        const person = await self.apos.doc.db.findOne({
+          _id: viewer.personId,
+          type: 'person'
+        });
+        const household = person && await self.apos.doc.db.findOne({
+          _id: directory.householdIdOf(person),
+          type: 'household'
+        });
+        const hidden = (person && person.hiddenFields) || [];
+        const values = {
+          email: (person && person.email) || '',
+          cellphone: (person && person.cellphone) || '',
+          address: household ? directory.addressLine(household) : ''
+        };
+        const rows = directory.HIDEABLE
+          .filter(field => values[field])
+          .map(field => ({
+            field,
+            value: values[field],
+            hidden: hidden.includes(field)
+          }));
+        return self.page(req, viewer, 'privacy', {
+          rows,
+          next,
+          token: self.token(req)
+        }, status);
       },
       async viewerFor(user) {
         const person = user.personId
@@ -164,7 +249,8 @@ module.exports = {
           name: person.title,
           personId: person._id,
           householdId: directory.householdIdOf(person),
-          isAdult: true
+          isAdult: true,
+          privacyPending: !person.privacySeenAt
         };
       },
       token(req) {

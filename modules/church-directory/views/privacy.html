@@ -1,0 +1,30 @@
+{% extends data.outerLayout %}
+
+{% block title %}{{ __t('church:privacyTitle') }}{% endblock %}
+
+{% block main %}
+  <main id="main" class="church-main">
+    <h1>{{ __t('church:privacyTitle') }}</h1>
+    <p>{{ __t('church:privacyIntro') }}</p>
+    <form method="post" action="/members/privacy" class="privacy-form">
+      <input type="hidden" name="token" value="{{ data.token }}">
+      <input type="hidden" name="next" value="{{ data.next }}">
+      {% if data.rows | length %}
+        <fieldset>
+          <legend>{{ __t('church:privacyLegend') }}</legend>
+          {% for row in data.rows %}
+            <label class="check"><input type="checkbox" name="hide" value="{{ row.field }}"{% if row.hidden %} checked{% endif %}> <span>{% if row.field == 'email' %}{{ __t('church:privacyHide_email') }}{% elif row.field == 'cellphone' %}{{ __t('church:privacyHide_cellphone') }}{% else %}{{ __t('church:privacyHide_address') }}{% endif %}<br><span class="privacy-value{% if row.field == 'cellphone' %} privacy-phone{% endif %}">{{ row.value }}</span></span></label>
+          {% endfor %}
+        </fieldset>
+      {% else %}
+        <p>{{ __t('church:privacyNothing') }}</p>
+      {% endif %}
+      <p>{{ __t('church:privacyAlways') }}</p>
+      <p>{{ __t('church:privacyLater') }}</p>
+      <p class="form-actions">
+        <button type="submit">{{ __t('church:privacySave') }}</button>
+        <button type="submit" formaction="/members/privacy?keep=1" class="secondary">{{ __t('church:privacyKeep') }}</button>
+      </p>
+    </form>
+  </main>
+{% endblock %}

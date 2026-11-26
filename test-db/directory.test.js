@@ -200,3 +200,32 @@ test('the demo seed is idempotent and resets only on request', async () => {
   assert.equal(again.seeded, true);
   assert.equal((await mod.snapshot()).people.length, count);
 });
+
+// LGC-85: the first-sign-in privacy screen.
+test('a member is sent to the privacy screen once; saving records it and their choices', async () => {
+  const dir = apos.modules['church-directory'];
+  const household = await apos.household.insert(apos.task.getReq(), {
+    ...apos.household.newInstance(),
+    title: 'Privacytest',
+    address: { street: '1 Quiet Ln', city: 'La Grange', state: 'TX', zip: '78945' }
+  });
+  const person = await apos.person.insert(apos.task.getReq(), {
+    ...apos.person.newInstance(),
+    firstName: 'Priv',
+    lastName: 'Privacytest',
+    dateOfBirth: '1970-01-01',
+    email: 'priv.test@example.com',
+    cellphone: '(979) 555-0199',
+    hiddenFields: [ 'birthday' ],
+    householdIds: [ household._id ]
+  });
+  const viewer = await dir.viewerFor({ role: 'guest', personId: person._id });
+  assert.equal(viewer.privacyPending, true, 'not seen yet');
+  const office = await dir.viewerFor({ role: 'admin', personId: person._id, title: 'Office' });
+  assert.ok(!office.privacyPending, 'the office is exempt');
+
+  assert.equal(dir.privacyNext('/members/household/x'), '/members/household/x');
+  assert.equal(dir.privacyNext('https://evil.example/'), '/members/directory');
+  assert.equal(dir.privacyNext('//evil.example/members/'), '/members/directory');
+  assert.equal(dir.privacyNext('/members/privacy?next=/members/directory'), '/members/directory');
+});
