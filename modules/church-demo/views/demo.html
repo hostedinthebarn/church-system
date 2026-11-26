@@ -19,7 +19,7 @@
         <li>{{ __t('church:demoResetRemoves') }}</li>
         <li>{{ __t('church:demoResetKeeps') }}</li>
       </ul>
-      <form method="post" action="/demo/reset" data-demo-form>
+      <form method="post" action="{{ data.prefix }}/demo/reset" data-demo-form>
         <input type="hidden" name="token" value="{{ data.token }}">
         <p>
           <label for="demo-confirm">{{ __t('church:demoResetConfirmLabel', { word: data.word }) }}</label><br>

@@ -6,6 +6,6 @@
   <main id="main" class="church-main">
     <h1>{{ __t('church:signinBadLinkTitle') }}</h1>
     <p role="alert">{{ __t('church:signinBadLinkBody') }}</p>
-    <p><a href="/sign-in">{{ __t('church:signinTryAgain') }}</a></p>
+    <p><a href="{{ data.prefix }}/sign-in">{{ __t('church:signinTryAgain') }}</a></p>
   </main>
 {% endblock %}

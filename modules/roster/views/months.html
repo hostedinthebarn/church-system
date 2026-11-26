@@ -9,7 +9,7 @@
         <h1>{{ __t('church:rosterTitle') }}</h1>
         <p class="week-range">{{ __t('church:rosterIndexIntro') }}</p>
       </div>
-      <a class="secondary-link" href="/away">{{ __t('church:awayTitle') }}</a>
+      <a class="secondary-link" href="{{ data.prefix }}/away">{{ __t('church:awayTitle') }}</a>
     </div>
     <ul class="month-cards">
       {% for item in data.months %}
@@ -22,7 +22,7 @@
             {% else %}<span class="chip muted">{{ __t('church:rosterStatusNone') }}</span>{% endif %}
             {% if due %}<span class="chip warn">{{ __t('church:rosterDueNow') }}</span>{% endif %}
           </p>
-          <a class="btn{% if not due %} ghost{% endif %}" href="/roster/{{ item.month }}">
+          <a class="btn{% if not due %} ghost{% endif %}" href="{{ data.prefix }}/roster/{{ item.month }}">
             {% if item.status == 'published' %}{{ __t('church:rosterActionView') }}
             {% elif item.status == 'draft' %}{{ __t('church:rosterActionContinue') }}
             {% else %}{{ __t('church:rosterActionBuild') }}{% endif %}<span class="visually-hidden"> {{ item.month | churchDate('month', data.locale) }}</span>

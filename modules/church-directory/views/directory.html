@@ -7,10 +7,10 @@
     <h1>{{ __t('church:directoryTitle') }}</h1>
 
     <p class="actions">
-      <a class="btn" href="/members/directory.pdf" download>{{ __t('church:downloadPdf') }}</a>
+      <a class="btn" href="{{ data.prefix }}/members/directory.pdf" download>{{ __t('church:downloadPdf') }}</a>
     </p>
 
-    <form class="search" role="search" method="get" action="/members/directory">
+    <form class="search" role="search" method="get" action="{{ data.prefix }}/members/directory">
       <label for="q">{{ __t('church:searchLabel') }}</label>
       <div class="search-row">
         <input id="q" type="search" name="q" value="{{ data.query }}" autocomplete="off" aria-describedby="q-help">
@@ -29,7 +29,7 @@
     </form>
 
     <p class="layout-switch">
-      <a href="/members/directory?layout={{ data.otherLayout }}{% if data.query %}&amp;q={{ data.query | urlencode }}{% endif %}{% if data.include.inactive %}&amp;inactive=1{% endif %}{% if data.include.visitors %}&amp;visitors=1{% endif %}{% if data.include.optedOut %}&amp;optedOut=1{% endif %}" class="btn ghost">
+      <a href="{{ data.prefix }}/members/directory?layout={{ data.otherLayout }}{% if data.query %}&amp;q={{ data.query | urlencode }}{% endif %}{% if data.include.inactive %}&amp;inactive=1{% endif %}{% if data.include.visitors %}&amp;visitors=1{% endif %}{% if data.include.optedOut %}&amp;optedOut=1{% endif %}" class="btn ghost">
         {% if data.layout == 'a' %}{{ __t('church:layoutSwitchToList') }}{% else %}{{ __t('church:layoutSwitchToCards') }}{% endif %}
       </a>
     </p>
@@ -42,7 +42,7 @@
       <ul class="cards plain">
         {% for row in data.rows %}
           <li>
-            <a class="hh-card" href="/members/household/{{ row.id }}">
+            <a class="hh-card" href="{{ data.prefix }}/members/household/{{ row.id }}">
               {% if row.photoUrl %}
                 <img class="photo" src="{{ row.photoUrl }}" alt="" width="56" height="56">
               {% else %}
@@ -84,7 +84,7 @@
                   {% if row.phone %}
                     <p><a href="tel:{{ row.phone | replace(r/[^0-9+]/g, '') }}">{{ __t('church:callPhone', { phone: row.phone }) }}</a></p>
                   {% endif %}
-                  <p><a class="btn small" href="/members/household/{{ row.id }}">{{ __t('church:openHousehold') }}</a></p>
+                  <p><a class="btn small" href="{{ data.prefix }}/members/household/{{ row.id }}">{{ __t('church:openHousehold') }}</a></p>
                 </div>
               </details>
             {% endfor %}

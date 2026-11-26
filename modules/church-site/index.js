@@ -141,6 +141,13 @@ module.exports = {
         }
         return next();
       },
+      // Our templates write links as {{ data.prefix }}/calendar so a person
+      // reading Spanish (/es) stays in Spanish. Empty in English.
+      linkPrefix(req, res, next) {
+        req.data = req.data || {};
+        req.data.prefix = req.prefix;
+        return next();
+      },
       hideLocales(req, res, next) {
         if (!req.user && self.options.hiddenLocales.includes(req.locale)) {
           return res.status(404).send('Not found');

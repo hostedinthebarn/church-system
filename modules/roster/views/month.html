@@ -5,8 +5,8 @@
 {% block main %}
   <main id="main" class="church-main">
     <nav class="week-nav" aria-label="{{ __t('church:rosterTitle') }}">
-      <a class="btn ghost" href="/roster"><span aria-hidden="true">←</span> {{ __t('church:rosterBack') }}</a>
-      <a class="btn ghost" href="/roster/{{ data.month }}/print">{{ __t('church:rosterPrint') }}</a>
+      <a class="btn ghost" href="{{ data.prefix }}/roster"><span aria-hidden="true">←</span> {{ __t('church:rosterBack') }}</a>
+      <a class="btn ghost" href="{{ data.prefix }}/roster/{{ data.month }}/print">{{ __t('church:rosterPrint') }}</a>
     </nav>
     <h1>{{ __t('church:rosterMonthTitle') }} {{ data.month | churchDate('month', data.locale) }}</h1>
 
@@ -34,7 +34,7 @@
       {% endif %}
     </section>
 
-    <form method="post" action="/roster/{{ data.month }}/{{ 'swap' if data.published else 'save' }}" id="roster-form">
+    <form method="post" action="{{ data.prefix }}/roster/{{ data.month }}/{{ 'swap' if data.published else 'save' }}" id="roster-form">
       {% for block in data.blocks %}
         <fieldset class="role-card">
           <legend>{{ block.name }}{% if block.monthly %} ({{ __t('church:rosterAllMonth') }}){% endif %}</legend>
@@ -63,7 +63,7 @@
           <button type="submit" class="btn">{{ __t('church:rosterSwapButton') }}</button>
         {% else %}
           <button type="submit" class="btn ghost">{{ __t('church:rosterSaveButton') }}</button>
-          <button type="submit" class="btn" formaction="/roster/{{ data.month }}/publish">{{ __t('church:rosterPublishButton') }}</button>
+          <button type="submit" class="btn" formaction="{{ data.prefix }}/roster/{{ data.month }}/publish">{{ __t('church:rosterPublishButton') }}</button>
         {% endif %}
       </div>
     </form>

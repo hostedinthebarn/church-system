@@ -5,18 +5,18 @@
 {% block main %}
   <main id="main" class="church-main calendar">
     <h1>{{ __t('church:calTitle') }}</h1>
-    <p><a href="/calendar/subscribe">{{ __t('church:calSubscribeTitle') }}</a></p>
+    <p><a href="{{ data.prefix }}/calendar/subscribe">{{ __t('church:calSubscribeTitle') }}</a></p>
 
     <nav class="cal-nav" aria-label="{{ __t('church:calMonthNav') }}">
-      {% if data.prevUrl %}<a class="btn ghost" rel="prev" href="{{ data.prevUrl }}">{{ __t('church:calPrev') }}</a>{% else %}<span></span>{% endif %}
+      {% if data.prevUrl %}<a class="btn ghost" rel="prev" href="{{ data.prefix }}{{ data.prevUrl }}">{{ __t('church:calPrev') }}</a>{% else %}<span></span>{% endif %}
       <h2 class="cal-month">{{ data.title }}</h2>
-      {% if data.nextUrl %}<a class="btn ghost" rel="next" href="{{ data.nextUrl }}">{{ __t('church:calNext') }}</a>{% else %}<span></span>{% endif %}
+      {% if data.nextUrl %}<a class="btn ghost" rel="next" href="{{ data.prefix }}{{ data.nextUrl }}">{{ __t('church:calNext') }}</a>{% else %}<span></span>{% endif %}
     </nav>
-    {% if data.todayUrl %}<p><a href="{{ data.todayUrl }}">{{ __t('church:calThisMonth') }}</a></p>{% endif %}
+    {% if data.todayUrl %}<p><a href="{{ data.prefix }}{{ data.todayUrl }}">{{ __t('church:calThisMonth') }}</a></p>{% endif %}
 
     {% if data.empty %}<p role="status">{{ __t('church:calNoEvents') }}</p>{% endif %}
     {% if not data.signedIn %}
-      <p class="muted">{{ __t('church:calSignInHint') }} <a href="/sign-in">{{ __t('church:memberSignIn') }}</a></p>
+      <p class="muted">{{ __t('church:calSignInHint') }} <a href="{{ data.prefix }}/sign-in">{{ __t('church:memberSignIn') }}</a></p>
     {% endif %}
 
     {# Phone: the days that have events, one after another. #}
@@ -65,7 +65,7 @@
       </tbody>
     </table>
 
-    <form class="cal-picker" method="get" action="/calendar">
+    <form class="cal-picker" method="get" action="{{ data.prefix }}/calendar">
       <fieldset>
         <legend>{{ __t('church:calPickerLegend') }}</legend>
         <div class="fgrid">

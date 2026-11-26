@@ -7,8 +7,8 @@
     <h1>{{ __t('church:notAllowedTitle') }}</h1>
     <p>{{ __t('church:notAllowedBody') }}</p>
     <p>
-      {% if data.householdId %}<a class="btn ghost" href="/members/household/{{ data.householdId }}">{{ __t('church:backToHousehold') }}</a>{% endif %}
-      <a class="btn" href="/members/directory">{{ __t('church:backToDirectory') }}</a>
+      {% if data.householdId %}<a class="btn ghost" href="{{ data.prefix }}/members/household/{{ data.householdId }}">{{ __t('church:backToHousehold') }}</a>{% endif %}
+      <a class="btn" href="{{ data.prefix }}/members/directory">{{ __t('church:backToDirectory') }}</a>
     </p>
   </main>
 {% endblock %}

@@ -20,9 +20,9 @@
             <td><time datetime="{{ week.date }}">{{ week.date | churchDate('long', data.locale) }}</time>{% if week.thisWeek %} <strong>({{ __t('church:bulletinThisWeekTag') }})</strong>{% endif %}</td>
             <td data-status="{{ week.status }}">{% if week.status == 'signedOff' %}{{ __t('church:bulletinStatus_signedOff') }}{% elif week.status == 'printed' %}{{ __t('church:bulletinStatus_printed') }}{% elif week.status == 'draft' %}{{ __t('church:bulletinStatus_draft') }}{% else %}{{ __t('church:bulletinStatus_none') }}{% endif %}</td>
             <td>
-              <a class="btn" href="/bulletin/{{ week.date }}/edit">{% if week.status == 'none' %}{{ __t('church:bulletinStart') }}{% else %}{{ __t('church:bulletinOpen') }}{% endif %}</a>
+              <a class="btn" href="{{ data.prefix }}/bulletin/{{ week.date }}/edit">{% if week.status == 'none' %}{{ __t('church:bulletinStart') }}{% else %}{{ __t('church:bulletinOpen') }}{% endif %}</a>
               {% if week.status == 'signedOff' or week.status == 'printed' %}
-                <a href="/bulletin/{{ week.date }}">{{ __t('church:bulletinWebsiteVersion') }}</a>
+                <a href="{{ data.prefix }}/bulletin/{{ week.date }}">{{ __t('church:bulletinWebsiteVersion') }}</a>
               {% endif %}
             </td>
           </tr>

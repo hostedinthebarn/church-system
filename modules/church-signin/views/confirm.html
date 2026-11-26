@@ -11,13 +11,13 @@
          runs it, so it can't spend it (ADR-0002). The button is the fallback
          without JavaScript. #}
       <p role="status">{{ __t('church:signinConfirmBody') }}</p>
-      <form method="post" action="/sign-in/verify" data-auto-signin>
+      <form method="post" action="{{ data.prefix }}/sign-in/verify" data-auto-signin>
         <input type="hidden" name="token" value="{{ data.token }}">
         <button type="submit">{{ __t('church:signinConfirmButton') }}</button>
       </form>
     {% else %}
       <p role="alert">{{ __t('church:signinBadLinkBody') }}</p>
-      <p><a href="/sign-in">{{ __t('church:signinTryAgain') }}</a></p>
+      <p><a href="{{ data.prefix }}/sign-in">{{ __t('church:signinTryAgain') }}</a></p>
     {% endif %}
   </main>
 {% endblock %}

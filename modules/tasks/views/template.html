@@ -7,7 +7,7 @@
     <h1>{{ __t('church:tasksTemplateTitle') }}</h1>
     <p>{{ __t('church:tasksTemplateIntro') }} <time datetime="{{ data.nextWeekStart }}">{{ data.nextWeekStart }}</time>.</p>
     {% if data.startsNextWeek %}<p>{{ __t('church:tasksTemplatePending') }}</p>{% endif %}
-    <p><a href="/tasks">{{ __t('church:tasksBackToThisWeek') }}</a></p>
+    <p><a href="{{ data.prefix }}/tasks">{{ __t('church:tasksBackToThisWeek') }}</a></p>
     <p data-message role="status"></p>
     <form data-template-form>
       <ol>

@@ -16,7 +16,7 @@
 {% block mainAnchor %}
   <p class="demo-banner" data-demo-banner>{{ __t('church:demoBanner') }}
     {% if data.user and data.user.role == 'admin' and apos.churchDemo and apos.churchDemo.enabled() %}
-      <a href="/demo" data-demo-link>{{ __t('church:demoResetLink') }}</a>
+      <a href="{{ data.prefix }}/demo" data-demo-link>{{ __t('church:demoResetLink') }}</a>
     {% endif %}
   </p>
   {% set site = apos.modules['church-site'].site() %}
@@ -26,31 +26,33 @@
   <header class="site-header">
     <div class="site-header-bar">
       {% if data.global.logo %}
-        <a class="church-home" href="/"><img class="church-logo" src="{{ apos.attachment.url(data.global.logo, { size: 'full' }) }}" alt="{{ data.global.logoAlt or site.name }}"></a>
+        <a class="church-home" href="{{ data.prefix }}/"><img class="church-logo" src="{{ apos.attachment.url(data.global.logo, { size: 'full' }) }}" alt="{{ data.global.logoAlt or site.name }}"></a>
       {% else %}
-        <p class="church-name"><a href="/"><strong>{{ site.name }}</strong></a></p>
+        <p class="church-name"><a href="{{ data.prefix }}/"><strong>{{ site.name }}</strong></a></p>
       {% endif %}
       <div class="site-header-actions">
         {% if data.user and data.memberBar %}
           {# Who is signed in, top right like most sites; the members' toolbar below has the pages. #}
           <p class="header-who">{{ data.memberBar.name }}{% if data.memberBar.office %} <span class="tag office">{{ __t('church:officeAdmin') }}</span>{% endif %}</p>
-          <form method="post" action="/members/sign-out" class="inline-form">
+          <form method="post" action="{{ data.prefix }}/members/sign-out" class="inline-form">
             <input type="hidden" name="token" value="{{ data.memberBar.token }}">
             <button type="submit" class="church-signin">{{ __t('church:signOut') }}</button>
           </form>
         {% elif data.user %}
-          <a class="church-signin" href="/members">{{ __t('church:membersArea') }}</a>
+          <a class="church-signin" href="{{ data.prefix }}/members">{{ __t('church:membersArea') }}</a>
         {% else %}
-          <a class="church-signin" href="/sign-in">{{ __t('church:memberSignIn') }}</a>
+          <a class="church-signin" href="{{ data.prefix }}/sign-in">{{ __t('church:memberSignIn') }}</a>
         {% endif %}
         <button type="button" class="menu-btn" aria-expanded="false" aria-controls="main-nav" data-menu-button hidden>{{ __t('church:menu') }}</button>
       </div>
     </div>
     {# data.url is absolute when APOS_BASE_URL is set (production); keep only the path. #}
+    {# Under /es the path starts with the locale prefix; the tabs compare without it. #}
     {% set here = (data.url or "/").replace(r/^https?:\/\/[^\/]+/, "").split("?")[0] or "/" %}
+    {% set here = ("/" + here.slice(data.prefix.replace(r/^https?:\/\/[^\/]+/, "").length)).replace(r/^\/+/, "/") if data.prefix and here.indexOf(data.prefix.replace(r/^https?:\/\/[^\/]+/, "")) == 0 else here %}
     {% macro tab(here, href, label, exact=false, cls='') %}
       {% set on = (here == href) if exact else (here == href or here.indexOf(href + '/') == 0) %}
-      <li{% if cls %} class="{{ cls }}"{% endif %}><a href="{{ href }}"{% if on %} aria-current="page"{% endif %}>{{ label }}</a></li>
+      <li{% if cls %} class="{{ cls }}"{% endif %}><a href="{{ data.prefix }}{{ href }}"{% if on %} aria-current="page"{% endif %}>{{ label }}</a></li>
     {% endmacro %}
     <nav id="main-nav" class="site-nav" aria-label="{{ __t('church:mainNav') }}" data-main-nav>
       <ul>

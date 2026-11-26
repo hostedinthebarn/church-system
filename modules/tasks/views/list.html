@@ -12,13 +12,13 @@
           <time datetime="{{ data.weekStart }}">{{ data.weekStart | churchDate('medium', data.locale) }}</time> – <time datetime="{{ data.weekEnd }}">{{ data.weekEnd | churchDate('medium', data.locale) }}</time>
         </p>
       </div>
-      <a class="secondary-link" href="/tasks/template">{{ __t('church:tasksTemplateLink') }}</a>
+      <a class="secondary-link" href="{{ data.prefix }}/tasks/template">{{ __t('church:tasksTemplateLink') }}</a>
     </div>
 
     <nav class="week-nav" aria-label="{{ __t('church:tasksWeeks') }}">
-      {% if data.older %}<a class="btn ghost" href="/tasks/week/{{ data.older }}"><span aria-hidden="true">←</span> {{ __t('church:tasksOlder') }}</a>{% endif %}
-      {% if not data.isCurrent %}<a class="btn ghost" href="/tasks">{{ __t('church:tasksBackToThisWeek') }}</a>{% endif %}
-      {% if data.newer and data.newer != data.currentWeek %}<a class="btn ghost" href="/tasks/week/{{ data.newer }}">{{ __t('church:tasksNewer') }} <span aria-hidden="true">→</span></a>{% endif %}
+      {% if data.older %}<a class="btn ghost" href="{{ data.prefix }}/tasks/week/{{ data.older }}"><span aria-hidden="true">←</span> {{ __t('church:tasksOlder') }}</a>{% endif %}
+      {% if not data.isCurrent %}<a class="btn ghost" href="{{ data.prefix }}/tasks">{{ __t('church:tasksBackToThisWeek') }}</a>{% endif %}
+      {% if data.newer and data.newer != data.currentWeek %}<a class="btn ghost" href="{{ data.prefix }}/tasks/week/{{ data.newer }}">{{ __t('church:tasksNewer') }} <span aria-hidden="true">→</span></a>{% endif %}
     </nav>
 
     <p data-message role="status"></p>
@@ -50,7 +50,7 @@
                 </p>
               </div>
               <div class="task-side">
-                {% if item.isBulletin %}<a class="btn ghost small" href="/bulletin/this-week">{{ __t('church:tasksOpenBulletin') }}</a>{% endif %}
+                {% if item.isBulletin %}<a class="btn ghost small" href="{{ data.prefix }}/bulletin/this-week">{{ __t('church:tasksOpenBulletin') }}</a>{% endif %}
                 {% if data.isCurrent %}
                   <label class="visually-hidden" for="owner-{{ loop.index }}">{{ __t('church:tasksOwnerOf', { task: item.title }) }}</label>
                   <select id="owner-{{ loop.index }}" class="owner" data-owner-for="{{ item.id }}">

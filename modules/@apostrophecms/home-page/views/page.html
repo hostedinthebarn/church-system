@@ -30,7 +30,7 @@
 
     <ul class="home-quick plain">
       <li><a href="#contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" focusable="false"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg><span>{{ __t('church:homeQuickLocation') }}</span></a></li>
-      <li><a href="/calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>{{ __t('church:homeQuickCalendar') }}</span></a></li>
+      <li><a href="{{ data.prefix }}/calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>{{ __t('church:homeQuickCalendar') }}</span></a></li>
       {% if info.email %}<li><a href="mailto:{{ info.email }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><span>{{ __t('church:homeQuickMessage') }}</span></a></li>{% endif %}
     </ul>
 
@@ -54,7 +54,7 @@
           <p role="status">{{ __t('church:homeEventsNone') }}</p>
         {% endif %}
         <ul class="home-event-links plain">
-          <li><a class="btn" href="/calendar">{{ __t('church:homeEventsCalendar') }}</a></li>
+          <li><a class="btn" href="{{ data.prefix }}/calendar">{{ __t('church:homeEventsCalendar') }}</a></li>
           {% if home.webcal %}
             <li><a class="btn ghost" href="{{ home.webcal }}">{{ __t('church:homeEventsSubscribe') }}</a></li>
             <li><a class="btn ghost" href="{{ home.google }}" rel="noopener" target="_blank">{{ __t('church:homeEventsGoogle') }} <span class="visually-hidden">{{ __t('church:opensNewTab') }}</span></a></li>
