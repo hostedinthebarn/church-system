@@ -124,6 +124,9 @@ module.exports = {
       // condition keeps that true if the visibility field ever drifts.
       // Cancelled events are kept: the page strikes them through.
       async monthEvents(req, month) {
+        return self.monthShape(req, await self.monthPieces(req, month));
+      },
+      async monthPieces(req, month) {
         const { first, last } = monthBounds(month);
         const viewer = req.clone({ mode: 'published' });
         const query = self.apos.event.find(viewer, {
@@ -137,6 +140,9 @@ module.exports = {
           startDate: 1,
           start: 1
         }).limit(MONTH_LIMIT).toArray();
+        return pieces;
+      },
+      monthShape(req, pieces) {
         const time = new Intl.DateTimeFormat(req.locale || 'en', {
           timeZone: 'America/Chicago',
           timeStyle: 'short'
@@ -212,7 +218,8 @@ module.exports = {
       async monthPage(req, month) {
         const locale = req.locale || 'en';
         const today = rules.todayIso();
-        const events = await self.monthEvents(req, month);
+        const pieces = await self.monthPieces(req, month);
+        const events = self.monthShape(req, pieces);
         const { weeks, days } = buildMonth(month, events, today);
         const names = (options, count, at) => Array.from({ length: count }, (_, i) =>
           new Intl.DateTimeFormat(locale, {
@@ -251,6 +258,8 @@ module.exports = {
             label: dayLabel.format(Date.parse(`${day.date}T00:00:00Z`))
           })),
           empty: days.length === 0,
+          // For the Event JSON-LD (LGC-101); the template filters it.
+          pieces,
           signedIn: Boolean(req.user)
         });
       },

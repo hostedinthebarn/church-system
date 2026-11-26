@@ -119,10 +119,13 @@ test('cancelled events are shown, struck through and marked in words', async () 
   assert.match(html, /<a href="[^"]*\/events\/[^"]+"><del>Cancelled sing<\/del><\/a>\s*<span class="tag grey">Cancelled<\/span>/);
 });
 
+const visible = html => html.replace(/<script type="application\/ld\+json">.*?<\/script>/gs, '');
+
 test('a multi-day event is on every day it touches, in both months', async () => {
   const may = await page('?month=2031-05');
   const june = await page('?month=2031-06');
-  const count = (html, text) => (html.match(new RegExp(text, 'g')) || []).length;
+  // The JSON-LD block (LGC-101) names each event once more: not a rendering.
+  const count = (html, text) => (visible(html).match(new RegExp(text, 'g')) || []).length;
   // Two renderings (list and grid) times the days in that month.
   assert.equal(count(may, 'Gospel meeting'), 2 * 2);
   assert.equal(count(june, 'Gospel meeting'), 2 * 2);
@@ -130,7 +133,7 @@ test('a multi-day event is on every day it touches, in both months', async () =>
 
 test('each occurrence of a series shows once per rendering', async () => {
   const html = await page('?month=2031-05');
-  assert.equal((html.match(/Weekly class/g) || []).length, 2 * 4);
+  assert.equal((visible(html).match(/Weekly class/g) || []).length, 2 * 4);
   const june = await page('?month=2031-06');
   assert.doesNotMatch(june, /Weekly class/);
 });
