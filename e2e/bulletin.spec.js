@@ -27,6 +27,18 @@ async function signIn(page) {
   await page.waitForURL(url => !url.pathname.startsWith('/login'));
 }
 
+// Clicks a button that POSTs and then reloads the page (Save, Sign off, Mark
+// as printed), and waits for both, so the next step sees what the server
+// stored. Without this the next step raced the reload (LGC-73: CI saw empty
+// announcements and "Draft" after sign-off).
+async function act(page, name, path) {
+  await Promise.all([
+    page.waitForResponse(r => r.request().method() === 'POST' && r.url().endsWith(`/${path}`) && r.ok()),
+    page.waitForEvent('load'),
+    page.getByRole('button', { name, exact: true }).click()
+  ]);
+}
+
 async function save(page, date, text) {
   if (!page.url().endsWith(`/bulletin/${date}/edit`)) {
     await page.goto(`/bulletin/${date}/edit`);
@@ -76,27 +88,31 @@ test('edit screen: fill, save, overflow signal, sign-off rule', async ({ page })
 
   // Tick the members-only event: it appears after saving.
   await page.getByLabel('Members-only: put it in the bulletin').check();
-  await page.getByRole('button', { name: 'Save' }).click();
+  await act(page, 'Save', 'save');
   await expect(preview.locator('[data-section="calendar"]')).toContainText('Elders\' meeting');
 
   // Too much text: the panel is flagged and sign-off is refused.
   const long = Array.from({ length: 80 }, (_, i) => `Announcement line number ${i} with some words`).join('\n\n');
   await page.locator('#hand-announcements').fill(long);
-  await page.getByRole('button', { name: 'Save' }).click();
+  await act(page, 'Save', 'save');
   await expect(page.locator('#hand-announcements')).toHaveValue(long);
   await expect(page.locator('[data-panel="left"]')).toHaveAttribute('data-overflow', 'true');
   await expect(page.locator('[data-overflow-status]')).toContainText(/left: full by \d+ lines?/);
-  await page.getByRole('button', { name: 'Sign off', exact: true }).click();
+  // Refused (400): no reload, so wait for the answer and its message only.
+  await Promise.all([
+    page.waitForResponse(r => r.url().endsWith('/status') && r.status() === 400),
+    page.getByRole('button', { name: 'Sign off', exact: true }).click()
+  ]);
   await expect(page.locator('[data-message]')).toContainText('Full: left');
   await expect(page.locator('[data-bulletin-status]')).toHaveText('Draft');
 
   // Back to a text that fits: sign-off works, then printed.
   await page.locator('#hand-announcements').fill('Collection today.');
-  await page.getByRole('button', { name: 'Save' }).click();
+  await act(page, 'Save', 'save');
   await expect(page.locator('#hand-announcements')).toHaveValue('Collection today.');
-  await page.getByRole('button', { name: 'Sign off', exact: true }).click();
+  await act(page, 'Sign off', 'status');
   await expect(page.locator('[data-bulletin-status]')).toHaveText('Signed off');
-  await page.getByRole('button', { name: 'Mark as printed' }).click();
+  await act(page, 'Mark as printed', 'status');
   await expect(page.locator('[data-bulletin-status]')).toHaveText('Printed');
 });
 
@@ -133,13 +149,13 @@ test('website page: a signed-off week is public, without the prayer list or memb
   await signIn(page);
   await page.goto(`/bulletin/${DATE}/edit`);
   await page.locator('#hand-prayerRequests').fill('Zed Prayer in hospital');
-  await page.getByRole('button', { name: 'Save' }).click();
+  await act(page, 'Save', 'save');
   await expect(page.locator('#hand-prayerRequests')).toHaveValue('Zed Prayer in hospital');
   await page.getByLabel('Members-only: put it in the bulletin').check();
-  await page.getByRole('button', { name: 'Save' }).click();
+  await act(page, 'Save', 'save');
   await expect(page.locator('.preview [data-section="prayer"]')).toContainText('Zed Prayer');
   await expect(page.locator('.preview [data-section="calendar"]')).toContainText('Elders\' meeting');
-  await page.getByRole('button', { name: 'Sign off', exact: true }).click();
+  await act(page, 'Sign off', 'status');
   await expect(page.locator('[data-bulletin-status]')).toHaveText('Signed off');
 
   const response = await request.get(`/bulletin/${DATE}`);
