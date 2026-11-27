@@ -4,6 +4,9 @@
    option 1 mockup. The hero photo and the Latest Message picture are uploads
    on this page; without them the hero is the brand colour and the Latest
    Message shows a verse on the beige panel. #}
+{# The one Church block on the site (LGC-101). #}
+{% block structuredData %}{{ apos.modules['church-site'].churchJsonLd(data) }}{% endblock %}
+
 {% block main %}
   {% set info = apos.modules['church-site'].info(data.global) %}
   {% set site = apos.modules['church-site'].site() %}

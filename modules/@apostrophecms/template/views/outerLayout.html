@@ -5,6 +5,8 @@
 {% block extraHead %}
   <meta name="robots" content="noindex, nofollow">
   <style>{{ apos.modules['church-site'].fontFaceCss() }}</style>
+  {# JSON-LD (LGC-101): only the pages that own a type fill this in. #}
+  {% block structuredData %}{% endblock %}
 {% endblock %}
 
 {% block beforeMain %}

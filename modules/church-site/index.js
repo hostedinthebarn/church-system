@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { promisify } = require('node:util');
 const fonts = require('../../lib/fonts.js');
+const jsonld = require('../../lib/jsonld.js');
 
 const MIME = {
   png: 'image/png',
@@ -37,6 +38,15 @@ module.exports = {
       info(settings) {
         return self.info(settings);
       },
+      // JSON-LD for the public pages (LGC-101). The home page calls
+      // churchJsonLd(data), the pages that show events call
+      // eventJsonLd(data, pieces). Each returns a ready <script> tag, or ''.
+      churchJsonLd(data) {
+        return self.apos.template.safe(self.churchJsonLd(data));
+      },
+      eventJsonLd(data, pieces) {
+        return self.apos.template.safe(self.eventJsonLd(data, pieces));
+      },
       // The pages' @font-face rules, linked to the self-hosted files.
       fontFaceCss() {
         return self.apos.template.safe(fonts.fontFaceCss());
@@ -62,6 +72,45 @@ module.exports = {
           // The church's existing website, for what the POC hasn't ported.
           currentSiteUrl: site.currentSiteUrl || ''
         };
+      },
+      // Absolute address for a path or an address: the configured base URL, or
+      // the address the request came in on. `data.origin` is set below.
+      absolute(data, url) {
+        if (!url) {
+          return '';
+        }
+        return /^https?:\/\//.test(url) ? url : `${data.origin || ''}${url}`;
+      },
+      // The locale prefix as a path (it is absolute when a base URL is set).
+      pathPrefix(data) {
+        return String(data.prefix || '').replace(/^https?:\/\/[^/]+/, '');
+      },
+      churchJsonLd(data) {
+        const site = self.options.site;
+        const settings = data.global || {};
+        const geo = site.geo || {};
+        const logoUrl = settings.logo && settings.logo._id
+          ? self.absolute(data, self.apos.attachment.url(settings.logo, { size: 'original' }))
+          : '';
+        return jsonld.scriptTag([ jsonld.churchNode({
+          site,
+          info: self.info(settings),
+          url: self.absolute(data, `${self.pathPrefix(data)}/`),
+          logoUrl,
+          locale: data.locale,
+          latitude: settings.latitude !== undefined ? settings.latitude : geo.latitude,
+          longitude: settings.longitude !== undefined ? settings.longitude : geo.longitude
+        }) ]);
+      },
+      eventJsonLd(data, pieces) {
+        const info = self.info(data.global);
+        const nodes = (pieces || []).map(piece => jsonld.eventNode(piece, {
+          info,
+          churchName: self.options.site.name,
+          url: self.absolute(data, piece._url),
+          locale: data.locale
+        })).filter(Boolean);
+        return jsonld.scriptTag(nodes);
       },
       // The uploaded logo from the site-wide settings, as { src, alt }, or
       // null when none is set (dev, tests, CI): callers then show the church's
@@ -146,6 +195,8 @@ module.exports = {
       linkPrefix(req, res, next) {
         req.data = req.data || {};
         req.data.prefix = req.prefix;
+        // The site's own address, for the absolute URLs in structured data.
+        req.data.origin = (self.apos.baseUrl || `${req.protocol}://${req.get('host')}`).replace(/\/+$/, '');
         return next();
       },
       hideLocales(req, res, next) {

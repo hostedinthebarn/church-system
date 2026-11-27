@@ -2,6 +2,8 @@
 {% block title %}{{ data.piece.title }}{% endblock %}
 
 {# Replaces the stock page of @apostrophecms/event-page (LGC-41). #}
+{% block structuredData %}{{ apos.modules['church-site'].eventJsonLd(data, [ data.piece ]) }}{% endblock %}
+
 {% block main %}
   <main id="main" class="church-main">
     {% set status = data.piece.status %}

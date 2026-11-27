@@ -2,6 +2,8 @@
 
 {% block title %}{{ data.title }} · {{ __t('church:calTitle') }}{% endblock %}
 
+{% block structuredData %}{{ apos.modules['church-site'].eventJsonLd(data, data.pieces) }}{% endblock %}
+
 {% block main %}
   <main id="main" class="church-main calendar">
     <h1>{{ __t('church:calTitle') }}</h1>
