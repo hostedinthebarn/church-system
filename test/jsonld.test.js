@@ -159,10 +159,13 @@ test('a regular service is no Event unless it is cancelled or changed', () => {
     regularService: true,
     status: 'cancelled'
   }), ctx).eventStatus, 'https://schema.org/EventCancelled');
-  assert.equal(eventNode(piece({
+  // A changed regular service is marked up (it is news) with no eventStatus.
+  const changed = eventNode(piece({
     regularService: true,
     status: 'changed'
-  }), ctx).eventStatus, 'https://schema.org/EventRescheduled');
+  }), ctx);
+  assert.equal(changed.name, 'Fellowship meal');
+  assert.equal(changed.eventStatus, undefined);
 });
 
 test('a cancelled one-off carries EventCancelled; a members-only event is never marked up', () => {
