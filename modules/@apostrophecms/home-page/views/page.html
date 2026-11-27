@@ -30,7 +30,7 @@
   {% set cards = page.missionCards if (page.missionCards and page.missionCards.length) else defaultCards %}
 
   <main id="main" class="home">
-    <section class="home-hero{% if page.heroImage %} has-photo{% endif %}" aria-labelledby="home-hero-h"{% if page.heroImage %} style="background-image: linear-gradient(rgba(30, 10, 40, 0.6), rgba(30, 10, 40, 0.6)), url('{{ apos.attachment.url(page.heroImage, { size: 'max' }) }}')"{% endif %}>
+    <section class="home-hero{% if page.heroImage %} has-photo{% endif %}" aria-labelledby="home-hero-h"{% if page.heroImage %} style="background-image: linear-gradient(rgba(30, 10, 40, 0.3), rgba(30, 10, 40, 0.3)), url('{{ apos.attachment.url(page.heroImage, { size: 'max' }) }}')"{% endif %}>
       <div class="home-hero-inner">
         <h1 id="home-hero-h">{{ page.heroTitle or __t('church:homeHeroTitle') }}</h1>
         <a class="btn" href="#mission">{{ page.heroButtonLabel or __t('church:homeHeroButton') }}</a>
@@ -124,12 +124,12 @@
     </section>
 
     <section class="home-together" aria-labelledby="together-h">
-      <div class="home-wrap">
+      <div class="home-wrap home-together-grid">
         <h2 id="together-h">{{ __t('church:homeTogetherTitle') }}</h2>
         <ul class="home-together-photos plain">
           {% for tile in tiles %}
             <li>
-              {% if tile.photo %}<img src="{{ apos.attachment.url(tile.photo, { size: 'one-third' }) }}" alt="" loading="lazy">{% else %}<span class="home-together-blank" aria-hidden="true"></span>{% endif %}
+              {% if tile.photo %}<img src="{{ apos.attachment.url(tile.photo, { size: 'one-half' }) }}" alt="" loading="lazy">{% else %}<span class="home-together-blank" aria-hidden="true"></span>{% endif %}
               <span class="home-together-caption">{{ tile.caption }}</span>
             </li>
           {% endfor %}
@@ -138,8 +138,8 @@
           <p>{{ __t('church:homeTogetherP1') }}</p>
           <p>{{ __t('church:homeTogetherP2') }}</p>
           <p>{{ __t('church:homeTogetherP3') }}</p>
+          <p><a href="#contact">{{ __t('church:homeContactUs') }}</a></p>
         </div>
-        <p><a class="btn light" href="#contact">{{ __t('church:homeContactUs') }}</a></p>
       </div>
     </section>
   </main>

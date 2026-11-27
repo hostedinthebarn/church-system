@@ -66,7 +66,8 @@ module.exports = {
           social: [
             { key: 'facebook', url: set.facebookUrl || (site.social && site.social.facebook) || '' },
             { key: 'instagram', url: set.instagramUrl || (site.social && site.social.instagram) || '' },
-            { key: 'youtube', url: set.youtubeUrl || (site.social && site.social.youtube) || '' }
+            { key: 'youtube', url: set.youtubeUrl || (site.social && site.social.youtube) || '' },
+            { key: 'podcast', url: site.podcastUrl || '' }
           ].filter(item => item.url)
         };
       },

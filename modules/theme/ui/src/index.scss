@@ -1183,33 +1183,53 @@ legend { padding: 0 0.4rem; font-weight: 700; }
 
 // ---------- home page parity with the current site (LGC-100) ----------
 
-// The header floats over the hero on the home page, dark and translucent so
-// white text keeps its contrast. It keeps its place under the demo banner
-// (position: absolute with no offsets stays where it would have been).
+// The header floats over the hero on the home page like the legacy page's:
+// a light band (white at 30%, blurred) so the photo stays bright, the logo
+// straight on it, light white text with a soft shadow. Without JavaScript it
+// scrolls away with the page; with it (js-float) it is fixed under the demo
+// banner, slides away on scroll and comes back at the top (theme index.js).
 .site-header.is-overlay {
   position: absolute;
   left: 0;
   right: 0;
   z-index: 5;
   border-bottom: 0;
-  background: rgba(30, 10, 40, 0.62);
+  background: rgba(255, 255, 255, 0.3);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
   color: #fff;
+}
+
+.site-header.is-overlay.js-float {
+  position: fixed;
+  top: var(--banner-h, 0px);
+  transition: transform 0.15s ease;
+}
+
+.site-header.is-overlay.js-float.is-hidden {
+  transform: translateY(calc(-100% - var(--banner-h, 0px)));
 }
 
 .site-header.is-overlay .church-name a,
 .site-header.is-overlay .header-who,
-.site-header.is-overlay .site-nav a { color: #fff; }
-.site-header.is-overlay .site-nav a:hover { border-bottom-color: #fff; }
-.site-header.is-overlay .site-nav a[aria-current='page'] { border-bottom-color: #fff; }
-.site-header.is-overlay .church-home {
-  padding: 0.25rem 0.5rem;
-  border-radius: 6px;
-  background: #fff;
+.site-header.is-overlay .site-nav a {
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.55);
 }
+.site-header.is-overlay .site-nav a { font-weight: 400; }
+.site-header.is-overlay .site-nav a:hover { border-bottom-color: #fff; }
+.site-header.is-overlay .site-nav a[aria-current='page'] { border-bottom-color: #fff; font-weight: 400; }
 .site-header.is-overlay .church-signin,
 .site-header.is-overlay button.church-signin { color: var(--church-brand); background: #fff; }
-.site-header.is-overlay .menu-btn { color: #fff; background: transparent; border-color: #fff; }
-.site-header.is-overlay :focus-visible { outline-color: #fff; box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.4); }
+// A thin three-line icon with no box.
+.site-header.is-overlay .menu-btn {
+  color: #fff;
+  background: transparent;
+  border-color: transparent;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.55));
+}
+.site-header.is-overlay .menu-btn svg { stroke-width: 1.5; }
+.site-header.is-overlay :focus-visible { outline-color: #fff; box-shadow: 0 0 0 6px rgba(0, 0, 0, 0.35); }
 
 // The home hero starts under the floating header.
 .home .home-hero { padding-top: 7rem; }
@@ -1217,58 +1237,82 @@ legend { padding: 0 0.4rem; font-weight: 700; }
 .site-header .church-signin { white-space: normal; }
 @media (min-width: 380px) { .site-header .church-signin { white-space: nowrap; } }
 @media (min-width: 861px) {
+  .site-header.is-overlay { padding-left: 1.5rem; padding-right: 1.5rem; }
   .site-header.is-overlay .site-nav ul { flex-wrap: nowrap; }
   .site-header.is-overlay .site-nav a { padding: 0 0.5rem; white-space: nowrap; }
+  .site-header.is-overlay .church-logo { width: 16rem; }
+}
+@media (min-width: 1360px) {
+  .site-header.is-overlay .church-logo { width: 20rem; }
 }
 .menu-btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.5rem 0.7rem; }
 
-@media (min-width: 861px) {
-  .site-header.is-overlay .church-logo { width: 16rem; }
-  .site-header.is-overlay .church-home { padding: 0.35rem 0.75rem; }
-}
-
 @media (max-width: 860px) {
+  .site-header.is-overlay .church-logo { width: 13rem; max-height: none; }
   .site-header.is-overlay .site-nav { padding-bottom: 0.75rem; }
   .site-header.is-overlay .site-nav ul { flex-direction: column; }
-  .home .home-hero { min-height: 10rem; padding-top: 6rem; }
-  .site-header.is-overlay .site-nav.open { background: #2b0d35; }
+  .home .home-hero { min-height: 10rem; padding-top: 8rem; }
+  .site-header.is-overlay .site-nav.open { background: rgba(30, 10, 40, 0.88); }
 }
 
 .home-card { display: grid; gap: 0.5rem; align-content: start; }
 .home-card svg { width: 44px; height: 44px; color: var(--church-brand); }
 .home-card h3 { margin: 0; }
 
-.home-together { color: #fff; background: #b84a00; }
-.home-together h2 { margin-top: 0; font-size: clamp(1.6rem, 3.5vw, 2.2rem); text-align: center; }
-.home .home-together .btn.light { color: var(--church-brand); background: #fff; border-color: #fff; }
+// Be Together, Serve Together: the legacy page's light amber band. On a phone
+// it stacks (heading, photos, text); from 900px the photos are a 2x2 grid on
+// the left and the heading and words on the right.
+.home-together { color: var(--church-ink); background: #fcb041; }
+.home-together-grid { display: grid; gap: 1.5rem; }
+.home-together h2 { margin: 0; font-size: clamp(1.6rem, 3.5vw, 2.2rem); }
+.home .home-together a { color: var(--church-ink); text-decoration: underline; font-weight: 600; }
 .home-together-photos {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
-  margin: 0 0 2rem;
+  margin: 0;
+  align-content: start;
 }
-.home-together-photos li { display: grid; gap: 0.5rem; }
+.home-together-photos li { display: grid; gap: 0.5rem; align-content: start; }
 .home-together-photos img,
 .home-together-blank {
   width: 100%;
   aspect-ratio: 4 / 3;
   object-fit: cover;
   border-radius: 4px;
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(0, 0, 0, 0.12);
 }
 .home-together-caption { font-family: var(--church-font-heading); font-weight: 600; text-align: center; }
-.home-together-text { max-width: 51rem; margin: 0 auto; }
 .home-together-text p { margin: 0 0 1rem; line-height: 1.7; }
-.home-together .home-wrap > p:last-child { text-align: center; }
+@media (min-width: 900px) {
+  .home-together-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: "photos title" "photos text";
+    grid-template-rows: auto 1fr;
+    column-gap: 3rem;
+  }
+  .home-together h2 { grid-area: title; align-self: end; text-align: left; }
+  .home-together-photos { grid-area: photos; }
+  .home-together-text { grid-area: text; }
+}
 
 .home-card p, .home-latest p { line-height: 1.65; }
 
-// Follow-us icons (LGC-100): in the header on wide screens, in the footer always.
-.social-icons { display: flex; gap: 0.25rem; margin: 0; }
-.social-icons a { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; color: inherit; }
-.social-icons svg { width: 26px; height: 26px; }
-.site-header .social-icons a { color: var(--church-brand); }
-.site-header.is-overlay .social-icons a { color: #fff; }
+// Follow-us icons (LGC-100): purple squares with white glyphs, as on the
+// legacy page. In the header on wide screens, in the footer always.
+.social-icons { display: flex; gap: 0.5rem; margin: 0; }
+.social-icons a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  color: #fff;
+  background: var(--church-brand);
+}
+.social-icons svg { width: 24px; height: 24px; }
 .header-social { display: none; }
-@media (min-width: 1100px) { .header-social { display: flex; } }
-.home-footer .social-icons a { color: #fff; }
+@media (min-width: 1360px) { .header-social { display: flex; } }
+// On the purple footer the square is white with a purple glyph.
+.home-footer .social-icons a { color: var(--church-brand); background: #fff; }

@@ -91,14 +91,19 @@ test('parity with the current site (LGC-100): four quick links, full mission, Be
   await expect(together.getByRole('heading', { name: 'Be Together, Serve Together' })).toBeVisible();
   await expect(together.locator('li')).toHaveCount(4);
   await expect(together.getByRole('link', { name: 'Contact Us' })).toBeVisible();
+  // Desktop: photos on the left in two columns, the words on the right.
+  const photos = await together.locator('.home-together-photos').boundingBox();
+  const words = await together.locator('.home-together-text').boundingBox();
+  expect(photos.x + photos.width).toBeLessThanOrEqual(words.x);
   await noAxeViolations(page);
 });
 
 test('follow-us icons: header on wide screens, footer always (LGC-100)', async ({ page }) => {
-  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
-  await expect(page.locator('.header-social a')).toHaveCount(2);
+  await expect(page.locator('.header-social a')).toHaveCount(4);
   await expect(page.locator('.header-social a').first()).toBeVisible();
+  await expect(page.locator('footer .footer-social a')).toHaveText([ /Facebook/, /Instagram/, /YouTube/, /Apple Podcasts/ ]);
   await expect(page.locator('footer .footer-social').getByRole('link', { name: /Facebook/ })).toHaveAttribute('href', /facebook\.com/);
   const give = await page.locator('#main-nav .nav-give a').boundingBox();
   const signIn = await page.locator('.site-header-actions .church-signin').boundingBox();
@@ -107,6 +112,26 @@ test('follow-us icons: header on wide screens, footer always (LGC-100)', async (
   await page.setViewportSize({ width: 390, height: 800 });
   await expect(page.locator('.header-social')).toBeHidden();
   await expect(page.locator('footer .footer-social a').first()).toBeVisible();
+});
+
+test('the floating header slides away on scroll and returns at the top (LGC-100)', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 700 });
+  await page.goto('/');
+  const header = page.locator('.site-header.is-overlay');
+  await expect(header).toHaveClass(/js-float/);
+  await expect(header).not.toHaveClass(/is-hidden/);
+  await page.mouse.wheel(0, 900);
+  await expect(header).toHaveClass(/is-hidden/);
+  // Scrolling back up leaves it hidden until the very top.
+  await page.mouse.wheel(0, -300);
+  await expect(header).toHaveClass(/is-hidden/);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await expect(header).not.toHaveClass(/is-hidden/);
+  // Keyboard focus inside it brings it back.
+  await page.evaluate(() => window.scrollTo(0, 900));
+  await expect(header).toHaveClass(/is-hidden/);
+  await header.getByRole('link', { name: 'Calendar' }).focus();
+  await expect(header).not.toHaveClass(/is-hidden/);
 });
 
 test('the option 1 look: wave and icons are decoration, Latest Message has its art panel (LGC-83)', async ({ page }) => {

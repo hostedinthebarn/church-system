@@ -8,6 +8,28 @@ export default () => {
   if (signin) {
     signin.submit();
   }
+  // The home page's floating header (LGC-100): fixed under the demo banner,
+  // slides away once the page scrolls and returns at the top. Keyboard focus
+  // inside it brings it back. Without this script it just scrolls with the page.
+  const floating = document.querySelector('.site-header.is-overlay');
+  if (floating) {
+    const banner = document.querySelector('[data-demo-banner]');
+    const place = () => {
+      const height = banner ? banner.getBoundingClientRect().bottom + window.scrollY : 0;
+      document.documentElement.style.setProperty('--banner-h', `${Math.max(0, Math.round(height))}px`);
+    };
+    const update = () => {
+      const away = window.scrollY > 4 && !floating.contains(document.activeElement);
+      floating.classList.toggle('is-hidden', away);
+    };
+    place();
+    floating.classList.add('js-float');
+    window.addEventListener('resize', place);
+    window.addEventListener('scroll', update, { passive: true });
+    floating.addEventListener('focusin', update);
+    floating.addEventListener('focusout', () => setTimeout(update, 0));
+    update();
+  }
   const button = document.querySelector('[data-menu-button]');
   const nav = document.querySelector('[data-main-nav]');
   if (!button || !nav) {
