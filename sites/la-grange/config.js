@@ -34,6 +34,8 @@ module.exports = {
   // The church's existing email sign-up (a link out; the list itself is part of
   // the go-live email decision, not the POC).
   currentSiteUrl: 'https://www.lagrangecoc.com',
+  // The church's sermon podcast on Apple Podcasts (podcast.md, checked 2026-08-11).
+  podcastUrl: 'https://podcasts.apple.com/us/podcast/id1001588165',
   mailchimpUrl: 'https://lagrangecoc.us8.list-manage.com/subscribe?u=14fc3df9d155df4b78daba87d&id=6b457556b9',
   contact: {
     email: 'info@lagrangecoc.com',

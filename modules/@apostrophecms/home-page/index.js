@@ -55,6 +55,27 @@ module.exports = {
           }
         }
       },
+      togetherPhotos: {
+        type: 'array',
+        label: 'church:homeTogetherPhotos',
+        help: 'church:homeTogetherPhotosHelp',
+        titleField: 'caption',
+        max: 4,
+        fields: {
+          add: {
+            caption: {
+              type: 'string',
+              label: 'church:homePhotoCaption',
+              required: true
+            },
+            photo: {
+              type: 'attachment',
+              fileGroup: 'images',
+              label: 'church:homePhoto'
+            }
+          }
+        }
+      },
       latestTitle: {
         type: 'string',
         label: 'church:homeLatestTitle',
@@ -90,6 +111,10 @@ module.exports = {
       mission: {
         label: 'church:homeGroupMission',
         fields: [ 'missionCards' ]
+      },
+      together: {
+        label: 'church:homeGroupTogether',
+        fields: [ 'togetherPhotos' ]
       },
       latest: {
         label: 'church:homeGroupLatest',

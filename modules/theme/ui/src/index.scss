@@ -660,8 +660,8 @@ legend { padding: 0 0.4rem; font-weight: 700; }
   position: relative;
   display: grid;
   place-items: center;
-  min-height: 22rem;
-  padding: 5rem 1rem 6rem;
+  min-height: 12rem;
+  padding: 4rem 1rem 5rem;
   text-align: center;
   color: #fff;
   // No photo uploaded: the brand colour. With one, the template sets the photo
@@ -671,7 +671,7 @@ legend { padding: 0 0.4rem; font-weight: 700; }
   background-size: cover;
 }
 
-.home-hero.has-photo { min-height: 34rem; }
+.home-hero.has-photo { min-height: 12rem; }
 .home-hero-inner { display: grid; gap: 1.5rem; justify-items: center; }
 .home-hero h1 { margin: 0; font-size: clamp(2.1rem, 5vw, 3.2rem); text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4); }
 // On the photo the button is the purple of the mockup; on the plain band it is white.
@@ -690,19 +690,21 @@ legend { padding: 0 0.4rem; font-weight: 700; }
 
 .home-intro {
   max-width: 51rem;
-  margin: 3rem auto 1.5rem;
+  margin: 2rem auto 1rem;
   padding: 0 1rem;
   text-align: center;
+  font-size: 1.25rem;
+  line-height: 1.7;
   font-style: italic;
   color: #3d3d3d;
 }
 
 .home-quick {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
   gap: 1rem;
-  max-width: 51rem;
-  margin: 0 auto 4rem;
+  max-width: 60rem;
+  margin: 0 auto 3rem;
   padding: 0 1rem;
   text-align: center;
 }
@@ -718,12 +720,12 @@ legend { padding: 0 0.4rem; font-weight: 700; }
   font-weight: 500;
 }
 
-.home-quick svg { width: 44px; height: 44px; }
+.home-quick svg { width: 60px; height: 60px; }
 
 @media (max-width: 860px) {
   .home-quick { grid-template-columns: 1fr; gap: 0; }
   .home .home-quick a { flex-direction: row; justify-content: flex-start; padding: 0.75rem 1rem; }
-  .home-quick svg { width: 32px; height: 32px; }
+  .home-quick svg { width: 36px; height: 36px; }
 }
 
 .home-panel { background: var(--church-panel); }
@@ -807,7 +809,7 @@ legend { padding: 0 0.4rem; font-weight: 700; }
 
 @media (max-width: 860px) {
   .home-cards, .home-footer-cols { grid-template-columns: 1fr; }
-  .home-hero { padding: 3rem 1rem; }
+  .home-hero { padding: 2.5rem 1rem 3.5rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1178,3 +1180,85 @@ legend { padding: 0 0.4rem; font-weight: 700; }
 // The privacy screen (LGC-85): the detail sits under its label, unbroken.
 .privacy-value { color: #4d4d4d; overflow-wrap: anywhere; }
 .privacy-phone { white-space: nowrap; }
+
+// ---------- home page parity with the current site (LGC-100) ----------
+
+// The header floats over the hero on the home page, dark and translucent so
+// white text keeps its contrast. It keeps its place under the demo banner
+// (position: absolute with no offsets stays where it would have been).
+.site-header.is-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 5;
+  border-bottom: 0;
+  background: rgba(30, 10, 40, 0.62);
+  color: #fff;
+}
+
+.site-header.is-overlay .church-name a,
+.site-header.is-overlay .header-who,
+.site-header.is-overlay .site-nav a { color: #fff; }
+.site-header.is-overlay .site-nav a:hover { border-bottom-color: #fff; }
+.site-header.is-overlay .site-nav a[aria-current='page'] { border-bottom-color: #fff; }
+.site-header.is-overlay .church-home {
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  background: #fff;
+}
+.site-header.is-overlay .church-signin,
+.site-header.is-overlay button.church-signin { color: var(--church-brand); background: #fff; }
+.site-header.is-overlay .menu-btn { color: #fff; background: transparent; border-color: #fff; }
+.site-header.is-overlay :focus-visible { outline-color: #fff; box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.4); }
+
+// The home hero starts under the floating header.
+.home .home-hero { padding-top: 7rem; }
+
+.site-header .church-signin { white-space: normal; }
+@media (min-width: 380px) { .site-header .church-signin { white-space: nowrap; } }
+@media (min-width: 861px) {
+  .site-header.is-overlay .site-nav ul { flex-wrap: nowrap; }
+  .site-header.is-overlay .site-nav a { padding: 0 0.5rem; white-space: nowrap; }
+}
+.menu-btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.5rem 0.7rem; }
+
+@media (min-width: 861px) {
+  .site-header.is-overlay .church-logo { width: 16rem; }
+  .site-header.is-overlay .church-home { padding: 0.35rem 0.75rem; }
+}
+
+@media (max-width: 860px) {
+  .site-header.is-overlay .site-nav { padding-bottom: 0.75rem; }
+  .site-header.is-overlay .site-nav ul { flex-direction: column; }
+  .home .home-hero { min-height: 10rem; padding-top: 6rem; }
+  .site-header.is-overlay .site-nav.open { background: #2b0d35; }
+}
+
+.home-card { display: grid; gap: 0.5rem; align-content: start; }
+.home-card svg { width: 44px; height: 44px; color: var(--church-brand); }
+.home-card h3 { margin: 0; }
+
+.home-together { color: #fff; background: #b84a00; }
+.home-together h2 { margin-top: 0; font-size: clamp(1.6rem, 3.5vw, 2.2rem); text-align: center; }
+.home .home-together .btn.light { color: var(--church-brand); background: #fff; border-color: #fff; }
+.home-together-photos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 1rem;
+  margin: 0 0 2rem;
+}
+.home-together-photos li { display: grid; gap: 0.5rem; }
+.home-together-photos img,
+.home-together-blank {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.18);
+}
+.home-together-caption { font-family: var(--church-font-heading); font-weight: 600; text-align: center; }
+.home-together-text { max-width: 51rem; margin: 0 auto; }
+.home-together-text p { margin: 0 0 1rem; line-height: 1.7; }
+.home-together .home-wrap > p:last-child { text-align: center; }
+
+.home-card p, .home-latest p { line-height: 1.65; }

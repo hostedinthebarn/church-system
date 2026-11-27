@@ -36,7 +36,7 @@ test.describe('phone, signed out', () => {
     await expect(page.locator('#main-nav')).toBeHidden();
   });
 
-  test('the menu opens and closes by keyboard and lists the four links', async ({ page }) => {
+  test('the menu opens and closes by keyboard and lists the links', async ({ page }) => {
     await page.goto('/');
     const menu = page.getByRole('button', { name: 'Menu' });
     await menu.focus();
@@ -44,7 +44,7 @@ test.describe('phone, signed out', () => {
     await expect(menu).toHaveAttribute('aria-expanded', 'true');
     const nav = page.getByRole('navigation', { name: 'Main' });
     await expect(nav.getByRole('link')).toHaveText([
-      'Home', 'Calendar', 'Give', 'Member sign-in'
+      'Home', 'Calendar', /^Ministries/, /^Media/, /^About Us/, /^Contact/, 'Give', 'Member sign-in'
     ]);
     await noAxeViolations(page);
     await page.keyboard.press('Escape');
@@ -73,6 +73,25 @@ test.describe('phone, signed out', () => {
     await page.goto('/');
     await noAxeViolations(page);
   });
+});
+
+test('parity with the current site (LGC-100): four quick links, full mission, Be Together band', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto('/');
+  const quick = page.locator('.home-quick a');
+  await expect(quick).toHaveText([ /Location & Times/, /iTunes Podcast/, /Calendar/, /Send a message/ ]);
+  // The mission paragraph and the quick links are on the first screen.
+  for (const loc of [ page.locator('.home-intro'), quick.first() ]) {
+    const box = await loc.boundingBox();
+    expect(box.y + box.height).toBeLessThan(900);
+  }
+  await expect(page.locator('.home-card')).toHaveCount(4);
+  await expect(page.locator('.home-card').nth(3)).toContainText('leave our mark on the places where we live');
+  const together = page.locator('.home-together');
+  await expect(together.getByRole('heading', { name: 'Be Together, Serve Together' })).toBeVisible();
+  await expect(together.locator('li')).toHaveCount(4);
+  await expect(together.getByRole('link', { name: 'Contact Us' })).toBeVisible();
+  await noAxeViolations(page);
 });
 
 test('the option 1 look: wave and icons are decoration, Latest Message has its art panel (LGC-83)', async ({ page }) => {

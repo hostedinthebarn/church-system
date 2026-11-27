@@ -60,7 +60,8 @@ module.exports = {
           giveUrl: set.giveUrl || site.giveUrl || '',
           mailchimpUrl: set.mailchimpUrl || site.mailchimpUrl || '',
           // The church's existing website, for what the POC hasn't ported.
-          currentSiteUrl: site.currentSiteUrl || ''
+          currentSiteUrl: site.currentSiteUrl || '',
+          podcastUrl: site.podcastUrl || ''
         };
       },
       // The uploaded logo from the site-wide settings, as { src, alt }, or
