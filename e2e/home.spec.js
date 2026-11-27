@@ -94,6 +94,21 @@ test('parity with the current site (LGC-100): four quick links, full mission, Be
   await noAxeViolations(page);
 });
 
+test('follow-us icons: header on wide screens, footer always (LGC-100)', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto('/');
+  await expect(page.locator('.header-social a')).toHaveCount(2);
+  await expect(page.locator('.header-social a').first()).toBeVisible();
+  await expect(page.locator('footer .footer-social').getByRole('link', { name: /Facebook/ })).toHaveAttribute('href', /facebook\.com/);
+  const give = await page.locator('#main-nav .nav-give a').boundingBox();
+  const signIn = await page.locator('.site-header-actions .church-signin').boundingBox();
+  expect(Math.abs((give.y + give.height / 2) - (signIn.y + signIn.height / 2))).toBeLessThan(12);
+  await noAxeViolations(page);
+  await page.setViewportSize({ width: 390, height: 800 });
+  await expect(page.locator('.header-social')).toBeHidden();
+  await expect(page.locator('footer .footer-social a').first()).toBeVisible();
+});
+
 test('the option 1 look: wave and icons are decoration, Latest Message has its art panel (LGC-83)', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto('/');

@@ -31,6 +31,7 @@
         <p class="church-name"><a href="{{ data.prefix }}/"><strong>{{ site.name }}</strong></a></p>
       {% endif %}
       <div class="site-header-actions">
+        {% set socialClass = 'header-social' %}{% include "church-site:_social.html" %}
         {% if data.user and data.memberBar %}
           {# Who is signed in, top right like most sites; the members' toolbar below has the pages. #}
           <p class="header-who">{{ data.memberBar.name }}{% if data.memberBar.office %} <span class="tag office">{{ __t('church:officeAdmin') }}</span>{% endif %}</p>

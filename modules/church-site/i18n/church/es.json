@@ -456,5 +456,13 @@
   "navMedia": "[es] Media",
   "navAbout": "[es] About Us",
   "navContact": "[es] Contact",
-  "opensCurrentSite": "[es] (opens the church’s current website)"
+  "opensCurrentSite": "[es] (opens the church’s current website)",
+  "settingsFacebookUrl": "[es] Facebook page link",
+  "settingsInstagramUrl": "[es] Instagram link",
+  "settingsYoutubeUrl": "[es] YouTube channel link",
+  "settingsSocialHelp": "[es] Shown as an icon in the header and the footer. Leave empty to use the site's default, or none.",
+  "followUs": "[es] Follow us",
+  "socialFacebook": "[es] Facebook",
+  "socialInstagram": "[es] Instagram",
+  "socialYoutube": "[es] YouTube"
 }

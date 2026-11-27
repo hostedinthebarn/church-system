@@ -35,6 +35,12 @@ module.exports = {
   // the go-live email decision, not the POC).
   currentSiteUrl: 'https://www.lagrangecoc.com',
   // The church's sermon podcast on Apple Podcasts (podcast.md, checked 2026-08-11).
+  // ⚠️ Found by search on 2026-11-12 (facebook-posting.md), not read from the
+  // legacy page's footer: confirm before the site goes public. No YouTube yet.
+  social: {
+    facebook: 'https://www.facebook.com/lagrangecofc',
+    instagram: 'https://www.instagram.com/lgcoc/'
+  },
   podcastUrl: 'https://podcasts.apple.com/us/podcast/id1001588165',
   mailchimpUrl: 'https://lagrangecoc.us8.list-manage.com/subscribe?u=14fc3df9d155df4b78daba87d&id=6b457556b9',
   contact: {

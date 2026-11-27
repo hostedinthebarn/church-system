@@ -57,6 +57,24 @@ module.exports = {
         help: 'church:settingsMailchimpUrlHelp',
         group: 'details'
       },
+      facebookUrl: {
+        type: 'url',
+        label: 'church:settingsFacebookUrl',
+        help: 'church:settingsSocialHelp',
+        group: 'details'
+      },
+      instagramUrl: {
+        type: 'url',
+        label: 'church:settingsInstagramUrl',
+        help: 'church:settingsSocialHelp',
+        group: 'details'
+      },
+      youtubeUrl: {
+        type: 'url',
+        label: 'church:settingsYoutubeUrl',
+        help: 'church:settingsSocialHelp',
+        group: 'details'
+      },
       logo: {
         type: 'attachment',
         label: 'Logo',
@@ -72,7 +90,7 @@ module.exports = {
     group: {
       details: {
         label: 'church:settingsDetails',
-        fields: [ 'serviceTimes', 'address', 'phone', 'email', 'giveUrl', 'mailchimpUrl' ]
+        fields: [ 'serviceTimes', 'address', 'phone', 'email', 'giveUrl', 'mailchimpUrl', 'facebookUrl', 'instagramUrl', 'youtubeUrl' ]
       }
     }
   }

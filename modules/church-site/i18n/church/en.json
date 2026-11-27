@@ -456,5 +456,13 @@
   "navMedia": "Media",
   "navAbout": "About Us",
   "navContact": "Contact",
-  "opensCurrentSite": "(opens the church’s current website)"
+  "opensCurrentSite": "(opens the church’s current website)",
+  "settingsFacebookUrl": "Facebook page link",
+  "settingsInstagramUrl": "Instagram link",
+  "settingsYoutubeUrl": "YouTube channel link",
+  "settingsSocialHelp": "Shown as an icon in the header and the footer. Leave empty to use the site's default, or none.",
+  "followUs": "Follow us",
+  "socialFacebook": "Facebook",
+  "socialInstagram": "Instagram",
+  "socialYoutube": "YouTube"
 }

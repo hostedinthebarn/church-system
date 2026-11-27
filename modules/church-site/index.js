@@ -61,7 +61,13 @@ module.exports = {
           mailchimpUrl: set.mailchimpUrl || site.mailchimpUrl || '',
           // The church's existing website, for what the POC hasn't ported.
           currentSiteUrl: site.currentSiteUrl || '',
-          podcastUrl: site.podcastUrl || ''
+          podcastUrl: site.podcastUrl || '',
+          // Follow-us links: set in the site settings, else the site's config.
+          social: [
+            { key: 'facebook', url: set.facebookUrl || (site.social && site.social.facebook) || '' },
+            { key: 'instagram', url: set.instagramUrl || (site.social && site.social.instagram) || '' },
+            { key: 'youtube', url: set.youtubeUrl || (site.social && site.social.youtube) || '' }
+          ].filter(item => item.url)
         };
       },
       // The uploaded logo from the site-wide settings, as { src, alt }, or

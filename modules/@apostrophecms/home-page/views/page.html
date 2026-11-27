@@ -165,6 +165,7 @@
           {% if info.email %}<li>{{ __t('church:email') }}: <a href="mailto:{{ info.email }}">{{ info.email }}</a></li>{% endif %}
           {% if info.address %}<li>{{ __t('church:homeAddress') }}: <a href="https://maps.google.com/?q={{ info.address | urlencode }}">{{ info.address }}</a></li>{% endif %}
         </ul>
+        {% if info.social.length %}<h2>{{ __t('church:followUs') }}</h2>{% set socialClass = 'footer-social' %}{% include "church-site:_social.html" %}{% endif %}
         {% if info.giveUrl %}<p><a class="btn light" href="{{ info.giveUrl }}">{{ __t('church:give') }}</a></p>{% endif %}
       </div>
     </div>
