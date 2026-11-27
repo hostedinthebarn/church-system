@@ -149,7 +149,7 @@ test('a whole-day event has dates and no offset', () => {
   assert.equal(node.endDate, '2026-12-12');
 });
 
-test('a regular service is no Event unless it is cancelled or changed', () => {
+test('a regular service is no Event unless it is cancelled', () => {
   assert.equal(eventNode(piece({ regularService: true }), ctx), null);
   assert.equal(eventNode(piece({
     regularService: true,
@@ -159,13 +159,17 @@ test('a regular service is no Event unless it is cancelled or changed', () => {
     regularService: true,
     status: 'cancelled'
   }), ctx).eventStatus, 'https://schema.org/EventCancelled');
-  // A changed regular service is marked up (it is news) with no eventStatus.
-  const changed = eventNode(piece({
+  // A changed regular service gives no Event at all.
+  assert.equal(eventNode(piece({
     regularService: true,
     status: 'changed'
-  }), ctx);
-  assert.equal(changed.name, 'Fellowship meal');
-  assert.equal(changed.eventStatus, undefined);
+  }), ctx), null);
+});
+
+test('a changed one-off is an Event with no eventStatus', () => {
+  const node = eventNode(piece({ status: 'changed' }), ctx);
+  assert.equal(node.name, 'Fellowship meal');
+  assert.equal(node.eventStatus, undefined);
 });
 
 test('a cancelled one-off carries EventCancelled; a members-only event is never marked up', () => {
