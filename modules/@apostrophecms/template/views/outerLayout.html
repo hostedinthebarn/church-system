@@ -25,7 +25,7 @@
   {% set info = apos.modules['church-site'].info(data.global) %}
   {# The sign-in button sits beside the menu button, outside the menu, so a
      returning member never has to open it (public-home-poc.md). #}
-  <header class="site-header">
+  <header class="site-header{% if data.page and data.page.type == '@apostrophecms/home-page' %} is-overlay{% endif %}">
     <div class="site-header-bar">
       {% if data.global.logo %}
         <a class="church-home" href="{{ data.prefix }}/"><img class="church-logo" src="{{ apos.attachment.url(data.global.logo, { size: 'full' }) }}" alt="{{ data.global.logoAlt or site.name }}"></a>
@@ -33,6 +33,7 @@
         <p class="church-name"><a href="{{ data.prefix }}/"><strong>{{ site.name }}</strong></a></p>
       {% endif %}
       <div class="site-header-actions">
+        {% set socialClass = 'header-social' %}{% include "church-site:_social.html" %}
         {% if data.user and data.memberBar %}
           {# Who is signed in, top right like most sites; the members' toolbar below has the pages. #}
           <p class="header-who">{{ data.memberBar.name }}{% if data.memberBar.office %} <span class="tag office">{{ __t('church:officeAdmin') }}</span>{% endif %}</p>
@@ -45,7 +46,7 @@
         {% else %}
           <a class="church-signin" href="{{ data.prefix }}/sign-in">{{ __t('church:memberSignIn') }}</a>
         {% endif %}
-        <button type="button" class="menu-btn" aria-expanded="false" aria-controls="main-nav" data-menu-button hidden>{{ __t('church:menu') }}</button>
+        <button type="button" class="menu-btn" aria-expanded="false" aria-controls="main-nav" data-menu-button hidden><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span class="visually-hidden">{{ __t('church:menu') }}</span></button>
       </div>
     </div>
     {# data.url is absolute when APOS_BASE_URL is set (production); keep only the path. #}
@@ -60,6 +61,13 @@
       <ul>
         {{ tab(here, '/', __t('church:home'), true) }}
         {{ tab(here, '/calendar', __t('church:calTitle')) }}
+        {# The pages not ported yet are on the church's current website (public-home-poc.md). #}
+        {% if info.currentSiteUrl %}
+          <li class="nav-legacy"><a href="{{ info.currentSiteUrl }}/hands-of-hope" rel="noopener">{{ __t('church:navMinistries') }}<span class="visually-hidden"> {{ __t('church:opensCurrentSite') }}</span></a></li>
+          <li class="nav-legacy"><a href="{{ info.currentSiteUrl }}/sermons" rel="noopener">{{ __t('church:navMedia') }}<span class="visually-hidden"> {{ __t('church:opensCurrentSite') }}</span></a></li>
+          <li class="nav-legacy"><a href="{{ info.currentSiteUrl }}/our-mission" rel="noopener">{{ __t('church:navAbout') }}<span class="visually-hidden"> {{ __t('church:opensCurrentSite') }}</span></a></li>
+          <li class="nav-legacy"><a href="{{ info.currentSiteUrl }}/contact" rel="noopener">{{ __t('church:navContact') }}<span class="visually-hidden"> {{ __t('church:opensCurrentSite') }}</span></a></li>
+        {% endif %}
         <li class="nav-give"><a href="{{ info.giveUrl }}">{{ __t('church:give') }}</a></li>
         {# On desktop the sign-in button sits beside the menu, so this one is the phone menu's. #}
         {% if not data.user %}{{ tab(here, '/sign-in', __t('church:memberSignIn'), false, 'nav-signin') }}{% endif %}

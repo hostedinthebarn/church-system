@@ -70,7 +70,15 @@ module.exports = {
           giveUrl: set.giveUrl || site.giveUrl || '',
           mailchimpUrl: set.mailchimpUrl || site.mailchimpUrl || '',
           // The church's existing website, for what the POC hasn't ported.
-          currentSiteUrl: site.currentSiteUrl || ''
+          currentSiteUrl: site.currentSiteUrl || '',
+          podcastUrl: site.podcastUrl || '',
+          // Follow-us links: set in the site settings, else the site's config.
+          social: [
+            { key: 'facebook', url: set.facebookUrl || (site.social && site.social.facebook) || '' },
+            { key: 'instagram', url: set.instagramUrl || (site.social && site.social.instagram) || '' },
+            { key: 'youtube', url: set.youtubeUrl || (site.social && site.social.youtube) || '' },
+            { key: 'podcast', url: site.podcastUrl || '' }
+          ].filter(item => item.url)
         };
       },
       // Absolute address for a path or an address: the configured base URL, or

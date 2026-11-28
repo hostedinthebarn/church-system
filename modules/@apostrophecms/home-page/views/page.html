@@ -18,10 +18,22 @@
     { title: __t('church:homeCard3Title'), text: __t('church:homeCard3Text') },
     { title: __t('church:homeCard4Title'), text: __t('church:homeCard4Text') }
   ] %}
+  {% set cardIcons = [
+    '<path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z"/>',
+    '<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M15 14.5c3 0 6 1.5 6 5.5"/>',
+    '<path d="M4 4h16v12H8l-4 4z"/><path d="M8 9h8M8 12h5"/>',
+    '<path d="M12 3v3M4.2 6.2l2.1 2.1M19.8 6.2l-2.1 2.1M2 14h3M19 14h3"/><path d="M7 20h10M8 17a4 4 0 1 1 8 0z"/>'
+  ] %}
+  {% set tiles = page.togetherPhotos if (page.togetherPhotos and page.togetherPhotos.length) else [
+    { caption: __t('church:homeTogetherCaption1') },
+    { caption: __t('church:homeTogetherCaption2') },
+    { caption: __t('church:homeTogetherCaption3') },
+    { caption: __t('church:homeTogetherCaption4') }
+  ] %}
   {% set cards = page.missionCards if (page.missionCards and page.missionCards.length) else defaultCards %}
 
   <main id="main" class="home">
-    <section class="home-hero{% if page.heroImage %} has-photo{% endif %}" aria-labelledby="home-hero-h"{% if page.heroImage %} style="background-image: linear-gradient(rgba(30, 10, 40, 0.6), rgba(30, 10, 40, 0.6)), url('{{ apos.attachment.url(page.heroImage, { size: 'max' }) }}')"{% endif %}>
+    <section class="home-hero{% if page.heroImage %} has-photo{% endif %}" aria-labelledby="home-hero-h"{% if page.heroImage %} style="background-image: linear-gradient(rgba(30, 10, 40, 0.3), rgba(30, 10, 40, 0.3)), url('{{ apos.attachment.url(page.heroImage, { size: 'max' }) }}')"{% endif %}>
       <div class="home-hero-inner">
         <h1 id="home-hero-h">{{ page.heroTitle or __t('church:homeHeroTitle') }}</h1>
         <a class="btn" href="#mission">{{ page.heroButtonLabel or __t('church:homeHeroButton') }}</a>
@@ -32,9 +44,10 @@
     <p class="home-intro">{{ page.intro or __t('church:homeMissionIntro') }}</p>
 
     <ul class="home-quick plain">
-      <li><a href="#contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" focusable="false"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg><span>{{ __t('church:homeQuickLocation') }}</span></a></li>
-      <li><a href="{{ data.prefix }}/calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>{{ __t('church:homeQuickCalendar') }}</span></a></li>
-      {% if info.email %}<li><a href="mailto:{{ info.email }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><span>{{ __t('church:homeQuickMessage') }}</span></a></li>{% endif %}
+      <li><a href="#contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg><span>{{ __t('church:homeQuickLocation') }}</span></a></li>
+      {% if info.podcastUrl %}<li><a href="{{ info.podcastUrl }}" rel="noopener" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3a4 4 0 0 0-4 4v5a4 4 0 0 0 8 0V7a4 4 0 0 0-4-4z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span>{{ __t('church:homeQuickPodcast') }} <span class="visually-hidden">{{ __t('church:opensNewTab') }}</span></span></a></li>{% endif %}
+      <li><a href="{{ data.prefix }}/calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>{{ __t('church:homeQuickCalendar') }}</span></a></li>
+      {% if info.email %}<li><a href="mailto:{{ info.email }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><span>{{ __t('church:homeQuickMessage') }}</span></a></li>{% endif %}
     </ul>
 
     <section class="home-panel" id="events" aria-labelledby="events-h" data-upcoming-events>
@@ -85,6 +98,8 @@
             {% else %}
               <a class="btn" href="{{ page.latestUrl }}">{{ __t('church:homeLatestListen', { title: page.latestTitle }) }}</a>
             {% endif %}
+          {% elif info.podcastUrl %}
+            <a class="btn" href="{{ info.podcastUrl }}" rel="noopener" target="_blank">{{ __t('church:homeLatestPodcast') }} <span class="visually-hidden">{{ __t('church:opensNewTab') }}</span></a>
           {% else %}
             <p class="muted">{{ __t('church:homeLatestNone') }}</p>
           {% endif %}
@@ -103,8 +118,31 @@
       <h2 id="mission-h">{{ __t('church:homeMissionTitle') }}</h2>
       <div class="home-cards">
         {% for card in cards %}
-          <div class="home-card"><h3>{{ card.title }}</h3><p>{{ card.text }}</p></div>
+          <div class="home-card">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">{{ cardIcons[loop.index0 % 4] | safe }}</svg>
+            <h3>{{ card.title }}</h3><p>{{ card.text }}</p>
+          </div>
         {% endfor %}
+      </div>
+    </section>
+
+    <section class="home-together" aria-labelledby="together-h">
+      <div class="home-wrap home-together-grid">
+        <h2 id="together-h">{{ __t('church:homeTogetherTitle') }}</h2>
+        <ul class="home-together-photos plain">
+          {% for tile in tiles %}
+            <li>
+              {% if tile.photo %}<img src="{{ apos.attachment.url(tile.photo, { size: 'one-half' }) }}" alt="" loading="lazy">{% else %}<span class="home-together-blank" aria-hidden="true"></span>{% endif %}
+              <span class="home-together-caption">{{ tile.caption }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+        <div class="home-together-text">
+          <p>{{ __t('church:homeTogetherP1') }}</p>
+          <p>{{ __t('church:homeTogetherP2') }}</p>
+          <p>{{ __t('church:homeTogetherP3') }}</p>
+          <p><a href="#contact">{{ __t('church:homeContactUs') }}</a></p>
+        </div>
       </div>
     </section>
   </main>
@@ -130,6 +168,7 @@
           {% if info.email %}<li>{{ __t('church:email') }}: <a href="mailto:{{ info.email }}">{{ info.email }}</a></li>{% endif %}
           {% if info.address %}<li>{{ __t('church:homeAddress') }}: <a href="https://maps.google.com/?q={{ info.address | urlencode }}">{{ info.address }}</a></li>{% endif %}
         </ul>
+        {% if info.social.length %}<h2>{{ __t('church:followUs') }}</h2>{% set socialClass = 'footer-social' %}{% include "church-site:_social.html" %}{% endif %}
         {% if info.giveUrl %}<p><a class="btn light" href="{{ info.giveUrl }}">{{ __t('church:give') }}</a></p>{% endif %}
       </div>
     </div>
